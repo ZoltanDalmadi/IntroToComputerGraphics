@@ -95,9 +95,21 @@ namespace Utils {
       pt1 = P1;
     }
 
+    /// Sets starting point. (overload)
+    inline void setP1(T x, T y) {
+      pt1.setX(x);
+      pt1.setY(y);
+    }
+
     /// Sets ending point.
     inline void setP2(const Point2D<T>& P2) {
       pt2 = P2;
+    }
+
+    /// Sets ending point. (overload)
+    inline void setP2(T x, T y) {
+      pt2.setX(x);
+      pt2.setY(y);
     }
 
     /// Translate line with a given point.
