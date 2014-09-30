@@ -62,7 +62,7 @@ void init() {
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-  allLines.emplace_back(100, 200, 400, 250);
+  allLines.emplace_back(100, 200, 1000, 600);
   setupLines(allLines);
 
   allPoints.emplace_back(400, 600);
