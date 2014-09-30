@@ -38,7 +38,7 @@ namespace Utils {
     Color(int r, int g, int b, int a = 0) : r(r), g(g), b(b), a(a) {}
 
     // Initialize with a predefined color.
-    Color(Utils::namedColor color) {
+    Color(namedColor color) {
       int colors[][4] = {
           {   0,   0,   0,   0 }, // BLACK
           { 255, 255, 255,   0 }, // WHITE

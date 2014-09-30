@@ -2,6 +2,7 @@
 
 #include <ostream>
 #include <cmath>
+#include "Color.h"
 
 namespace Utils {
 
@@ -13,6 +14,9 @@ namespace Utils {
     T yp;
 
   public:
+    Color color = BLACK;
+    GLfloat size = 10.0;
+    bool smooth = true;
 
     // Initialize point at (0, 0) (origin). (glut: bottom-left corner)
     Point2D() : xp(0), yp(0) {}
@@ -151,6 +155,20 @@ namespace Utils {
     static inline T dotProduct(const Point2D<T> &p1, const Point2D<T> &p2) {
       return p1.xp * p2.xp + p1.yp * p2.yp;
     }
+
+    void draw() const {
+      if(smooth)
+        glEnable(GL_POINT_SMOOTH);
+      else
+        glDisable(GL_POINT_SMOOTH);
+
+      glPointSize(size);
+      color.setGLColor();
+      glBegin(GL_POINTS);
+      glVertex2<T>(*this);
+      glEnd();
+    }
+
   }; // end class Point2D
 
   // Type specific OpenGL calls.
