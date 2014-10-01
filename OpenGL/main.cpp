@@ -1,14 +1,26 @@
 #include <GL/glut.h>
 #include <iostream>
-#include "Utils.h"
+#include <cmath>
 
 const int WIDTH = 640;
 const int HEIGHT = 640;
+const int CENTER_X = WIDTH / 2;
+const int CENTER_Y = HEIGHT / 2;
+const int RADIUS = 200;
+
+const double M_PI = 3.14159265358979323846;
 
 void init(void) {
   glClearColor(1.0, 1.0, 1.0, 0.0);
   glMatrixMode(GL_PROJECTION);
-  gluOrtho2D(0.0, GLdouble(WIDTH), 0.0, GLdouble(HEIGHT));
+  gluOrtho2D(0.0, WIDTH, 0.0, HEIGHT);
+  glEnable(GL_POLYGON_SMOOTH);
+  glEnable(GL_LINE_SMOOTH);
+  glEnable(GL_POINT_SMOOTH);
+  glPointSize(10);
+  glLineWidth(2);
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 void drawGrid(int width, int height, int gap, GLfloat lineWidth,
@@ -58,13 +70,46 @@ void drawThing(int width, int height, int x, int y, int gap, int lineWidth,
   glFlush();
 }
 
-void lineSegment(void) {
+void circle() {
   //GLubyte gridColor[3] = { 45, 45, 45 };
   //drawGrid(WIDTH, HEIGHT, 50, 1, gridColor);
-  GLubyte thingColor[3] = { 0, 0, 0 };
-  drawThing(600, 600, 20, 20, 20, 1, thingColor);
-  Utils::Line *line = new Utils::Line(20, 30, 320, 240);
-  std::cout << line->length() << std::endl;
+  //GLubyte thingColor[3] = { 0, 0, 0 };
+  //drawThing(600, 600, 20, 20, 40, 1, thingColor);
+  size_t points = 128;
+  double gap = 2 * M_PI / points;
+  double gap2 = 2 * M_PI / 12;
+
+  double c = cos(gap); //precalculate the sine and cosine
+  double s = sin(gap);
+  double t;
+
+  double x = RADIUS; //we start at angle = 0 
+  double y = 0;
+
+  glClear(GL_COLOR_BUFFER_BIT);
+  glColor3ub(0, 0, 0);
+  glBegin(GL_LINE_LOOP);
+  for(int i = 0; i < points; i++) {
+    glVertex2d(x + CENTER_X, y + CENTER_Y); //output vertex 
+
+    //apply the rotation matrix
+    t = x;
+    x = c * x - s * y;
+    y = s * t + c * y;
+  }
+  glEnd();
+  //glBegin(GL_LINE_STRIP);
+  //for(size_t i = 0; i <= points; ++i)
+  //  glVertex2d(CENTER_X + RADIUS * cos(i*gap), CENTER_Y + RADIUS/2 * sin(i*gap));
+  //glEnd();
+
+  //glColor3ub(255, 0, 0);
+  //glBegin(GL_POINTS);
+  //for(size_t i = 0; i <= 12; ++i)
+  //  glVertex2d(CENTER_X + RADIUS * cos(i*gap2), CENTER_Y + RADIUS/2 * sin(i*gap2));
+  //glEnd();
+
+  glFlush();
 }
 
 int main(int argc, char** argv) {
@@ -75,7 +120,7 @@ int main(int argc, char** argv) {
   glutCreateWindow("Thing");
 
   init();
-  glutDisplayFunc(lineSegment);
+  glutDisplayFunc(circle);
   glutMainLoop();
   return 0;
 }
