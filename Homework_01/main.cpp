@@ -9,7 +9,6 @@
 typedef Utils::Line<GLdouble> Line;
 typedef Utils::Point2D<GLdouble> Point2D;
 typedef Utils::Circle<GLdouble> Circle;
-typedef std::vector<Point2D> pointVector;
 
 // Window size.
 const GLsizei WIDTH = 1280;
@@ -24,14 +23,13 @@ const GLint RADIUS = 300;
 // Colors.
 const Utils::Color bgColor(Utils::WHITE);
 const Utils::Color lineColor(Utils::BLACK);
+const Utils::Color gridColor(Utils::DARK_CYAN);
 const Utils::Color pointColor(Utils::RED);
 
 // Sizes.
 const GLfloat lineWidth = 4.0;
+const GLfloat gridLineWidth = 2.0;
 const GLfloat pointSize = 14.0;
-
-// Points container.
-pointVector allPoints;
 
 // Define main circle.
 Circle mainCircle(CENTER, RADIUS);
@@ -46,6 +44,9 @@ GLint smallHandLength = RADIUS - 110;
 // Rotation of hands.
 GLdouble bigHandRot = 90.0;
 GLdouble smallHandRot = 0.0;
+
+// Number of hand segments.
+size_t handSegments = 16;
 
 // Define hands.
 Line bigHand(CENTER.x(), CENTER.y(), CENTER.x(), CENTER.y() + bigHandLength);
@@ -80,6 +81,7 @@ void init() {
   // Setup colors
   mainCircle.color = lineColor;
   mainCircle.pointColor = pointColor;
+  mainCircle.centrePointColor = pointColor;
 
   // Setup line widths.
   mainCircle.lineWidth = lineWidth;
@@ -87,29 +89,21 @@ void init() {
   smallHand.lineWidth = lineWidth;
 }
 
-void drawThing(int width, int height, int x, int y, int gap, GLfloat lineWidth,
-               GLubyte* color) {
-  glClear(GL_COLOR_BUFFER_BIT);
+// Draw grid function.
+void drawGrid() {
+  glLineWidth(gridLineWidth);
+  gridColor.setGLColor();
 
-  glColor3ubv(color);
-  glLineWidth(lineWidth);
   glBegin(GL_LINES);
 
-  // draw axis
-  glVertex2i(x, y);
-  glVertex2i(x, y + height);
-  glVertex2i(x, y);
-  glVertex2i(x + width, y);
-
-  size_t notches = height / gap;
-
-  for(size_t i = 0; i < notches; i++) {
-    glVertex2i(x, y + gap*i);
-    glVertex2i(x + width - gap*i, y);
+  for(size_t i = 1; i < handSegments; i++) {
+    double seg = static_cast<double>(i) / handSegments;
+    Utils::glVertex2<GLdouble>(bigHand.pointAt(seg));
+    seg = static_cast<double>(handSegments - i) / handSegments;
+    Utils::glVertex2<GLdouble>(smallHand.pointAt(seg));
   }
 
   glEnd();
-  glFlush();
 }
 
 void clockDisplay() {
@@ -118,6 +112,9 @@ void clockDisplay() {
   // Draw Circle.
   mainCircle.draw();
   mainCircle.drawPoints(12);
+
+  // Draw grid between hands.
+  drawGrid();
 
   // Draw hands.
   bigHand.draw();
@@ -141,6 +138,15 @@ void clockUpdate(int n) {
   bigHandRot--;
   smallHandRot -= 1.0 / 12.0;
 
+  // reset degrees if one rotation has passed
+  if(bigHandRot == -270.0) {
+    bigHandRot = 90.0;
+  }
+
+  if(smallHandRot == -360.0) {
+    smallHandRot = 0.0;
+  }
+
   glutPostRedisplay();
   glutTimerFunc(50, clockUpdate, 0);
 }
@@ -149,6 +155,7 @@ int main(int argc, char** argv) {
   glutInit(&argc, argv);
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
   glutInitWindowSize(WIDTH, HEIGHT);
+  glutInitWindowPosition(100, 100);
   glutCreateWindow("Homework 01");
 
   init();
