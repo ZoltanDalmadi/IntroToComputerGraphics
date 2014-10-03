@@ -157,3 +157,6 @@ $RECYCLE.BIN/
 
 # freeglut library
 freeglut/
+
+# sample files directory
+OpenGL/
