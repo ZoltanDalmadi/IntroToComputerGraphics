@@ -1,52 +1,93 @@
 #include <GL/glut.h>
 #include <iostream>
 #include <cmath>
+#include <vector>
+#include "Line.h"
+#include "Circle.h"
 
-const int WIDTH = 640;
-const int HEIGHT = 640;
-const int CENTER_X = WIDTH / 2;
-const int CENTER_Y = HEIGHT / 2;
-const int RADIUS = 200;
+// Typedefs.
+typedef Utils::Line<GLdouble> Line;
+typedef Utils::Point2D<GLdouble> Point2D;
+typedef Utils::Circle<GLdouble> Circle;
+typedef std::vector<Point2D> pointVector;
 
-const double M_PI = 3.14159265358979323846;
+// Window size.
+const GLsizei WIDTH = 1280;
+const GLsizei HEIGHT = 720;
+
+// Center point.
+const Point2D CENTER(WIDTH / 2, HEIGHT / 2);
+
+// Radius of main circle.
+const GLint RADIUS = 300;
+
+// Colors.
+const Utils::Color bgColor(Utils::WHITE);
+const Utils::Color lineColor(Utils::BLACK);
+const Utils::Color pointColor(Utils::RED);
+
+// Sizes.
+const GLfloat lineWidth = 4.0;
+const GLfloat pointSize = 14.0;
+
+// Points container.
+pointVector allPoints;
+
+// Define main circle.
+Circle mainCircle(CENTER, RADIUS);
+
+// Points (segments) of main circle.
+size_t points = 256;
+
+// Length of hands.
+GLint bigHandLength = RADIUS - 10;
+GLint smallHandLength = RADIUS - 110;
+
+// Rotation of hands.
+GLdouble bigHandRot = 90.0;
+GLdouble smallHandRot = 0.0;
+
+// Define hands.
+Line bigHand(CENTER.x(), CENTER.y(), CENTER.x(), CENTER.y() + bigHandLength);
+Line smallHand(CENTER.x(), CENTER.y(), CENTER.x() + smallHandLength, CENTER.y());
+
+// Degrees to radians.
+GLdouble degToRad(GLdouble deg) {
+  return deg * (Utils::PI / 180);
+}
 
 void init() {
-  glClearColor(1.0, 1.0, 1.0, 0.0);
+  // Background color setup.
+  bgColor.setGLClearColor();
+
+  // Display settings.
   glMatrixMode(GL_PROJECTION);
-  glShadeModel(GL_FLAT);
   gluOrtho2D(0.0, WIDTH, 0.0, HEIGHT);
-  glEnable(GL_POLYGON_SMOOTH);
+  glShadeModel(GL_FLAT);
+
+  // Line and point settings.
   glEnable(GL_LINE_SMOOTH);
   glEnable(GL_POINT_SMOOTH);
-  glPointSize(10);
-  glLineWidth(2);
+
+  // Enable blending.
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+  // Setup main circle points.
+  mainCircle.points = points;
+  mainCircle.pointSize = pointSize;
+
+  // Setup colors
+  mainCircle.color = lineColor;
+  mainCircle.pointColor = pointColor;
+
+  // Setup line widths.
+  mainCircle.lineWidth = lineWidth;
+  bigHand.lineWidth = lineWidth;
+  smallHand.lineWidth = lineWidth;
 }
 
-void drawGrid(int width, int height, int gap, GLfloat lineWidth,
-              GLubyte* color) {
-  glClear(GL_COLOR_BUFFER_BIT);
-
-  glColor3ubv(color);
-  glLineWidth(lineWidth);
-  glBegin(GL_LINES);
-  for(int i = gap; i < width; i += gap) {
-    glVertex2i(i, 0);
-    glVertex2i(i, height);
-  }
-
-  for(int i = gap; i < height; i += gap) {
-    glVertex2i(0, i);
-    glVertex2i(width, i);
-  }
-
-  glEnd();
-
-  glFlush();
-}
-
-void drawThing(int width, int height, int x, int y, int gap, int lineWidth,
+void drawThing(int width, int height, int x, int y, int gap, GLfloat lineWidth,
                GLubyte* color) {
   glClear(GL_COLOR_BUFFER_BIT);
 
@@ -71,56 +112,48 @@ void drawThing(int width, int height, int x, int y, int gap, int lineWidth,
   glFlush();
 }
 
-void circle() {
-  //GLubyte gridColor[3] = { 45, 45, 45 };
-  //drawGrid(WIDTH, HEIGHT, 50, 1, gridColor);
-  //GLubyte thingColor[3] = { 0, 0, 0 };
-  //drawThing(600, 600, 20, 20, 40, 1, thingColor);
-  size_t points = 128;
-  double gap = 2 * M_PI / points;
-  double gap2 = 2 * M_PI / 12;
-
-  double c = cos(gap); //precalculate the sine and cosine
-  double s = sin(gap);
-  double t;
-
-  double x = RADIUS; //we start at angle = 0 
-  double y = 0;
-
+void clockDisplay() {
   glClear(GL_COLOR_BUFFER_BIT);
-  glColor3ub(0, 0, 0);
-  glBegin(GL_LINE_LOOP);
-  for(int i = 0; i < points; i++) {
-    glVertex2d(x + CENTER_X, y + CENTER_Y); //output vertex 
 
-    //apply the rotation matrix
-    t = x;
-    x = c * x - s * y;
-    y = s * t + c * y;
-  }
-  glEnd();
-  //glBegin(GL_LINE_STRIP);
-  //for(size_t i = 0; i <= points; ++i)
-  //  glVertex2d(CENTER_X + RADIUS * cos(i*gap), CENTER_Y + RADIUS/2 * sin(i*gap));
-  //glEnd();
+  // Draw Circle.
+  mainCircle.draw();
+  mainCircle.drawPoints(12);
 
-  //glColor3ub(255, 0, 0);
-  //glBegin(GL_POINTS);
-  //for(size_t i = 0; i <= 12; ++i)
-  //  glVertex2d(CENTER_X + RADIUS * cos(i*gap2), CENTER_Y + RADIUS/2 * sin(i*gap2));
-  //glEnd();
+  // Draw hands.
+  bigHand.draw();
+  smallHand.draw();
 
-  glFlush();
+  // Draw center point.
+  mainCircle.drawCenterPoint();
+
+  glutSwapBuffers();
+}
+
+void clockUpdate(int n) {
+  GLdouble rot = degToRad(bigHandRot);
+  bigHand.setP2(CENTER.x() + bigHandLength * cos(rot),
+                CENTER.y() + bigHandLength * sin(rot));
+
+  rot = degToRad(smallHandRot);
+  smallHand.setP2(CENTER.x() + smallHandLength * cos(rot),
+                  CENTER.y() + smallHandLength * sin(rot));
+
+  bigHandRot--;
+  smallHandRot -= 1.0 / 12.0;
+
+  glutPostRedisplay();
+  glutTimerFunc(50, clockUpdate, 0);
 }
 
 int main(int argc, char** argv) {
   glutInit(&argc, argv);
-  glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
+  glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
   glutInitWindowSize(WIDTH, HEIGHT);
-  glutCreateWindow("Thing");
+  glutCreateWindow("Homework 01");
 
   init();
-  glutDisplayFunc(circle);
+  glutDisplayFunc(clockDisplay);
+  glutTimerFunc(50, clockUpdate, 0);
   glutMainLoop();
   return 0;
 }

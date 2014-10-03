@@ -19,8 +19,6 @@ public:
   GLfloat pointSize = 10.0;
   Color color = BLACK;
   Color pointsColor = RED;
-  bool smooth = true;
-  bool smoothPoints = true;
 
   /// Init Line with raw coordinates.
   inline Line(T a1, T a2, T b1, T b2) : pt1(a1, a2), pt2(b1, b2) {}
@@ -171,14 +169,8 @@ public:
 
   /// Draw Line with OpenGL calls.
   void draw() const {
-    if(smooth)
-      glEnable(GL_LINE_SMOOTH);
-    else
-      glDisable(GL_LINE_SMOOTH);
-
     glLineWidth(lineWidth);
     color.setGLColor();
-
     glBegin(GL_LINES);
     glVertex2<T>(p1());
     glVertex2<T>(p2());
@@ -187,11 +179,6 @@ public:
 
   /// Draw Line's endpoints with OpenGL calls.
   void drawPoints() const {
-    if(smoothPoints)
-      glEnable(GL_POINT_SMOOTH);
-    else
-      glDisable(GL_POINT_SMOOTH);
-
     glPointSize(pointSize);
     pointsColor.setGLColor();
     glBegin(GL_POINTS);
