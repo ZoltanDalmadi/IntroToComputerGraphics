@@ -106,6 +106,7 @@ void drawGrid() {
   glEnd();
 }
 
+// Main display function.
 void clockDisplay() {
   glClear(GL_COLOR_BUFFER_BIT);
 
@@ -127,14 +128,17 @@ void clockDisplay() {
 }
 
 void clockUpdate(int n) {
+  // Calculate new position of big hands endpoint.
   GLdouble rot = degToRad(bigHandRot);
   bigHand.setP2(CENTER.x() + bigHandLength * cos(rot),
                 CENTER.y() + bigHandLength * sin(rot));
 
+  // Same for small hand
   rot = degToRad(smallHandRot);
   smallHand.setP2(CENTER.x() + smallHandLength * cos(rot),
                   CENTER.y() + smallHandLength * sin(rot));
 
+  // Adjust their rotation degree.
   bigHandRot--;
   smallHandRot -= 1.0 / 12.0;
 
