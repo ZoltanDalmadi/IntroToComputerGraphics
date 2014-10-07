@@ -23,7 +23,7 @@ const GLint RADIUS = 300;
 // Colors.
 const Utils::Color bgColor(Utils::WHITE);
 const Utils::Color lineColor(Utils::BLACK);
-const Utils::Color gridColor(Utils::DARK_CYAN);
+const Utils::Color gridColor("f08422");
 const Utils::Color pointColor(Utils::RED);
 
 // Sizes.

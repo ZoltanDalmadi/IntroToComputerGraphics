@@ -1,5 +1,6 @@
 #pragma once
 #include <GL/glut.h>
+#include <string>
 
 namespace Utils {
 
@@ -35,7 +36,27 @@ private:
 
 public:
   // Initialize with RGBA values.
-  Color(int r, int g, int b, int a = 0) : r(r), g(g), b(b), a(a) {}
+  inline Color(int r, int g, int b, int a = 0) : r(r), g(g), b(b), a(a) {}
+
+  // Initialize with hex string.
+  Color(std::string hexString) {
+    size_t startpos = 0;
+    if(hexString.front() == '#') {
+      startpos = 1;
+    }
+
+    if(hexString.length() == 6 || hexString.length() == 7) {
+      a = 0;
+    }
+
+    if(hexString.length() == 8 || hexString.length() == 9) {
+      a = std::stoul(hexString.substr(startpos + 6, 2), 0, 16);
+    }
+
+    r = std::stoul(hexString.substr(startpos, 2), 0, 16);
+    g = std::stoul(hexString.substr(startpos + 2, 2), 0, 16);
+    b = std::stoul(hexString.substr(startpos + 4, 2), 0, 16);
+  }
 
   // Initialize with a predefined color.
   Color(namedColor color) {
@@ -63,6 +84,8 @@ public:
     b = colors[color][2];
     a = colors[color][3];
   }
+
+
 
   // Returns red component.
   inline int red() const {
