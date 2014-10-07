@@ -11,8 +11,8 @@ typedef Utils::Point2D<GLdouble> Point2D;
 typedef Utils::Circle<GLdouble> Circle;
 
 // Window size.
-const GLsizei WIDTH = 1280;
-const GLsizei HEIGHT = 720;
+const GLsizei WIDTH = 800;
+const GLsizei HEIGHT = 800;
 
 // Center point.
 const Point2D CENTER(WIDTH / 2, HEIGHT / 2);
@@ -25,7 +25,7 @@ const Utils::Color bgColor(Utils::WHITE);
 const Utils::Color lineColor(Utils::BLACK);
 const Utils::Color gridColor("f08422");
 const Utils::Color pointColor(Utils::RED);
-const Utils::Color plateColor("fafabb");
+const Utils::Color plateColor("ccfafa");
 
 // Sizes.
 const GLfloat lineWidth = 4.0;
@@ -153,7 +153,6 @@ void clockUpdate(int n) {
   // Adjust their rotation degree.
   bigHandRot--;
   smallHandRot -= 1.0 / 12.0;
-  std::cout << smallHandRot << std::endl;
 
   // reset degrees if one rotation has passed
   if(bigHandRot == -270.0) {
