@@ -52,6 +52,9 @@ size_t handSegments = 16;
 Line bigHand(CENTER.x(), CENTER.y(), CENTER.x(), CENTER.y() + bigHandLength);
 Line smallHand(CENTER.x(), CENTER.y(), CENTER.x() + smallHandLength, CENTER.y());
 
+// Refresh rate in miliseconds.
+size_t refreshRate = 50;
+
 // Degrees to radians.
 GLdouble degToRad(GLdouble deg) {
   return deg * (Utils::PI / 180);
@@ -152,7 +155,7 @@ void clockUpdate(int n) {
   }
 
   glutPostRedisplay();
-  glutTimerFunc(50, clockUpdate, 0);
+  glutTimerFunc(refreshRate, clockUpdate, 0);
 }
 
 int main(int argc, char** argv) {
@@ -164,7 +167,7 @@ int main(int argc, char** argv) {
 
   init();
   glutDisplayFunc(clockDisplay);
-  glutTimerFunc(50, clockUpdate, 0);
+  glutTimerFunc(refreshRate, clockUpdate, 0);
   glutMainLoop();
   return 0;
 }
