@@ -25,6 +25,7 @@ const Utils::Color bgColor(Utils::WHITE);
 const Utils::Color lineColor(Utils::BLACK);
 const Utils::Color gridColor("f08422");
 const Utils::Color pointColor(Utils::RED);
+const Utils::Color plateColor("fafabb");
 
 // Sizes.
 const GLfloat lineWidth = 4.0;
@@ -33,6 +34,8 @@ const GLfloat pointSize = 14.0;
 
 // Define main circle.
 Circle mainCircle(CENTER, RADIUS);
+Circle dotsCircle(CENTER, RADIUS - 10);
+Circle secondaryCircle(CENTER, RADIUS - 20);
 
 // Points (segments) of main circle.
 size_t points = 256;
@@ -80,11 +83,16 @@ void init() {
   // Setup main circle points.
   mainCircle.points = points;
   mainCircle.pointSize = pointSize;
+  dotsCircle.points = points;
+  dotsCircle.pointSize = pointSize;
+  secondaryCircle.points = points;
 
   // Setup colors
   mainCircle.color = lineColor;
-  mainCircle.pointColor = pointColor;
   mainCircle.centrePointColor = pointColor;
+  dotsCircle.pointColor = pointColor;
+  secondaryCircle.color = plateColor;
+  secondaryCircle.filled = true;
 
   // Setup line widths.
   mainCircle.lineWidth = lineWidth;
@@ -115,7 +123,8 @@ void clockDisplay() {
 
   // Draw Circle.
   mainCircle.draw();
-  mainCircle.drawPoints(12);
+  dotsCircle.drawPoints(12);
+  secondaryCircle.draw();
 
   // Draw grid between hands.
   drawGrid();
@@ -144,14 +153,11 @@ void clockUpdate(int n) {
   // Adjust their rotation degree.
   bigHandRot--;
   smallHandRot -= 1.0 / 12.0;
+  std::cout << smallHandRot << std::endl;
 
   // reset degrees if one rotation has passed
   if(bigHandRot == -270.0) {
     bigHandRot = 90.0;
-  }
-
-  if(smallHandRot == -360.0) {
-    smallHandRot = 0.0;
   }
 
   glutPostRedisplay();

@@ -41,7 +41,11 @@ public:
     double x = rx; //we start at angle = 0 
     double y = 0;
 
-    glBegin(GL_LINE_LOOP);
+    if(filled)
+      glBegin(GL_POLYGON);
+    else
+      glBegin(GL_LINE_LOOP);
+
     for(size_t i = 0; i < points; i++) {
       Point2D<T> point(static_cast<T>(x + centre.x()), static_cast<T>(y + centre.y()));
       glVertex2<T>(point);

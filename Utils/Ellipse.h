@@ -21,6 +21,7 @@ public:
   Color color = BLACK;
   Color pointColor = BLUE;
   Color centrePointColor = RED;
+  bool filled = false;
 
   inline Ellipse(T cx, T cy, T rx, T ry) : centre(cx, cy), rx(rx), ry(ry) {}
   inline Ellipse(Point2D<T> c, T rx, T ry) : centre(c), rx(rx), ry(ry) {}
@@ -99,7 +100,12 @@ public:
     color.setGLColor();
 
     double gap = 2 * PI / points;
-    glBegin(GL_LINE_LOOP);
+
+    if(filled)
+      glBegin(GL_POLYGON);
+    else
+      glBegin(GL_LINE_LOOP);
+
     for(size_t i = 0; i <= points; ++i) {
       Point2D<T> point(static_cast<T>(centre.x() + rx*cos(i*gap)),
                        static_cast<T>(centre.y() + ry*sin(i*gap)));
