@@ -6,6 +6,10 @@
 
 namespace Utils {
 
+// Forward declare
+template <typename T> class Point2D;
+template <typename T> void glVertex2(const Point2D<T>& p);
+
 template <typename T>
 class Point2D {
 private:
@@ -173,8 +177,6 @@ public:
 }; // end class Point2D
 
 /// Type specific OpenGL calls.
-template <typename T> void glVertex2(const Point2D<T>& p);
-
 template <> void glVertex2<GLshort>(const Point2D<GLshort>& p) {
   glVertex2s(p.x(), p.y());
 }
