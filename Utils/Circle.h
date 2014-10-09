@@ -26,7 +26,7 @@ public:
     ry = radius;
   }
 
-  /// recalculate points.
+  /// Recalculate points (more efficient algorithm, but only for circles).
   virtual void recalcPoints() {
     pointsVector.clear();
     double gap = 2 * PI / points;

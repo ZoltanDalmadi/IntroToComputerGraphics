@@ -185,7 +185,7 @@ public:
     glEnd();
   }
 
-  /// Draw all diagonals of Circle's polygon.
+  /// Draw all diagonals of Ellipse's polygon.
   void drawDiagonals() const {
     glLineWidth(lineWidth);
     color.setGLColor();
