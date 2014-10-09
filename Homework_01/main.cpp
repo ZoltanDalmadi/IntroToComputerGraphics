@@ -81,11 +81,11 @@ void init() {
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   // Setup main circle points.
-  mainCircle.points = points;
+  mainCircle.setPoints(points);
   mainCircle.pointSize = pointSize;
-  dotsCircle.points = points;
+  dotsCircle.setPoints(12);
   dotsCircle.pointSize = pointSize;
-  secondaryCircle.points = points;
+  secondaryCircle.setPoints(points);
 
   // Setup colors
   mainCircle.color = lineColor;
@@ -123,7 +123,7 @@ void clockDisplay() {
 
   // Draw Circle.
   mainCircle.draw();
-  dotsCircle.drawPoints(12);
+  dotsCircle.drawPoints();
   secondaryCircle.draw();
 
   // Draw grid between hands.

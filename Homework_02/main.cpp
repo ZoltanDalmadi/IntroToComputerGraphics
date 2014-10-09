@@ -29,8 +29,8 @@ void init() {
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-
   circle.lineWidth = 2;
+  circle.setPoints(4);
 }
 
 void display() {

@@ -7,6 +7,8 @@
 
 namespace Utils {
 
+const GLdouble PI = 3.14159265358979323846;
+
 template <typename T>
 class Ellipse {
 protected:
@@ -25,8 +27,13 @@ public:
   Color centrePointColor = RED;
   bool filled = false;
 
-  inline Ellipse(T cx, T cy, T rx, T ry) : centre(cx, cy), rx(rx), ry(ry) {}
-  inline Ellipse(Point2D<T> c, T rx, T ry) : centre(c), rx(rx), ry(ry) {}
+  inline Ellipse(T cx, T cy, T rx, T ry) : centre(cx, cy), rx(rx), ry(ry) {
+    recalcPoints();
+  }
+
+  inline Ellipse(Point2D<T> c, T rx, T ry) : centre(c), rx(rx), ry(ry) {
+    recalcPoints();
+  }
 
   virtual ~Ellipse() {}
 
@@ -102,12 +109,26 @@ public:
     centre += point;
   }
 
-  void operator++(int) {
+  /// Increase Ellipse's points with postfix increment operator.
+  inline void operator++(int) {
     points++;
     recalcPoints();
   }
 
-  void operator--(int) {
+  /// Decrease Ellipse's points with postfix decrement operator.
+  inline void operator--(int) {
+    points--;
+    recalcPoints();
+  }
+
+  /// Increase Ellipse's points with prefix increment operator.
+  inline void operator++() {
+    points++;
+    recalcPoints();
+  }
+
+  /// Decrease Ellipse's points with prefix decrement operator.
+  inline void operator--() {
     points--;
     recalcPoints();
   }
@@ -117,52 +138,65 @@ public:
     this->translate(Point2D<T>(adx, ady));
   }
 
-  /// recalculate points.
-  virtual void recalcPoints() {}
+  /// Recalculate points.
+  virtual void recalcPoints() {
+    pointsVector.clear();
+    double gap = 2 * PI / points;
+    for(size_t i = 0; i <= points; ++i) {
+      pointsVector.emplace_back(static_cast<T>(centre.x() + rx*cos(i*gap)),
+                                static_cast<T>(centre.y() + ry*sin(i*gap)));
+    }
+  }
 
   /// Draw Ellipse with OpenGL calls.
-  virtual void draw() const {
+  void draw() const {
     glLineWidth(lineWidth);
     color.setGLColor();
-
-    double gap = 2 * PI / points;
 
     if(filled)
       glBegin(GL_POLYGON);
     else
       glBegin(GL_LINE_LOOP);
 
-    for(size_t i = 0; i <= points; ++i) {
-      Point2D<T> point(static_cast<T>(centre.x() + rx*cos(i*gap)),
-                       static_cast<T>(centre.y() + ry*sin(i*gap)));
+    for(const auto& point : pointsVector) {
       glVertex2<T>(point);
     }
     glEnd();
   }
 
-  virtual inline void drawPoints() const {
-    this->drawPoints(points);
-  }
-
-  virtual void drawPoints(size_t n) const {
+  /// Draw Ellipse's polygon points.
+  void drawPoints() const {
     glPointSize(pointSize);
     pointColor.setGLColor();
 
-    double gap = 2 * PI / n;
     glBegin(GL_POINTS);
-    for(size_t i = 0; i <= n; ++i) {
-      Point2D<T> point(static_cast<T>(centre.x() + rx*cos(i*gap)),
-                       static_cast<T>(centre.y() + ry*sin(i*gap)));
+    for(const auto& point : pointsVector) {
       glVertex2<T>(point);
     }
     glEnd();
   }
 
-  inline void drawCenterPoint() const {
+  /// Draw center point.
+  void drawCenterPoint() const {
     glPointSize(pointSize);
     centrePointColor.setGLColor();
     glBegin(GL_POINTS);
     glVertex2<T>(centre);
+    glEnd();
+  }
+
+  /// Draw all diagonals of Circle's polygon.
+  void drawDiagonals() const {
+    glLineWidth(lineWidth);
+    color.setGLColor();
+
+    glBegin(GL_LINES);
+    for(size_t i = 0; i < points; i++) {
+      for(size_t j = i + 1; j < points; j++) {
+        glVertex2<T>(pointsVector[i]); //output vertex 
+        glVertex2<T>(pointsVector[j]); //output vertex 
+      }
+    }
     glEnd();
   }
 
