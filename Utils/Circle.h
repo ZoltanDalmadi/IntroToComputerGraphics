@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 #include "Ellipse.h"
 
 namespace Utils {
@@ -15,8 +16,13 @@ private:
   inline T getRadiusY() const;
 
 public:
-  inline Circle(T cx, T cy, T r) : Ellipse(cx, cy, r, r) {}
-  inline Circle(Point2D<T> c, T r) : Ellipse(c, r, r) {}
+  inline Circle(T cx, T cy, T r) : Ellipse(cx, cy, r, r) {
+    recalcPoints();
+  }
+
+  inline Circle(Point2D<T> c, T r) : Ellipse(c, r, r) {
+    recalcPoints();
+  }
 
   virtual ~Circle() {}
 
@@ -29,11 +35,10 @@ public:
     ry = radius;
   }
 
-  /// Draw Circle with OpenGL calls.
-  virtual void draw() const {
-    glLineWidth(lineWidth);
-    color.setGLColor();
 
+  /// recalculate points.
+  virtual void recalcPoints() {
+    pointsVector.clear();
     double gap = 2 * PI / points;
     double c = cos(gap); //precalculate the sine and cosine
     double s = sin(gap);
@@ -41,19 +46,29 @@ public:
     double x = rx; //we start at angle = 0 
     double y = 0;
 
+    for(size_t i = 0; i < points; i++) {
+      Point2D<T> point(static_cast<T>(x + centre.x()), static_cast<T>(y + centre.y()));
+      pointsVector.push_back(point);
+
+      //apply the rotation matrix
+      temp = x;
+      x = c * x - s * y;
+      y = s * temp + c * y;
+    }
+  }
+
+  /// Draw Circle with OpenGL calls.
+  virtual void draw() const {
+    glLineWidth(lineWidth);
+    color.setGLColor();
+
     if(filled)
       glBegin(GL_POLYGON);
     else
       glBegin(GL_LINE_LOOP);
 
     for(size_t i = 0; i < points; i++) {
-      Point2D<T> point(static_cast<T>(x + centre.x()), static_cast<T>(y + centre.y()));
-      glVertex2<T>(point);
-
-      //apply the rotation matrix
-      temp = x;
-      x = c * x - s * y;
-      y = s * temp + c * y;
+      glVertex2<T>(pointsVector[i]);
     }
     glEnd();
   }
@@ -66,25 +81,26 @@ public:
     glPointSize(pointSize);
     pointColor.setGLColor();
 
-    double gap = 2 * PI / n;
-    double c = cos(gap); //precalculate the sine and cosine
-    double s = sin(gap);
-    double temp;
-    double x = rx; //we start at angle = 0 
-    double y = 0;
-
     glBegin(GL_POINTS);
 
     for(size_t i = 0; i < n; i++) {
-      Point2D<T> point(static_cast<T>(x + centre.x()), static_cast<T>(y + centre.y()));
-      glVertex2<T>(point); //output vertex 
-
-      //apply the rotation matrix
-      temp = x;
-      x = c * x - s * y;
-      y = s * temp + c * y;
+      glVertex2<T>(pointsVector[i]); //output vertex 
     }
 
+    glEnd();
+  }
+
+  void drawDiagonals() const {
+    glLineWidth(lineWidth);
+    color.setGLColor();
+
+    glBegin(GL_LINES);
+    for(size_t i = 0; i < points; i++) {
+      for(size_t j = i + 1; j < points; j++) {
+        glVertex2<T>(pointsVector[i]); //output vertex 
+        glVertex2<T>(pointsVector[j]); //output vertex 
+      }
+    }
     glEnd();
   }
 

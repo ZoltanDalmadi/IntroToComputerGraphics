@@ -1,6 +1,7 @@
 #pragma once
 #include <GL/freeglut.h>
 #include <cmath>
+#include <vector>
 #include "Point2D.h"
 #include "Color.h"
 
@@ -12,12 +13,13 @@ protected:
   Point2D<T> centre;
   T rx;
   T ry;
+  size_t points = 48;
 
 public:
   GLfloat lineWidth = 1.0;
   GLfloat pointSize = 6.0;
   GLfloat centrePointSize = 10.0;
-  size_t points = 48;
+  std::vector < Point2D<T> > pointsVector;
   Color color = BLACK;
   Color pointColor = BLUE;
   Color centrePointColor = RED;
@@ -84,15 +86,39 @@ public:
     ry = radius;
   };
 
+  /// Returns number of points.
+  inline size_t getPoints() const {
+    return points;
+  }
+
+  /// Sets number of points.
+  inline void setPoints(size_t p) {
+    points = p;
+    recalcPoints();
+  }
+
   /// Translate Ellipse with a given point.
   inline void translate(const Point2D<T>& point) {
     centre += point;
+  }
+
+  void operator++(int) {
+    points++;
+    recalcPoints();
+  }
+
+  void operator--(int) {
+    points--;
+    recalcPoints();
   }
 
   /// Translate Ellipse with raw coordinates.
   inline void translate(T adx, T ady) {
     this->translate(Point2D<T>(adx, ady));
   }
+
+  /// recalculate points.
+  virtual void recalcPoints() {}
 
   /// Draw Ellipse with OpenGL calls.
   virtual void draw() const {

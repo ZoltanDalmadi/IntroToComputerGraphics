@@ -20,7 +20,6 @@ private:
 public:
   Color color = BLACK;
   GLfloat size = 10.0;
-  bool smooth = true;
 
   /// Initialize point at (0, 0) (origin). (glut: bottom-left corner)
   Point2D() : xp(0), yp(0) {}
@@ -162,11 +161,6 @@ public:
 
   /// Draw point with OpenGL calls.
   void draw() const {
-    if(smooth)
-      glEnable(GL_POINT_SMOOTH);
-    else
-      glDisable(GL_POINT_SMOOTH);
-
     glPointSize(size);
     color.setGLColor();
     glBegin(GL_POINTS);
