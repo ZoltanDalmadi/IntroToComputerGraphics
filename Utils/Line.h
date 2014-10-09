@@ -172,8 +172,8 @@ public:
     glLineWidth(lineWidth);
     color.setGLColor();
     glBegin(GL_LINES);
-    glVertex2<T>(p1());
-    glVertex2<T>(p2());
+    glVertex2<T>(pt1);
+    glVertex2<T>(pt2);
     glEnd();
   }
 
