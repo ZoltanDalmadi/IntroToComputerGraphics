@@ -19,7 +19,8 @@ const GLsizei HEIGHT = 720;
 const Utils::Color bgColor(Utils::WHITE);
 
 Line line(300, HEIGHT, 800, 0);
-Vector2D vec(200, 300);
+Circle ball(100, 100, 50);
+Vector2D vec(1, 1);
 
 std::map<unsigned char, bool> keyStates {
     { 'a', false },
@@ -29,6 +30,9 @@ std::map<unsigned char, bool> keyStates {
 };
 
 GLdouble delta = 0.05;
+
+// Refresh rate in miliseconds.
+size_t refreshRate = 5;
 
 void init() {
   // Background color setup.
@@ -45,6 +49,7 @@ void init() {
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   line.lineWidth = 2;
+  ball.lineWidth = 2;
 }
 
 void keyPressed(unsigned char key, int x, int y) {
@@ -62,7 +67,6 @@ void keyOperations() {
   if(keyStates['4']) { line.rp2().changeX(-delta); }
   if(keyStates['6']) { line.rp2().changeX(delta); }
 
-
   glutPostRedisplay();
 }
 
@@ -72,11 +76,19 @@ void display() {
 
   line.draw();
   line.drawPoints();
-  
-  vec.toLine(200, 50).draw();
-  Vector2D::reflectTo(vec, Vector2D(line.dx(), line.dy())).toLine(400, 350).draw();
+  ball.draw();
 
   glutSwapBuffers();
+}
+
+void gameUpdate(int n) {
+  ball.translate(vec);
+  if(Line::pDistanceToLine(ball.c(), line) <= ball.getRadius()) {
+    vec = Vector2D::reflectFrom(vec, Vector2D(line.dx(), line.dy()));
+  }
+  std::cout << "(" << vec.x() << ", " << vec.y() << ")" << std::endl;
+
+  glutTimerFunc(refreshRate, gameUpdate, 0);
 }
 
 int main(int argc, char* argv[]) {
@@ -89,6 +101,7 @@ int main(int argc, char* argv[]) {
   glutDisplayFunc(display);
   glutKeyboardFunc(keyPressed);
   glutKeyboardUpFunc(keyUp);
+  glutTimerFunc(refreshRate, gameUpdate, 0);
   glutMainLoop();
   return 0;
 }

@@ -37,8 +37,7 @@ public:
     double y = 0;
 
     for(size_t i = 0; i < points; i++) {
-      pointsVector.emplace_back(static_cast<T>(x + centre.x()),
-                                static_cast<T>(y + centre.y()));
+      pointsVector.emplace_back(static_cast<T>(x), static_cast<T>(y));
 
       //apply the rotation matrix
       temp = x;

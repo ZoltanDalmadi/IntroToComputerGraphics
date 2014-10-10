@@ -105,8 +105,8 @@ public:
     return u.x() * v.x() + u.y() * v.y();
   }
   
-  static inline Vector2D<T> reflectTo(const Vector2D<T> &u, const Vector2D<T> &v) {
-    T c = 2 * (Vector2D<T>::dotProduct(v, u) / u.lengthSquared());
+  static inline Vector2D<T> reflectFrom(const Vector2D<T> &u, const Vector2D<T> &v) {
+    T c = 2 * Vector2D<T>::dotProduct(u, v) / v.lengthSquared();
     return Vector2D<T>(-u + c * v);
   }
 

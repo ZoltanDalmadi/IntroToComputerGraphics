@@ -3,6 +3,7 @@
 #include <cmath>
 #include <vector>
 #include "Point2D.h"
+#include "Vector2D.h"
 #include "Color.h"
 
 namespace Utils {
@@ -109,6 +110,17 @@ public:
     centre += point;
   }
 
+  /// Translate Ellipse with raw coordinates.
+  inline void translate(T adx, T ady) {
+    this->translate(Point2D<T>(adx, ady));
+  }
+
+  /// Translate Ellipse with a given Vector2D.
+  inline void translate(const Vector2D<T>& vector) {
+    centre.changeX(vector.x());
+    centre.changeY(vector.y());
+  }
+
   /// Increase Ellipse's points with postfix increment operator.
   inline void operator++(int) {
     points++;
@@ -133,18 +145,13 @@ public:
     recalcPoints();
   }
 
-  /// Translate Ellipse with raw coordinates.
-  inline void translate(T adx, T ady) {
-    this->translate(Point2D<T>(adx, ady));
-  }
-
   /// Recalculate points.
   virtual void recalcPoints() {
     pointsVector.clear();
     double gap = 2 * PI / points;
     for(size_t i = 0; i <= points; ++i) {
-      pointsVector.emplace_back(static_cast<T>(centre.x() + rx*cos(i*gap)),
-                                static_cast<T>(centre.y() + ry*sin(i*gap)));
+      pointsVector.emplace_back(static_cast<T>(rx*cos(i*gap)),
+                                static_cast<T>(ry*sin(i*gap)));
     }
   }
 
@@ -159,7 +166,7 @@ public:
       glBegin(GL_LINE_LOOP);
 
     for(const auto& point : pointsVector) {
-      glVertex2<T>(point);
+      glVertex2<T>(centre + point);
     }
     glEnd();
   }
@@ -171,7 +178,7 @@ public:
 
     glBegin(GL_POINTS);
     for(const auto& point : pointsVector) {
-      glVertex2<T>(point);
+      glVertex2<T>(centre + point);
     }
     glEnd();
   }
