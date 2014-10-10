@@ -19,6 +19,7 @@ const GLsizei HEIGHT = 720;
 const Utils::Color bgColor(Utils::WHITE);
 
 const GLdouble ballSize = 50.0;
+const GLdouble ballSizeSquared = ballSize*ballSize;
 
 Line line(300, HEIGHT, 800, 0);
 Line leftWall(0, 0, 0, HEIGHT);
@@ -35,14 +36,8 @@ Circle ball2(WIDTH - 100, HEIGHT - 100, ballSize);
 Vector2D vec1(1, 1);
 Vector2D vec2(1, 1);
 
-std::map<unsigned char, bool> keyStates {
-    { 'a', false },
-    { 'd', false },
-    { '4', false },
-    { '6', false }
-};
-
-GLdouble delta = 0.05;
+bool keyStates[256];
+GLdouble delta = 2.0;
 
 // Refresh rate in miliseconds.
 size_t refreshRate = 5;
@@ -62,12 +57,13 @@ void init() {
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   line.lineWidth = 2;
-  ball1.lineWidth = 2;
-  ball2.lineWidth = 2;
+  ball1.lineWidth = 3;
+  ball2.lineWidth = 3;
 }
 
 void keyPressed(unsigned char key, int x, int y) {
   keyStates[key] = true;
+  glutPostRedisplay();
 }
 
 void keyUp(unsigned char key, int x, int y) {
@@ -75,13 +71,21 @@ void keyUp(unsigned char key, int x, int y) {
 }
 
 void keyOperations() {
-  if(keyStates['a']) { line.rp1().changeX(-delta); }
-  if(keyStates['d']) { line.rp1().changeX(delta); }
+  if(keyStates['a']) {
+    line.rp1().changeX(-delta);
+  }
 
-  if(keyStates['4']) { line.rp2().changeX(-delta); }
-  if(keyStates['6']) { line.rp2().changeX(delta); }
+  if(keyStates['d']) {
+    line.rp1().changeX(delta);
+  }
 
-  glutPostRedisplay();
+  if(keyStates['4']) {
+    line.rp2().changeX(-delta);
+  }
+
+  if(keyStates['6']) {
+    line.rp2().changeX(delta);
+  }
 }
 
 void display() {
@@ -94,52 +98,57 @@ void display() {
   ball2.draw();
 
   glutSwapBuffers();
-}
 
-void gameUpdate(int n) {
   ball1.translate(vec1);
-  if(Line::pDistanceToLine(ball1.c(), line) <= ballSize) {
+  ball2.translate(vec2);
+
+  Point2D *c1 = &ball1.c();
+  Point2D *c2 = &ball2.c();
+
+  //std::cout << "(" << vec1.x() << ", " << vec1.y() << ")" << std::endl;
+  if(Line::pDistanceToLineSquared(*c1, line) <= ballSizeSquared) {
     vec1 = Vector2D::reflectFrom(vec1, lineVector);
   }
 
-  if(Line::pDistanceToLine(ball1.c(), leftWall) <= ballSize) {
+  if(Line::pDistanceToLineSquared(*c1, leftWall) <= ballSizeSquared) {
     vec1 = Vector2D::reflectFrom(vec1, leftWallVector);
   }
 
-  if(Line::pDistanceToLine(ball1.c(), rightWall) <= ballSize) {
+  if(Line::pDistanceToLineSquared(*c1, rightWall) <= ballSizeSquared) {
     vec1 = Vector2D::reflectFrom(vec1, rightWallVector);
   }
 
-  if(Line::pDistanceToLine(ball1.c(), topWall) <= ballSize) {
+  if(Line::pDistanceToLineSquared(*c1, topWall) <= ballSizeSquared) {
     vec1 = Vector2D::reflectFrom(vec1, topWallVector);
   }
 
-  if(Line::pDistanceToLine(ball1.c(), bottomWall) <= ballSize) {
+  if(Line::pDistanceToLineSquared(*c1, bottomWall) <= ballSizeSquared) {
     vec1 = Vector2D::reflectFrom(vec1, bottomWallVector);
   }
 
-  ball2.translate(vec2);
-  if(Line::pDistanceToLine(ball2.c(), line) <= ballSize) {
+  if(Line::pDistanceToLineSquared(*c2, line) <= ballSizeSquared) {
     vec2 = Vector2D::reflectFrom(vec2, lineVector);
   }
 
-  if(Line::pDistanceToLine(ball2.c(), leftWall) <= ballSize) {
+  if(Line::pDistanceToLineSquared(*c2, leftWall) <= ballSizeSquared) {
     vec2 = Vector2D::reflectFrom(vec2, leftWallVector);
   }
 
-  if(Line::pDistanceToLine(ball2.c(), rightWall) <= ballSize) {
+  if(Line::pDistanceToLineSquared(*c2, rightWall) <= ballSizeSquared) {
     vec2 = Vector2D::reflectFrom(vec2, rightWallVector);
   }
 
-  if(Line::pDistanceToLine(ball2.c(), topWall) <= ballSize) {
+  if(Line::pDistanceToLineSquared(*c2, topWall) <= ballSizeSquared) {
     vec2 = Vector2D::reflectFrom(vec2, topWallVector);
   }
 
-  if(Line::pDistanceToLine(ball2.c(), bottomWall) <= ballSize) {
+  if(Line::pDistanceToLineSquared(*c2, bottomWall) <= ballSizeSquared) {
     vec2 = Vector2D::reflectFrom(vec2, bottomWallVector);
   }
-  //std::cout << "(" << vec.x() << ", " << vec.y() << ")" << std::endl;
+}
 
+void gameUpdate(int n) {
+  glutPostRedisplay();
   glutTimerFunc(refreshRate, gameUpdate, 0);
 }
 

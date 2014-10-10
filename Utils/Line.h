@@ -171,7 +171,15 @@ public:
   static inline T pDistanceToLine(const Point2D<T> &p, const Line<T> &line) {
     T DX = line.dx();
     T DY = line.dy();
-    return abs(line.standardEquation(p.x(), p.y())) / sqrt(DY*DY + DX*DX);
+    return std::abs(line.standardEquation(p.x(), p.y())) / sqrt(DY*DY + DX*DX);
+  }
+
+  /// Returns distance of Point2D to Line. [static]
+  static inline T pDistanceToLineSquared(const Point2D<T> &p, const Line<T> &line) {
+    T DX = line.dx();
+    T DY = line.dy();
+    T e = line.standardEquation(p.x(), p.y());
+    return e*e / (DY*DY + DX*DX);
   }
 
   /// Returns dot product of two lines interpreted as vectors. [static]
