@@ -17,6 +17,8 @@ const GLsizei HEIGHT = 720;
 const Utils::Color bgColor(Utils::WHITE);
 
 Line line(300, HEIGHT, 800, 0);
+Line line2(100, 260, 100, 400);
+Line line3(100, 260, 200, 460);
 
 std::map<unsigned char, bool> keyStates {
     { 'a', false },
@@ -68,6 +70,11 @@ void display() {
 
   line.draw();
   line.drawPoints();
+
+  line2.draw();
+  line2.drawPoints();
+  line3.draw();
+  line3.drawPoints();
 
   glutSwapBuffers();
 }

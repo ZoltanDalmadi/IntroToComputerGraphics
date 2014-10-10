@@ -174,6 +174,10 @@ public:
     return abs(line.standardEquation(x, y)) / sqrt(DY*DY + DX*DX);
   }
 
+  static inline T dotProduct(const Line<T> &l1, const Line<T> &l2) {
+    return l1.dx() * l2.dx() + l1.dy() * l2.dy();
+  }
+
   /// Draw Line with OpenGL calls.
   void draw() const {
     glLineWidth(lineWidth);
@@ -197,6 +201,13 @@ public:
   /// Prints line to a stream.
   friend inline std::ostream& operator<<(std::ostream& os, const Line<T>& line) {
     return os << "[" << line.p1() << " : " << line.p2() << "]" << std::endl;
+  }
+
+  /// Unary negate operator overload.
+  friend inline Line<T> operator-(const Line<T>& line) {
+    return Line<T>(line.x1(), line.y1(),
+                   line.x2() - 2 * line.dx(),
+                   line.y2() - 2 * line.dy());
   }
 
 }; // end class Line
