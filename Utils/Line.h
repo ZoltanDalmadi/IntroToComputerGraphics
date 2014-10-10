@@ -158,13 +158,20 @@ public:
   inline T standardEquation(T a, T b) const {
     T DX = dx();
     T DY = dy();
-    T C = (DY * x1()) - (DX * y1());
+    T C = DY * x1() - DX * y1();
     return -DY * a + DX * b + C;
   }
 
   /// Standard equation of Line overload.
   inline T standardEquation(const Point2D<T>& p) const {
     return this->standardEquation(p.x(), p.y());
+  }
+
+  /// Returns distance of Point2D to Line. [static]
+  static inline T pDistanceToLine(const Point2D<T> &p, const Line<T> &line) {
+    T DX = line.dx();
+    T DY = line.dy();
+    return abs(line.standardEquation(x, y)) / sqrt(DY*DY + DX*DX);
   }
 
   /// Draw Line with OpenGL calls.

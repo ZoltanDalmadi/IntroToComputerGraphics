@@ -20,6 +20,7 @@ private:
 public:
   Color color = BLACK;
   GLfloat size = 10.0;
+  bool dragged = false;
 
   /// Initialize point at (0, 0) (origin). (glut: bottom-left corner)
   Point2D() : xp(0), yp(0) {}
@@ -50,6 +51,16 @@ public:
   /// Sets Y coordinate.
   inline void setY(T value) {
     yp = value;
+  }
+
+  /// Changes X coordinate by an amount.
+  inline void changeX(T value) {
+    xp += value;
+  }
+
+  /// Changes Y coordinate by an amount.
+  inline void changeY(T value) {
+    yp += value;
   }
 
   /// Returns a pointer to this Point2D.

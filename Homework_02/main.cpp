@@ -1,10 +1,13 @@
 #include <GL/glut.h>
 #include <iostream>
+#include <map>
+#include "Line.h"
 #include "Circle.h"
 
 // Typedefs.
 typedef Utils::Point2D<GLdouble> Point2D;
 typedef Utils::Circle<GLdouble> Circle;
+typedef Utils::Line<GLdouble> Line;
 
 // Window size.
 const GLsizei WIDTH = 1280;
@@ -13,7 +16,16 @@ const GLsizei HEIGHT = 720;
 // Colors.
 const Utils::Color bgColor(Utils::WHITE);
 
-Circle circle(WIDTH / 2, HEIGHT / 2, 300);
+Line line(300, HEIGHT, 800, 0);
+
+std::map<unsigned char, bool> keyStates {
+    { 'a', false },
+    { 'd', false },
+    { '4', false },
+    { '6', false }
+};
+
+GLdouble delta = 0.05;
 
 void init() {
   // Background color setup.
@@ -29,45 +41,35 @@ void init() {
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-  circle.lineWidth = 2;
-  circle.setPoints(4);
-}
-
-void display() {
-  glClear(GL_COLOR_BUFFER_BIT);
-  circle.drawDiagonals();
-
-  glutSwapBuffers();
+  line.lineWidth = 2;
 }
 
 void keyPressed(unsigned char key, int x, int y) {
-  switch(key) {
-    case 'a':
-    circle++;
-    glutPostRedisplay();
-    break;
-
-    case 'd':
-    circle--;
-    glutPostRedisplay();
-    break;
-
-    default:
-    break;
-  }
+  keyStates[key] = true;
 }
 
 void keyUp(unsigned char key, int x, int y) {
-  switch(key) {
-    case 'a':
-    break;
+  keyStates[key] = false;
+}
 
-    case 'd':
-    break;
+void keyOperations() {
+  if(keyStates['a']) { line.rp1().changeX(-delta); }
+  if(keyStates['d']) { line.rp1().changeX(delta); }
 
-    default:
-    break;
-  }
+  if(keyStates['4']) { line.rp2().changeX(-delta); }
+  if(keyStates['6']) { line.rp2().changeX(delta); }
+
+  glutPostRedisplay();
+}
+
+void display() {
+  keyOperations();
+  glClear(GL_COLOR_BUFFER_BIT);
+
+  line.draw();
+  line.drawPoints();
+
+  glutSwapBuffers();
 }
 
 int main(int argc, char* argv[]) {
