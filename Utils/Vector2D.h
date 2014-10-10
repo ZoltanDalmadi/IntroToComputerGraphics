@@ -1,4 +1,6 @@
 #pragma once
+#include <cmath>
+#include "Line.h"
 
 namespace Utils {
 
@@ -21,6 +23,16 @@ public:
   /// Returns Y component.
   inline T y() const {
     return yp;
+  }
+
+  /// Returns length (norm).
+  inline T length() const {
+    return std::hypot(xp, yp);
+  }
+
+  /// Returns length (norm) squared.
+  inline T lengthSquared() const {
+    return xp * xp + yp * yp;
   }
 
   /// Compound addition operator overload.
@@ -94,7 +106,12 @@ public:
   }
   
   static inline Vector2D<T> reflectTo(const Vector2D<T> &u, const Vector2D<T> &v) {
+    T c = 2 * (Vector2D<T>::dotProduct(v, u) / u.lengthSquared());
+    return Vector2D<T>(-u + c * v);
+  }
 
+  inline Line<T> toLine(T x, T y) const {
+    return Line<T>(x, y, x + xp, y + yp);
   }
 
 }; // end class Vector2D

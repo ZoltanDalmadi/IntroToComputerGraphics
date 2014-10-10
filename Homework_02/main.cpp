@@ -2,12 +2,14 @@
 #include <iostream>
 #include <map>
 #include "Line.h"
+#include "Vector2D.h"
 #include "Circle.h"
 
 // Typedefs.
 typedef Utils::Point2D<GLdouble> Point2D;
 typedef Utils::Circle<GLdouble> Circle;
 typedef Utils::Line<GLdouble> Line;
+typedef Utils::Vector2D<GLdouble> Vector2D;
 
 // Window size.
 const GLsizei WIDTH = 1280;
@@ -17,8 +19,7 @@ const GLsizei HEIGHT = 720;
 const Utils::Color bgColor(Utils::WHITE);
 
 Line line(300, HEIGHT, 800, 0);
-Line line2(100, 260, 100, 400);
-Line line3(100, 260, 200, 460);
+Vector2D vec(200, 300);
 
 std::map<unsigned char, bool> keyStates {
     { 'a', false },
@@ -61,6 +62,7 @@ void keyOperations() {
   if(keyStates['4']) { line.rp2().changeX(-delta); }
   if(keyStates['6']) { line.rp2().changeX(delta); }
 
+
   glutPostRedisplay();
 }
 
@@ -70,11 +72,9 @@ void display() {
 
   line.draw();
   line.drawPoints();
-
-  line2.draw();
-  line2.drawPoints();
-  line3.draw();
-  line3.drawPoints();
+  
+  vec.toLine(200, 50).draw();
+  Vector2D::reflectTo(vec, Vector2D(line.dx(), line.dy())).toLine(400, 350).draw();
 
   glutSwapBuffers();
 }
