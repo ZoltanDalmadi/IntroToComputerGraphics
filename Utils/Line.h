@@ -174,6 +174,7 @@ public:
     return abs(line.standardEquation(x, y)) / sqrt(DY*DY + DX*DX);
   }
 
+  /// Returns dot product of two lines interpreted as vectors. [static]
   static inline T dotProduct(const Line<T> &l1, const Line<T> &l2) {
     return l1.dx() * l2.dx() + l1.dy() * l2.dy();
   }
@@ -203,8 +204,8 @@ public:
     return os << "[" << line.p1() << " : " << line.p2() << "]" << std::endl;
   }
 
-  /// Unary negate operator overload.
-  friend inline Line<T> operator-(const Line<T>& line) {
+  /// Unary negate operator overload. Flips line direction.
+  inline friend Line<T> operator-(const Line<T>& line) {
     return Line<T>(line.x1(), line.y1(),
                    line.x2() - 2 * line.dx(),
                    line.y2() - 2 * line.dy());
