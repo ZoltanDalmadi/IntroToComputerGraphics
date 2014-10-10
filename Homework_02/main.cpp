@@ -18,9 +18,22 @@ const GLsizei HEIGHT = 720;
 // Colors.
 const Utils::Color bgColor(Utils::WHITE);
 
+const GLdouble ballSize = 50.0;
+
 Line line(300, HEIGHT, 800, 0);
-Circle ball(100, 100, 50);
-Vector2D vec(1, 1);
+Line leftWall(0, 0, 0, HEIGHT);
+Line rightWall(WIDTH, 0, WIDTH, HEIGHT);
+Line topWall(0, HEIGHT, WIDTH, HEIGHT);
+Line bottomWall(0, 0, WIDTH, 0);
+Vector2D lineVector(line.dx(), line.dy());
+Vector2D leftWallVector(leftWall.dx(), leftWall.dy());
+Vector2D rightWallVector(rightWall.dx(), rightWall.dy());
+Vector2D topWallVector(topWall.dx(), topWall.dy());
+Vector2D bottomWallVector(bottomWall.dx(), bottomWall.dy());
+Circle ball1(100, 100, ballSize);
+Circle ball2(WIDTH - 100, HEIGHT - 100, ballSize);
+Vector2D vec1(1, 1);
+Vector2D vec2(1, 1);
 
 std::map<unsigned char, bool> keyStates {
     { 'a', false },
@@ -49,7 +62,8 @@ void init() {
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   line.lineWidth = 2;
-  ball.lineWidth = 2;
+  ball1.lineWidth = 2;
+  ball2.lineWidth = 2;
 }
 
 void keyPressed(unsigned char key, int x, int y) {
@@ -76,17 +90,55 @@ void display() {
 
   line.draw();
   line.drawPoints();
-  ball.draw();
+  ball1.draw();
+  ball2.draw();
 
   glutSwapBuffers();
 }
 
 void gameUpdate(int n) {
-  ball.translate(vec);
-  if(Line::pDistanceToLine(ball.c(), line) <= ball.getRadius()) {
-    vec = Vector2D::reflectFrom(vec, Vector2D(line.dx(), line.dy()));
+  ball1.translate(vec1);
+  if(Line::pDistanceToLine(ball1.c(), line) <= ballSize) {
+    vec1 = Vector2D::reflectFrom(vec1, lineVector);
   }
-  std::cout << "(" << vec.x() << ", " << vec.y() << ")" << std::endl;
+
+  if(Line::pDistanceToLine(ball1.c(), leftWall) <= ballSize) {
+    vec1 = Vector2D::reflectFrom(vec1, leftWallVector);
+  }
+
+  if(Line::pDistanceToLine(ball1.c(), rightWall) <= ballSize) {
+    vec1 = Vector2D::reflectFrom(vec1, rightWallVector);
+  }
+
+  if(Line::pDistanceToLine(ball1.c(), topWall) <= ballSize) {
+    vec1 = Vector2D::reflectFrom(vec1, topWallVector);
+  }
+
+  if(Line::pDistanceToLine(ball1.c(), bottomWall) <= ballSize) {
+    vec1 = Vector2D::reflectFrom(vec1, bottomWallVector);
+  }
+
+  ball2.translate(vec2);
+  if(Line::pDistanceToLine(ball2.c(), line) <= ballSize) {
+    vec2 = Vector2D::reflectFrom(vec2, lineVector);
+  }
+
+  if(Line::pDistanceToLine(ball2.c(), leftWall) <= ballSize) {
+    vec2 = Vector2D::reflectFrom(vec2, leftWallVector);
+  }
+
+  if(Line::pDistanceToLine(ball2.c(), rightWall) <= ballSize) {
+    vec2 = Vector2D::reflectFrom(vec2, rightWallVector);
+  }
+
+  if(Line::pDistanceToLine(ball2.c(), topWall) <= ballSize) {
+    vec2 = Vector2D::reflectFrom(vec2, topWallVector);
+  }
+
+  if(Line::pDistanceToLine(ball2.c(), bottomWall) <= ballSize) {
+    vec2 = Vector2D::reflectFrom(vec2, bottomWallVector);
+  }
+  //std::cout << "(" << vec.x() << ", " << vec.y() << ")" << std::endl;
 
   glutTimerFunc(refreshRate, gameUpdate, 0);
 }
