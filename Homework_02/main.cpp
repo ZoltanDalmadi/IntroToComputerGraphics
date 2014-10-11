@@ -44,14 +44,13 @@ Point2D *c2 = ball2.pc();
 Vector2D vec2(1, 1);
 Circle ball2Outer(*c2, ballSize);
 
-
 bool keyStates[256];
 GLdouble delta = 1.0;
 
 std::random_device rd;
 std::mt19937 gen(rd());
-std::uniform_int_distribution<> disX(0, WIDTH);
-std::uniform_int_distribution<> disY(0, HEIGHT);
+std::uniform_int_distribution<> disX(ballSize, WIDTH - ballSize);
+std::uniform_int_distribution<> disY(ballSize, HEIGHT - ballSize);
 
 Point2D *food1;
 Point2D *food2;
@@ -83,6 +82,8 @@ void init() {
 
   ball1Outer.lineWidth = 5;
   ball2Outer.lineWidth = 5;
+  ball1Outer.color = ball1Color;
+  ball2Outer.color = ball2Color;
 
   food1 = new Point2D(disX(gen), disY(gen));
   food1->color = ball1Color;
@@ -100,22 +101,98 @@ void keyUp(unsigned char key, int x, int y) {
 
 void keyOperations() {
   if(keyStates['a']) {
-    line.rp1().changeX(-delta);
+    // if on top wall
+    if(line.x1() >= 0 && line.x1() <= WIDTH && line.y1() == HEIGHT) {
+      line.rp1().changeX(-delta);
+    }
+
+    // if on bottom wall
+    if(line.x1() >= 0 && line.x1() <= WIDTH && line.y1() == 0) {
+      line.rp1().changeX(delta);
+    }
+
+    // if on left wall
+    if(line.x1() == 0 && line.y1() >= 0 && line.y1() <= HEIGHT) {
+      line.rp1().changeY(-delta);
+    }
+
+    // if on right wall
+    if(line.x1() == WIDTH && line.y1() >= 0 && line.y1() <= HEIGHT) {
+      line.rp1().changeY(delta);
+    }
+
     lineVector.set(line.dx(), line.dy());
   }
 
   if(keyStates['d']) {
-    line.rp1().changeX(delta);
+    // if on top wall
+    if(line.x1() >= 0 && line.x1() <= WIDTH && line.y1() == HEIGHT) {
+      line.rp1().changeX(delta);
+    }
+
+    // if on bottom wall
+    if(line.x1() >= 0 && line.x1() <= WIDTH && line.y1() == 0) {
+      line.rp1().changeX(-delta);
+    }
+
+    // if on left wall
+    if(line.x1() == 0 && line.y1() >= 0 && line.y1() <= HEIGHT) {
+      line.rp1().changeY(delta);
+    }
+
+    // if on right wall
+    if(line.x1() == WIDTH && line.y1() >= 0 && line.y1() <= HEIGHT) {
+      line.rp1().changeY(-delta);
+    }
+
     lineVector.set(line.dx(), line.dy());
   }
 
   if(keyStates['4']) {
-    line.rp2().changeX(-delta);
+    // if on top wall
+    if(line.x2() >= 0 && line.x2() <= WIDTH && line.y2() == HEIGHT) {
+      line.rp2().changeX(delta);
+    }
+
+    // if on bottom wall
+    if(line.x2() >= 0 && line.x2() <= WIDTH && line.y2() == 0) {
+      line.rp2().changeX(-delta);
+    }
+
+    // if on left wall
+    if(line.x2() == 0 && line.y2() >= 0 && line.y2() <= HEIGHT) {
+      line.rp2().changeY(delta);
+    }
+
+    // if on right wall
+    if(line.x2() == WIDTH && line.y2() >= 0 && line.y2() <= HEIGHT) {
+      line.rp2().changeY(-delta);
+    }
+
     lineVector.set(line.dx(), line.dy());
   }
 
   if(keyStates['6']) {
-    line.rp2().changeX(delta);
+    // if on top wall
+    if(line.x2() >= 0 && line.x2() <= WIDTH && line.y2() == HEIGHT) {
+      line.rp2().changeX(-delta);
+    }
+
+    // if on bottom wall
+    if(line.x2() >= 0 && line.x2() <= WIDTH && line.y2() == 0) {
+      line.rp2().changeX(delta);
+    }
+
+    // if on left wall
+    if(line.x2() == 0 && line.y2() >= 0 && line.y2() <= HEIGHT) {
+      line.rp2().changeY(-delta);
+    }
+
+    // if on right wall
+    if(line.x2() == WIDTH && line.y2() >= 0 && line.y2() <= HEIGHT) {
+      line.rp2().changeY(delta);
+    }
+
     lineVector.set(line.dx(), line.dy());
   }
 }
@@ -188,7 +265,7 @@ void display() {
   glClear(GL_COLOR_BUFFER_BIT);
 
   line.draw();
-  line.drawPoints();
+  //line.drawPoints();
   ball1.drawDiagonals();
   ball1Outer.draw();
   ball2.drawDiagonals();
