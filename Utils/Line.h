@@ -1,9 +1,7 @@
 #pragma once
 
 #include <GL/freeglut.h>
-#include <cmath>
 #include "Point2D.h"
-#include "Color.h"
 
 namespace Utils {
 

@@ -8,6 +8,7 @@ namespace Utils {
 
 // Forward declare
 template <typename T> class Point2D;
+template <typename T> class Line;
 template <typename T> void glVertex2(const Point2D<T>& p);
 
 template <typename T>
@@ -168,6 +169,21 @@ public:
   /// Returns dot product of two points. [static]
   static inline T dotProduct(const Point2D<T> &p1, const Point2D<T> &p2) {
     return p1.xp * p2.xp + p1.yp * p2.yp;
+  }
+
+  /// Returns distance of Point2D to Line.
+  inline T distanceToLine(const Line<T> &line) {
+    T DX = line.dx();
+    T DY = line.dy();
+    return std::abs(line.standardEquation(xp, yp)) / sqrt(DY*DY + DX*DX);
+  }
+
+  /// Returns distance of Point2D to Line.
+  inline T distanceToLineSquared(const Line<T> &line) {
+    T DX = line.dx();
+    T DY = line.dy();
+    T e = line.standardEquation(xp, yp);
+    return e*e / (DY*DY + DX*DX);
   }
 
   /// Draw point with OpenGL calls.

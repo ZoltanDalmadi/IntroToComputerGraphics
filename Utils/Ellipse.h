@@ -22,7 +22,7 @@ public:
   GLfloat lineWidth = 1.0;
   GLfloat pointSize = 6.0;
   GLfloat centrePointSize = 10.0;
-  std::vector < Point2D<T> > pointsVector;
+  std::vector < Point2D<T> > pointsContainer;
   Color color = BLACK;
   Color pointColor = BLUE;
   Color centrePointColor = RED;
@@ -123,35 +123,35 @@ public:
 
   /// Increase Ellipse's points with postfix increment operator.
   inline void operator++(int) {
-    points++;
+    this->points++;
     recalcPoints();
   }
 
   /// Decrease Ellipse's points with postfix decrement operator.
   inline void operator--(int) {
-    points--;
+    this->points--;
     recalcPoints();
   }
 
   /// Increase Ellipse's points with prefix increment operator.
   inline void operator++() {
-    points++;
+    this->points++;
     recalcPoints();
   }
 
   /// Decrease Ellipse's points with prefix decrement operator.
   inline void operator--() {
-    points--;
+    this->points--;
     recalcPoints();
   }
 
   /// Recalculate points.
   virtual void recalcPoints() {
-    pointsVector.clear();
+    this->pointsContainer.clear();
     double gap = 2 * PI / points;
     for(size_t i = 0; i <= points; ++i) {
-      pointsVector.emplace_back(static_cast<T>(rx*cos(i*gap)),
-                                static_cast<T>(ry*sin(i*gap)));
+      pointsContainer.emplace_back(static_cast<T>(rx*cos(i*gap)),
+                                   static_cast<T>(ry*sin(i*gap)));
     }
   }
 
@@ -165,7 +165,7 @@ public:
     else
       glBegin(GL_LINE_LOOP);
 
-    for(const auto& point : pointsVector) {
+    for(const auto& point : pointsContainer) {
       glVertex2<T>(centre + point);
     }
     glEnd();
@@ -177,7 +177,7 @@ public:
     pointColor.setGLColor();
 
     glBegin(GL_POINTS);
-    for(const auto& point : pointsVector) {
+    for(const auto& point : pointsContainer) {
       glVertex2<T>(centre + point);
     }
     glEnd();
@@ -200,8 +200,8 @@ public:
     glBegin(GL_LINES);
     for(size_t i = 0; i < points; i++) {
       for(size_t j = i + 1; j < points; j++) {
-        glVertex2<T>(pointsVector[i]); //output vertex 
-        glVertex2<T>(pointsVector[j]); //output vertex 
+        glVertex2<T>(centre + pointsContainer[i]);
+        glVertex2<T>(centre + pointsContainer[j]);
       }
     }
     glEnd();

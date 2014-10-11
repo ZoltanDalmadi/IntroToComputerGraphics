@@ -41,6 +41,12 @@ public:
     yp = y;
   }
 
+  /// Sets components. (overload)
+  inline void set(const Vector2D<T> &v) {
+    xp = v.xp;
+    yp = v.yp;
+  }
+
   /// Returns length (norm).
   inline T length() const {
     return std::hypot(xp, yp);
@@ -119,6 +125,11 @@ public:
   /// Returns dot product of two vectors. [static]
   static inline T dotProduct(const Vector2D<T> &u, const Vector2D<T> &v) {
     return u.xp * v.xp + u.yp * v.yp;
+  }
+
+  inline void reflectFrom(const Vector2D<T> &v) {
+    T c = 2 * Vector2D<T>::dotProduct(v, *this) / v.lengthSquared();
+    this->set(-(*this) + c * v);
   }
 
   static inline Vector2D<T> reflectFrom(const Vector2D<T> &u, const Vector2D<T> &v) {

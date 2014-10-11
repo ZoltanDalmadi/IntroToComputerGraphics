@@ -28,7 +28,7 @@ public:
 
   /// Recalculate points (more efficient algorithm, but only for circles).
   virtual void recalcPoints() {
-    pointsVector.clear();
+    pointsContainer.clear();
     double gap = 2 * PI / points;
     double c = cos(gap); //precalculate the sine and cosine
     double s = sin(gap);
@@ -37,7 +37,7 @@ public:
     double y = 0;
 
     for(size_t i = 0; i < points; i++) {
-      pointsVector.emplace_back(static_cast<T>(x), static_cast<T>(y));
+      pointsContainer.emplace_back(static_cast<T>(x), static_cast<T>(y));
 
       //apply the rotation matrix
       temp = x;
