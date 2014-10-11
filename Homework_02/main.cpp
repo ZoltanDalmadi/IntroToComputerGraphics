@@ -49,8 +49,10 @@ GLdouble delta = 1.0;
 
 std::random_device rd;
 std::mt19937 gen(rd());
-std::uniform_int_distribution<> disX(ballSize, WIDTH - ballSize);
-std::uniform_int_distribution<> disY(ballSize, HEIGHT - ballSize);
+std::uniform_int_distribution<int> disX(static_cast<int>(ballSize),
+                                        static_cast<int>(WIDTH - ballSize));
+std::uniform_int_distribution<int> disY(static_cast<int>(ballSize),
+                                        static_cast<int>(HEIGHT - ballSize));
 
 Point2D *food1;
 Point2D *food2;
