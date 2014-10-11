@@ -12,8 +12,8 @@ typedef Utils::Line<GLdouble> Line;
 typedef Utils::Vector2D<GLdouble> Vector2D;
 
 // Window size.
-const GLsizei WIDTH = 1280;
-const GLsizei HEIGHT = 720;
+const GLsizei WIDTH = 700;
+const GLsizei HEIGHT = 500;
 
 // Colors.
 const Utils::Color bgColor(Utils::WHITE);
@@ -23,7 +23,7 @@ const Utils::Color ball2Color(Utils::RED);
 const GLdouble ballSize = 50.0;
 const GLdouble ballSizeSquared = ballSize*ballSize;
 
-Line line(300, HEIGHT, 800, 0);
+Line line(WIDTH/2, HEIGHT, WIDTH/2, 0);
 Line leftWall(0, 0, 0, HEIGHT);
 Line rightWall(WIDTH, 0, WIDTH, HEIGHT);
 Line topWall(0, HEIGHT, WIDTH, HEIGHT);
@@ -77,10 +77,10 @@ void init() {
   line.lineWidth = 2;
   ball1.lineWidth = 2;
   ball1.color = ball1Color;
-  ball1.setPoints(4);
+  ball1.setPoints(7);
   ball2.lineWidth = 2;
   ball2.color = ball2Color;
-  ball2.setPoints(4);
+  ball2.setPoints(7);
 
   ball1Outer.lineWidth = 5;
   ball2Outer.lineWidth = 5;
