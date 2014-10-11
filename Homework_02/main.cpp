@@ -309,21 +309,32 @@ void display() {
   detectFoodCollision();
 }
 
+void checkGameStatus() {
+  if(ball1->getPoints() < 3 || ball2->getPoints() > 19) {
+    std::cout << "Red player wins!" << std::endl;
+    glutLeaveMainLoop();
+  }
+
+  if(ball2->getPoints() < 3 || ball1->getPoints() > 19) {
+    std::cout << "Blue player wins!" << std::endl;
+    glutLeaveMainLoop();
+  }
+}
+
 void gameUpdate(int n) {
+  checkGameStatus();
   glutPostRedisplay();
   glutTimerFunc(refreshRate, gameUpdate, 0);
 }
 
 // Cleanup function -----------------------------------------------------------
 void cleanUp() {
-  delete ball1;
-  delete c1;
-  delete vec1;
   delete ball1Outer;
-  delete ball2;
-  delete c2;
-  delete vec2;
   delete ball2Outer;
+  delete vec1;
+  delete vec2;
+  delete ball1;
+  delete ball2;
   delete food1;
   delete food2;
 }
@@ -331,6 +342,8 @@ void cleanUp() {
 // Main function --------------------------------------------------------------
 int main(int argc, char* argv[]) {
   glutInit(&argc, argv);
+  glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE,
+                GLUT_ACTION_GLUTMAINLOOP_RETURNS);
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
   glutInitWindowSize(WIDTH, HEIGHT);
   glutCreateWindow("Homework 02");
@@ -340,6 +353,7 @@ int main(int argc, char* argv[]) {
   glutKeyboardFunc(keyPressed);
   glutKeyboardUpFunc(keyUp);
   glutTimerFunc(refreshRate, gameUpdate, 0);
+  glutCloseFunc(cleanUp);
   glutMainLoop();
   cleanUp();
   return 0;
