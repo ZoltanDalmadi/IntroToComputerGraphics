@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Ellipse.h"
 
 namespace Utils {
@@ -48,4 +49,4 @@ class Circle : public Ellipse <T> {
 
 }; // end class Circle
 
-} // endl namespace Utils
+} // end namespace Utils
