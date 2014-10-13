@@ -6,10 +6,10 @@ namespace Utils {
 
 template <typename T>
 class Vector2D {
-private:
+ private:
   T xp, yp;
 
-public:
+ public:
 
   inline Vector2D(T x, T y) : xp(x), yp(y) {}
 
@@ -42,7 +42,7 @@ public:
   }
 
   /// Sets components. (overload)
-  inline void set(const Vector2D<T> &v) {
+  inline void set(const Vector2D<T>& v) {
     xp = v.xp;
     yp = v.yp;
   }
@@ -58,7 +58,7 @@ public:
   }
 
   /// Compound addition operator overload.
-  inline Vector2D& operator+=(const Vector2D<T> &v) {
+  inline Vector2D& operator+=(const Vector2D<T>& v) {
     xp += v.xp;
     yp += v.yp;
     return *this;
@@ -79,7 +79,7 @@ public:
   }
 
   /// Compound multiplication operator overload.
-  inline Vector2D& operator*=(const Vector2D<T> &v) {
+  inline Vector2D& operator*=(const Vector2D<T>& v) {
     xp *= v.xp;
     yp *= v.yp;
     return *this;
@@ -93,46 +93,50 @@ public:
   }
 
   /// Unary negate operator overload.
-  inline friend const Vector2D<T> operator-(const Vector2D<T> &v) {
+  inline friend const Vector2D<T> operator-(const Vector2D<T>& v) {
     return Vector2D<T>(-v.xp, -v.yp);
   }
 
   /// Addition operator overload.
-  inline friend const Vector2D<T> operator+(const Vector2D<T> &u, const Vector2D<T> &v) {
+  inline friend const Vector2D<T> operator+(const Vector2D<T>& u,
+                                            const Vector2D<T>& v) {
     return Vector2D<T>(u.xp + v.xp, u.yp + v.yp);
   }
 
   /// Subtraction operator overload.
-  inline friend const Vector2D<T> operator-(const Vector2D<T> &u, const Vector2D<T> &v) {
+  inline friend const Vector2D<T> operator-(const Vector2D<T>& u,
+                                            const Vector2D<T>& v) {
     return Vector2D<T>(u.xp - v.xp, u.yp - v.yp);
   }
 
   /// Scalar multiplication operator overload.
-  inline friend const Vector2D<T> operator*(T scalar, const Vector2D<T> &v) {
+  inline friend const Vector2D<T> operator*(T scalar, const Vector2D<T>& v) {
     return Vector2D<T>(v.xp * scalar, v.yp * scalar);
   }
 
   /// Scalar multiplication operator overload.
-  inline friend const Vector2D<T> operator*(const Vector2D<T> &v, T scalar) {
+  inline friend const Vector2D<T> operator*(const Vector2D<T>& v, T scalar) {
     return Vector2D<T>(v.xp * scalar, v.yp * scalar);
   }
 
   /// Multiplication operator overload.
-  inline friend const Vector2D<T> operator*(const Vector2D<T> &u, const Vector2D<T> &v) {
+  inline friend const Vector2D<T> operator*(const Vector2D<T>& u,
+                                            const Vector2D<T>& v) {
     return Vector2D<T>(u.xp * v.xp, u.yp * v.yp);
   }
 
   /// Returns dot product of two vectors. [static]
-  static inline T dotProduct(const Vector2D<T> &u, const Vector2D<T> &v) {
+  static inline T dotProduct(const Vector2D<T>& u, const Vector2D<T>& v) {
     return u.xp * v.xp + u.yp * v.yp;
   }
 
-  inline void reflectFrom(const Vector2D<T> &v) {
+  inline void reflectFrom(const Vector2D<T>& v) {
     T c = 2 * Vector2D<T>::dotProduct(v, *this) / v.lengthSquared();
     this->set(-(*this) + c * v);
   }
 
-  static inline Vector2D<T> reflectFrom(const Vector2D<T> &u, const Vector2D<T> &v) {
+  static inline Vector2D<T> reflectFrom(const Vector2D<T>& u,
+                                        const Vector2D<T>& v) {
     T c = 2 * Vector2D<T>::dotProduct(v, u) / v.lengthSquared();
     return Vector2D<T>(-u + c * v);
   }

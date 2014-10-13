@@ -7,12 +7,12 @@ namespace Utils {
 
 template <typename T>
 class Line {
-private:
+ private:
   // Endpoints.
   Point2D<T> pt1;
   Point2D<T> pt2;
 
-public:
+ public:
   GLfloat lineWidth = 1.0;
   GLfloat pointSize = 10.0;
   Color color = BLACK;
@@ -55,12 +55,12 @@ public:
   }
 
   /// Returns a pointer to starting point of Line.
-  inline Point2D<T>* pp1() {
+  inline Point2D<T> *pp1() {
     return pt1.getPointer();
   }
 
   /// Returns a pointer to ending point of Line.
-  inline Point2D<T>* pp2() {
+  inline Point2D<T> *pp2() {
     return pt2.getPointer();
   }
 
@@ -166,22 +166,23 @@ public:
   }
 
   /// Returns distance of Point2D to Line. [static]
-  static inline T pDistanceToLine(const Point2D<T> &p, const Line<T> &line) {
+  static inline T pDistanceToLine(const Point2D<T>& p, const Line<T>& line) {
     T DX = line.dx();
     T DY = line.dy();
-    return std::abs(line.standardEquation(p.x(), p.y())) / sqrt(DY*DY + DX*DX);
+    return std::abs(line.standardEquation(p.x(), p.y())) / sqrt(DY * DY + DX * DX);
   }
 
   /// Returns distance of Point2D to Line. [static]
-  static inline T pDistanceToLineSquared(const Point2D<T> &p, const Line<T> &line) {
+  static inline T pDistanceToLineSquared(const Point2D<T>& p,
+                                         const Line<T>& line) {
     T DX = line.dx();
     T DY = line.dy();
     T e = line.standardEquation(p.x(), p.y());
-    return e*e / (DY*DY + DX*DX);
+    return e * e / (DY * DY + DX * DX);
   }
 
   /// Returns dot product of two lines interpreted as vectors. [static]
-  static inline T dotProduct(const Line<T> &l1, const Line<T> &l2) {
+  static inline T dotProduct(const Line<T>& l1, const Line<T>& l2) {
     return l1.dx() * l2.dx() + l1.dy() * l2.dy();
   }
 

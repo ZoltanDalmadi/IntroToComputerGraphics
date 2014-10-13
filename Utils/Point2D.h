@@ -13,12 +13,12 @@ template <typename T> void glVertex2(const Point2D<T>& p);
 
 template <typename T>
 class Point2D {
-private:
+ private:
   // Coordinates.
   T xp;
   T yp;
 
-public:
+ public:
   Color color = BLACK;
   GLfloat size = 10.0;
   bool dragged = false;
@@ -65,7 +65,7 @@ public:
   }
 
   /// Returns a pointer to this Point2D.
-  inline Point2D<T>* getPointer() {
+  inline Point2D<T> *getPointer() {
     return this;
   }
 
@@ -126,12 +126,12 @@ public:
 
   /// Scalar multiplication operator overload (Point on left side).
   friend inline const Point2D<T> operator*(const Point2D<T>& p, T c) {
-    return Point2D<T>(p.xp*c, p.yp*c);
+    return Point2D<T>(p.xp * c, p.yp * c);
   }
 
   /// Scalar multiplication operator overload (Point on right side).
   friend inline const Point2D<T> operator*(T c, const Point2D<T>& p) {
-    return Point2D<T>(p.xp*c, p.yp*c);
+    return Point2D<T>(p.xp * c, p.yp * c);
   }
 
   /// Unary positive operator overload.
@@ -155,7 +155,7 @@ public:
   }
 
   /// Returns distance between two points. [static]
-  static inline T distance(const Point2D<T>&p1, const Point2D<T>& p2) {
+  static inline T distance(const Point2D<T>& p1, const Point2D<T>& p2) {
     return std::hypot(p2.xp - p1.xp, p2.yp - p1.yp);
   }
 
@@ -163,27 +163,27 @@ public:
   static inline T distance2(const Point2D<T>& p1, const Point2D<T>& p2) {
     T x = p2.xp - p1.xp;
     T y = p2.yp - p1.yp;
-    return x*x + y*y;
+    return x * x + y * y;
   }
 
   /// Returns dot product of two points. [static]
-  static inline T dotProduct(const Point2D<T> &p1, const Point2D<T> &p2) {
+  static inline T dotProduct(const Point2D<T>& p1, const Point2D<T>& p2) {
     return p1.xp * p2.xp + p1.yp * p2.yp;
   }
 
   /// Returns distance of Point2D to Line.
-  inline T distanceToLine(const Line<T> &line) {
+  inline T distanceToLine(const Line<T>& line) {
     T DX = line.dx();
     T DY = line.dy();
-    return std::abs(line.standardEquation(xp, yp)) / sqrt(DY*DY + DX*DX);
+    return std::abs(line.standardEquation(xp, yp)) / sqrt(DY * DY + DX * DX);
   }
 
   /// Returns distance of Point2D to Line.
-  inline T distanceToLineSquared(const Line<T> &line) {
+  inline T distanceToLineSquared(const Line<T>& line) {
     T DX = line.dx();
     T DY = line.dy();
     T e = line.standardEquation(xp, yp);
-    return e*e / (DY*DY + DX*DX);
+    return e * e / (DY * DY + DX * DX);
   }
 
   /// Draw point with OpenGL calls.
