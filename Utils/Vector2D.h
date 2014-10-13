@@ -147,4 +147,4 @@ class Vector2D {
 
 }; // end class Vector2D
 
-}
+} // end namespace Utils
