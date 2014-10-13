@@ -56,13 +56,6 @@ Vector2D rightWallVector(rightWall.dx(), rightWall.dy());
 Vector2D topWallVector(topWall.dx(), topWall.dy());
 Vector2D bottomWallVector(bottomWall.dx(), bottomWall.dy());
 
-// Food -----------------------------------------------------------------------
-Point2D *food1;
-Point2D *food2;
-
-// Keyboard button states -----------------------------------------------------
-bool keyStates[256];
-
 // Random number generator ----------------------------------------------------
 std::random_device rd;
 std::mt19937 gen(rd());
@@ -70,6 +63,13 @@ std::uniform_int_distribution<int> disX(static_cast<int>(ballSize),
                                         static_cast<int>(WIDTH - ballSize));
 std::uniform_int_distribution<int> disY(static_cast<int>(ballSize),
                                         static_cast<int>(HEIGHT - ballSize));
+
+// Food -----------------------------------------------------------------------
+Point2D food1 (disX(gen), disY(gen));
+Point2D food2 (disX(gen), disY(gen));
+
+// Keyboard button states -----------------------------------------------------
+bool keyStates[256];
 
 void init() {
   // Background color setup ---------------------------------------------------
@@ -99,10 +99,8 @@ void init() {
   ball1Outer.color = ball1Color;
   ball2Outer.color = ball2Color;
 
-  food1 = new Point2D(disX(gen), disY(gen));
-  food1->color = ball1Color;
-  food2 = new Point2D(disX(gen), disY(gen));
-  food2->color = ball2Color;
+  food1.color = ball1Color;
+  food2.color = ball2Color;
 }
 
 // Keyboard handling ----------------------------------------------------------
@@ -259,34 +257,30 @@ void detectWallCollision() {
 }
 
 void detectFoodCollision() {
-  if(Point2D::distance2(*c1, *food1) < ballSizeSquared) {
-    delete food1;
-    food1 = new Point2D(disX(gen), disY(gen));
-    food1->color = ball1Color;
+  if(Point2D::distance2(*c1, food1) < ballSizeSquared) {
+    food1.setX(disX(gen));
+    food1.setY(disY(gen));
     ball1++;
     checkGameStatus();
   }
 
-  if(Point2D::distance2(*c1, *food2) < ballSizeSquared) {
-    delete food2;
-    food2 = new Point2D(disX(gen), disY(gen));
-    food2->color = ball2Color;
+  if(Point2D::distance2(*c1, food2) < ballSizeSquared) {
+    food2.setX(disX(gen));
+    food2.setY(disY(gen));
     ball1--;
     checkGameStatus();
   }
 
-  if(Point2D::distance2(*c2, *food1) < ballSizeSquared) {
-    delete food1;
-    food1 = new Point2D(disX(gen), disY(gen));
-    food1->color = ball1Color;
+  if(Point2D::distance2(*c2, food1) < ballSizeSquared) {
+    food1.setX(disX(gen));
+    food1.setY(disY(gen));
     ball2--;
     checkGameStatus();
   }
 
-  if(Point2D::distance2(*c2, *food2) < ballSizeSquared) {
-    delete food2;
-    food2 = new Point2D(disX(gen), disY(gen));
-    food2->color = ball2Color;
+  if(Point2D::distance2(*c2, food2) < ballSizeSquared) {
+    food2.setX(disX(gen));
+    food2.setY(disY(gen));
     ball2++;
     checkGameStatus();
   }
@@ -302,8 +296,8 @@ void display() {
   ball1Outer.draw();
   ball2.drawDiagonals();
   ball2Outer.draw();
-  food1->draw();
-  food2->draw();
+  food1.draw();
+  food2.draw();
 
   glutSwapBuffers();
 
