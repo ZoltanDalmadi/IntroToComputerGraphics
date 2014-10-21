@@ -86,6 +86,8 @@
     <ClInclude Include="Ellipse.h" />
     <ClInclude Include="Line.h" />
     <ClInclude Include="Point2D.h" />
+    <ClInclude Include="Rectangle.h" />
+    <ClInclude Include="Slider.h" />
     <ClInclude Include="Vector2D.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
