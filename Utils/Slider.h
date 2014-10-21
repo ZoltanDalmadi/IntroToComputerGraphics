@@ -6,12 +6,11 @@
 
 namespace Utils {
 
-template <typename T>
 class Slider {
-private:
-  Line<T> body;
-  Point2D<T> handle;
-  double value;
+ private:
+  Line<GLint> body;
+  Point2D<GLint> handle;
+  int value = 0;
 
   GLfloat lineWidth = 2.0;
   Color bodyColor = BLACK;
@@ -20,56 +19,63 @@ private:
 
   inline void init() {
     this->body.color = this->bodyColor;
+    this->body.lineWidth = this->lineWidth;
     this->handle.color = this->handleColor;
-    value = 0.5;
-    handle.setX(static_cast<T>(body.x1() + body.dx() * value));
+    this->handle.size = this->handleSize;
   }
 
-public:
-  inline Slider(T x1, T y1, T x2, T y2) : body(x1, y2, x2, y2), handle(x1, y1) {
+ public:
+  Slider(GLint x1, GLint y1, GLint x2, GLint y2)
+    : body(x1, y1, x2, y2), handle(x1, y1) {
     init();
   }
 
-  inline Slider(Point2D<T> a, Point2D<T> b)
-    : body(a, b), handle(body.x1(), body.x2()) {
+  Slider(Point2D<GLint> a, Point2D<GLint> b)
+    : body(a, b), handle(a) {
     init();
   }
 
   virtual ~Slider() {}
 
-  inline void setValue(const double& val) {
+  inline void setValue(int val) {
     this->value = val;
   }
 
-  inline double getValue() {
+  inline int getValue() {
     return this->value;
   }
 
   inline void updateValue() {
-    this->value = static_cast<double>((this->handle.x() - this->body.x1()))
-      / this->body.dx();
+    double x =
+      std::round(static_cast<double>(handle.x() - body.x1()) / body.dx() * 100);
+
+    value = static_cast<int>(x);
   }
 
-  inline void setHandlePos(T pos) {
-    if(pos >= body.x1() && pos <= body.x2()) {
+  void setHandlePos(GLint pos) {
+    GLint x1 = body.x1();
+    GLint x2 = body.x2();
+
+    if (pos >= x1 && pos <= x2) {
       this->handle.setX(pos);
+
+      if (pos < x1)
+        this->handle.setX(x1);
+
+      if (pos > x2)
+        this->handle.setX(x2);
+
       updateValue();
     }
   }
 
-  inline void checkClick(const Point2D<T>& mousePos, int sens) {
+  inline void checkClick(const Point2D<GLint>& mousePos, int sens) {
     this->handle.checkClick(mousePos, sens);
   }
 
   inline void checkClick(GLint& xMouse, GLint& yMouse, int sens) {
-    Point2D<T> mousePos(static_cast<T>(xMouse),
-                        static_cast<T>(yMouse));
+    Point2D<GLint> mousePos(xMouse, yMouse);
     this->handle.checkClick(mousePos, sens);
-  }
-
-  inline void onDrag() {
-    if(this->handle.clicked)
-      setHandlePos(mouseX);
   }
 
   inline bool isDragging() {

@@ -8,7 +8,7 @@ const GLsizei WIDTH = 800;
 const GLsizei HEIGHT = 800;
 const Utils::Color bgColor(Utils::WHITE);
 
-typedef Utils::Slider<GLint> Slider;
+typedef Utils::Slider Slider;
 
 Slider slider(100, 400, 700, 400);
 
@@ -31,25 +31,25 @@ void display() {
 }
 
 void processMouse(GLint button, GLint action, GLint xMouse, GLint yMouse) {
-  if(button == GLUT_LEFT_BUTTON && action == GLUT_DOWN) {
+  if (button == GLUT_LEFT_BUTTON && action == GLUT_DOWN) {
     slider.checkClick(xMouse, yMouse, 12);
   }
 
-  if(button == GLUT_LEFT_BUTTON && action == GLUT_UP) {
+  if (button == GLUT_LEFT_BUTTON && action == GLUT_UP) {
     slider.release();
   }
 }
 
 void processMouseActiveMotion(GLint xMouse, GLint yMouse) {
-  if(slider.isDragging()) {
+  if (slider.isDragging()) {
     slider.setHandlePos(xMouse);
     std::cout << slider.getValue() << std::endl;
   }
-  
+
   glutPostRedisplay();
 }
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv) {
   glutInit(&argc, argv);
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
   glutInitWindowSize(WIDTH, HEIGHT);

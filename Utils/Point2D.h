@@ -188,7 +188,8 @@ class Point2D {
 
   inline void checkClick(const Point2D<T>& mousePos, int sens) {
     int s = sens * sens;
-    if(Point2D::distance2(*this, mousePos) < s) {
+
+    if (Point2D::distance2(*this, mousePos) < s) {
       this->clicked = true;
     }
   }

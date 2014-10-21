@@ -8,23 +8,23 @@ namespace Utils {
 
 template <typename T>
 class Rectangle {
-private:
+ private:
   Point2D<T> topLeft;
   Point2D<T> topRight;
   Point2D<T> bottomRight;
   Point2D<T> bottomLeft;
 
-public:
+ public:
   Color color = RED;
 
-  Rectangle(const Point2D<T> &topleft, const Point2D<T> &topright,
-            const Point2D<T> &bottomright, const Point2D<T> &bottomleft)
-            : topLeft(topleft), topRight(topright),
-            bottomRight(bottomright), bottomLeft(bottomleft) {}
+  Rectangle(const Point2D<T>& topleft, const Point2D<T>& topright,
+            const Point2D<T>& bottomright, const Point2D<T>& bottomleft)
+    : topLeft(topleft), topRight(topright),
+      bottomRight(bottomright), bottomLeft(bottomleft) {}
 
   Rectangle(T x, T y, T width, T height)
     : topLeft(x, y), topRight(x + width, y),
-    bottomRight(x + width, y - height), bottomLeft(x, y - height) {}
+      bottomRight(x + width, y - height), bottomLeft(x, y - height) {}
 
   virtual ~Rectangle() {}
 
