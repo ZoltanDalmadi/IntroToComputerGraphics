@@ -11,7 +11,7 @@ class Slider {
 private:
   Line<T> body;
   Point2D<T> handle;
-  double value = 0.5;
+  double value;
 
   GLfloat lineWidth = 2.0;
   Color bodyColor = BLACK;
@@ -21,6 +21,7 @@ private:
   inline void init() {
     this->body.color = this->bodyColor;
     this->handle.color = this->handleColor;
+    value = 0.5;
     handle.setX(static_cast<T>(body.x1() + body.dx() * value));
   }
 
@@ -42,6 +43,41 @@ public:
 
   inline double getValue() {
     return this->value;
+  }
+
+  inline void updateValue() {
+    this->value = static_cast<double>((this->handle.x() - this->body.x1()))
+      / this->body.dx();
+  }
+
+  inline void setHandlePos(T pos) {
+    if(pos >= body.x1() && pos <= body.x2()) {
+      this->handle.setX(pos);
+      updateValue();
+    }
+  }
+
+  inline void checkClick(const Point2D<T>& mousePos, int sens) {
+    this->handle.checkClick(mousePos, sens);
+  }
+
+  inline void checkClick(GLint& xMouse, GLint& yMouse, int sens) {
+    Point2D<T> mousePos(static_cast<T>(xMouse),
+                        static_cast<T>(yMouse));
+    this->handle.checkClick(mousePos, sens);
+  }
+
+  inline void onDrag() {
+    if(this->handle.clicked)
+      setHandlePos(mouseX);
+  }
+
+  inline bool isDragging() {
+    return this->handle.clicked;
+  }
+
+  inline void release() {
+    this->handle.release();
   }
 
   inline void draw() {

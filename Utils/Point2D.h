@@ -186,11 +186,21 @@ class Point2D {
     return e * e / (DY * DY + DX * DX);
   }
 
-  void checkMouseClick(const Point2D<T>& mousePos, GLint sens) {
-    GLint s = sens * sens;
+  inline void checkClick(const Point2D<T>& mousePos, int sens) {
+    int s = sens * sens;
     if(Point2D::distance2(*this, mousePos) < s) {
       this->clicked = true;
     }
+  }
+
+  inline void checkClick(GLint& xMouse, GLint& yMouse, int sens) {
+    Point2D<T> mousePos(static_cast<T>(xMouse),
+                        static_cast<T>(yMouse));
+    this->checkClick(mousePos, sens);
+  }
+
+  inline void release() {
+    this->clicked = false;
   }
 
   /// Draw point with OpenGL calls.

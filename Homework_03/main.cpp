@@ -30,6 +30,25 @@ void display() {
   glutSwapBuffers();
 }
 
+void processMouse(GLint button, GLint action, GLint xMouse, GLint yMouse) {
+  if(button == GLUT_LEFT_BUTTON && action == GLUT_DOWN) {
+    slider.checkClick(xMouse, yMouse, 12);
+  }
+
+  if(button == GLUT_LEFT_BUTTON && action == GLUT_UP) {
+    slider.release();
+  }
+}
+
+void processMouseActiveMotion(GLint xMouse, GLint yMouse) {
+  if(slider.isDragging()) {
+    slider.setHandlePos(xMouse);
+    std::cout << slider.getValue() << std::endl;
+  }
+  
+  glutPostRedisplay();
+}
+
 int main(int argc, char** argv) {
   glutInit(&argc, argv);
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
@@ -38,6 +57,8 @@ int main(int argc, char** argv) {
 
   init();
   glutDisplayFunc(display);
+  glutMouseFunc(processMouse);
+  glutMotionFunc(processMouseActiveMotion);
   glutMainLoop();
   return 0;
 }
