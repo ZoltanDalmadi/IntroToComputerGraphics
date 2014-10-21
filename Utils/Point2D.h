@@ -21,7 +21,7 @@ class Point2D {
  public:
   Color color = BLACK;
   GLfloat size = 10.0;
-  bool dragged = false;
+  bool clicked = false;
 
   /// Initialize point at (0, 0) (origin). (glut: bottom-left corner)
   Point2D() : xp(0), yp(0) {}
@@ -184,6 +184,13 @@ class Point2D {
     T DY = line.dy();
     T e = line.standardEquation(xp, yp);
     return e * e / (DY * DY + DX * DX);
+  }
+
+  void checkMouseClick(const Point2D<T>& mousePos, GLint sens) {
+    GLint s = sens * sens;
+    if(Point2D::distance2(*this, mousePos) < s) {
+      this->clicked = true;
+    }
   }
 
   /// Draw point with OpenGL calls.

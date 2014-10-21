@@ -1,16 +1,16 @@
 #include <GL/glut.h>
 #include <iostream>
 #include <cmath>
-#include "Rectangle.h"
+#include "Slider.h"
 
 // Window size.
 const GLsizei WIDTH = 800;
 const GLsizei HEIGHT = 800;
 const Utils::Color bgColor(Utils::WHITE);
 
-typedef Utils::Rectangle<GLint> Rect;
+typedef Utils::Slider<GLint> Slider;
 
-Rect rect(100, 400, 200, 300);
+Slider slider(100, 400, 700, 400);
 
 void init() {
   bgColor.setGLClearColor();
@@ -26,7 +26,7 @@ void init() {
 
 void display() {
   glClear(GL_COLOR_BUFFER_BIT);
-  rect.draw();
+  slider.draw();
   glutSwapBuffers();
 }
 

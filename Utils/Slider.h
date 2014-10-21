@@ -1,31 +1,52 @@
 #pragma once
 
 #include <GL/glut.h>
-#include "Rectangle.h"
+#include "Point2D.h"
+#include "Line.h"
 
 namespace Utils {
 
 template <typename T>
 class Slider {
 private:
-  Rectangle<T> handle;
-  T handleWidth;
-  T handleHeigh;
-  T size;
-  T x;
-  T y;
+  Line<T> body;
+  Point2D<T> handle;
+  double value = 0.5;
+
+  GLfloat lineWidth = 2.0;
+  Color bodyColor = BLACK;
+  GLfloat handleSize = 12.0;
+  Color handleColor = DARK_GREEN;
+
+  inline void init() {
+    this->body.color = this->bodyColor;
+    this->handle.color = this->handleColor;
+    handle.setX(static_cast<T>(body.x1() + body.dx() * value));
+  }
 
 public:
-  bool vertical = false;
-  GLfloat lineWidth = 1.0;
-  Color color = BLACK;
+  inline Slider(T x1, T y1, T x2, T y2) : body(x1, y2, x2, y2), handle(x1, y1) {
+    init();
+  }
 
-  Slider(T x, T y, T siz, T handleW, T handleH)
-    : handle(x, y, handleH, handleW), size(siz) {}
+  inline Slider(Point2D<T> a, Point2D<T> b)
+    : body(a, b), handle(body.x1(), body.x2()) {
+    init();
+  }
+
   virtual ~Slider() {}
 
-  void setHandleSize() {
-    this->handle.setSize();
+  inline void setValue(const double& val) {
+    this->value = val;
+  }
+
+  inline double getValue() {
+    return this->value;
+  }
+
+  inline void draw() {
+    this->body.draw();
+    this->handle.draw();
   }
 
 }; // end class Slider
