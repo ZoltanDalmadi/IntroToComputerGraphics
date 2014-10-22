@@ -41,7 +41,7 @@ class Slider {
     this->value = val;
   }
 
-  inline int getValue() {
+  inline int getValue() const {
     return this->value;
   }
 
@@ -73,12 +73,12 @@ class Slider {
     this->handle.checkClick(mousePos, sens);
   }
 
-  inline void checkClick(GLint& xMouse, GLint& yMouse, int sens) {
+  inline void checkClick(GLint xMouse, GLint yMouse, int sens) {
     Point2D<GLint> mousePos(xMouse, yMouse);
     this->handle.checkClick(mousePos, sens);
   }
 
-  inline bool isDragging() {
+  inline bool isDragging() const {
     return this->handle.clicked;
   }
 

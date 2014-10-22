@@ -194,7 +194,7 @@ class Point2D {
     }
   }
 
-  inline void checkClick(GLint& xMouse, GLint& yMouse, int sens) {
+  inline void checkClick(GLint xMouse, GLint yMouse, int sens) {
     Point2D<T> mousePos(static_cast<T>(xMouse),
                         static_cast<T>(yMouse));
     this->checkClick(mousePos, sens);

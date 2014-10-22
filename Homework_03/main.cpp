@@ -2,6 +2,7 @@
 #include <iostream>
 #include <cmath>
 #include "Slider.h"
+#include "Circle.h"
 
 // Window size.
 const GLsizei WIDTH = 800;
@@ -9,8 +10,10 @@ const GLsizei HEIGHT = 800;
 const Utils::Color bgColor(Utils::WHITE);
 
 typedef Utils::Slider Slider;
+typedef Utils::Circle<GLdouble> Circle;
 
-Slider slider(100, 400, 700, 400);
+Circle circ(WIDTH / 2, HEIGHT / 2, 20, 96);
+Slider slider(100, 100, 700, 100);
 
 void init() {
   bgColor.setGLClearColor();
@@ -26,13 +29,15 @@ void init() {
 
 void display() {
   glClear(GL_COLOR_BUFFER_BIT);
+  circ.draw();
+  circ.drawTangents();
   slider.draw();
   glutSwapBuffers();
 }
 
 void processMouse(GLint button, GLint action, GLint xMouse, GLint yMouse) {
   if (button == GLUT_LEFT_BUTTON && action == GLUT_DOWN) {
-    slider.checkClick(xMouse, yMouse, 12);
+    slider.checkClick(xMouse, HEIGHT - yMouse, 12);
   }
 
   if (button == GLUT_LEFT_BUTTON && action == GLUT_UP) {

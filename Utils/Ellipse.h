@@ -33,6 +33,11 @@ class Ellipse {
     recalcPoints();
   }
 
+  inline Ellipse(T cx, T cy, T rx, T ry, size_t points)
+    : centre(cx, cy), rx(rx), ry(ry), points(points) {
+    recalcPoints();
+  }
+
   inline Ellipse(Point2D<T> c, T rx, T ry) : centre(c), rx(rx), ry(ry) {
     recalcPoints();
   }
@@ -209,6 +214,24 @@ class Ellipse {
         glVertex2<T>(centre + pointsContainer[i]);
         glVertex2<T>(centre + pointsContainer[j]);
       }
+    }
+
+    glEnd();
+  }
+
+  void drawTangent() const {
+    glLineWidth(lineWidth);
+    color.setGLColor();
+
+    double gap = 2 * PI / points;
+
+    glBegin(GL_LINES);
+
+    for (size_t i = 0; i <= points; ++i) {
+      double theta = i * gap;
+      glVertex2<T>(centre + pointsContainer.at(i));
+      glVertex2<T>(centre + Point2D<T>(rx * (cos(theta) + theta * sin(theta)),
+                                       ry * (sin(theta) - theta * cos(theta))));
     }
 
     glEnd();

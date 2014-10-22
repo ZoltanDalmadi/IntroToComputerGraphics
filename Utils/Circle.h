@@ -15,6 +15,7 @@ class Circle : public Ellipse <T> {
 
  public:
   inline Circle(T cx, T cy, T r) : Ellipse<T>(cx, cy, r, r) {}
+  inline Circle(T cx, T cy, T r, size_t points) : Ellipse<T>(cx, cy, r, r, points) {}
   inline Circle(Point2D<T> c, T r) : Ellipse<T>(c, r, r) {}
   virtual ~Circle() {}
 
