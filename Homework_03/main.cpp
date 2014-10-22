@@ -7,12 +7,16 @@
 // Window size.
 const GLsizei WIDTH = 800;
 const GLsizei HEIGHT = 800;
+const size_t revolutions = 4;
+const size_t circlePoints = 48;
+const double delta = static_cast<double>(circlePoints * revolutions) / 100;
+
 const Utils::Color bgColor(Utils::WHITE);
 
 typedef Utils::Slider Slider;
 typedef Utils::Circle<GLdouble> Circle;
 
-Circle circ(WIDTH / 2, HEIGHT / 2, 20, 96);
+Circle circ(WIDTH / 2, HEIGHT / 2, 10, circlePoints);
 Slider slider(100, 100, 700, 100);
 
 void init() {
@@ -30,7 +34,7 @@ void init() {
 void display() {
   glClear(GL_COLOR_BUFFER_BIT);
   circ.draw();
-  circ.drawTangents();
+  circ.drawTangentAt(slider.getValue() * delta);
   slider.draw();
   glutSwapBuffers();
 }
@@ -48,7 +52,6 @@ void processMouse(GLint button, GLint action, GLint xMouse, GLint yMouse) {
 void processMouseActiveMotion(GLint xMouse, GLint yMouse) {
   if (slider.isDragging()) {
     slider.setHandlePos(xMouse);
-    std::cout << slider.getValue() << std::endl;
   }
 
   glutPostRedisplay();
