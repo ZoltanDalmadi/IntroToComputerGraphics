@@ -5,9 +5,9 @@
 #include "Circle.h"
 
 // Window size.
-const GLsizei WIDTH = 800;
-const GLsizei HEIGHT = 800;
-const size_t revolutions = 4;
+const GLsizei WIDTH = 1280;
+const GLsizei HEIGHT = 720;
+const size_t revolutions = 5;
 const size_t circlePoints = 48;
 const double delta = static_cast<double>(circlePoints * revolutions) / 100;
 
@@ -17,7 +17,7 @@ typedef Utils::Slider Slider;
 typedef Utils::Circle<GLdouble> Circle;
 
 Circle circ(WIDTH / 2, HEIGHT / 2, 10, circlePoints);
-Slider slider(100, 100, 700, 100);
+Slider slider(100, 100, 1180, 100);
 
 void init() {
   bgColor.setGLClearColor();
@@ -29,12 +29,13 @@ void init() {
   glEnable(GL_POINT_SMOOTH);
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  circ.lineWidth = 2;
 }
 
 void display() {
   glClear(GL_COLOR_BUFFER_BIT);
   circ.draw();
-  circ.drawTangentAt(slider.getValue() * delta);
+  circ.drawEvolvents(4, slider.getValue() * delta);
   slider.draw();
   glutSwapBuffers();
 }

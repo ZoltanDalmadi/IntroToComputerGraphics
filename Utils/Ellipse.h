@@ -219,20 +219,27 @@ class Ellipse {
     glEnd();
   }
 
-  void drawTangentAt(double n) const {
+  void drawEvolvents(size_t n, double m) const {
     glLineWidth(lineWidth);
     color.setGLColor();
 
     double gap = 2 * PI / points;
-    double theta = n * gap;
+    double gap2 = 2 * PI / n;
+    double theta;
+    double alpha;
 
-    glBegin(GL_LINES);
+    for (size_t j = 0; j < n; j++) {
+      glBegin(GL_LINE_STRIP);
+      alpha = j * gap2;
+        
+      for (size_t i = 0; i <= m; i++) {
+        theta = i * gap;
+        glVertex2<T>(centre + Point2D<T>(rx * (cos(alpha + theta) + theta * sin(alpha + theta)),
+                                         ry * (sin(alpha + theta) - theta * cos(alpha + theta))));
+      }
 
-    glVertex2<T>(centre + Point2D<T>(rx * cos(theta), ry * sin(theta)));
-    glVertex2<T>(centre + Point2D<T>(rx * (cos(theta) + theta * sin(theta)),
-                                     ry * (sin(theta) - theta * cos(theta))));
-
-    glEnd();
+      glEnd();
+    }
   }
 
 }; // end class Ellipse
