@@ -93,11 +93,13 @@ class Ellipse {
   /// Sets X radius.
   inline void setRadiusX(T radius) {
     rx = radius;
+    recalcPoints();
   };
 
   /// Sets Y radius.
   inline void setRadiusY(T radius) {
     ry = radius;
+    recalcPoints();
   };
 
   /// Returns number of points.

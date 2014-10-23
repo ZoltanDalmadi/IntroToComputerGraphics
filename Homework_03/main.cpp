@@ -4,20 +4,29 @@
 #include "Slider.h"
 #include "Circle.h"
 
+// Typedefs.
+typedef Utils::Slider Slider;
+typedef Utils::Circle<GLdouble> Circle;
+
 // Window size.
 const GLsizei WIDTH = 1280;
 const GLsizei HEIGHT = 720;
+
+// Constants.
 const size_t revolutions = 5;
 const size_t circlePoints = 48;
 const double delta = static_cast<double>(circlePoints * revolutions) / 100;
 
+const size_t maxEvolvents = 30;
+
+// Colors.
 const Utils::Color bgColor(Utils::WHITE);
 
-typedef Utils::Slider Slider;
-typedef Utils::Circle<GLdouble> Circle;
-
+// Items.
 Circle circ(WIDTH / 2, HEIGHT / 2, 10, circlePoints);
-Slider slider(100, 100, 1180, 100);
+Slider progressSlider(100, 40, 1180, 40);
+Slider numbersSlider(100, 80, 1180, 80);
+Slider radiusSlider(100, 120, 1180, 120);
 
 void init() {
   bgColor.setGLClearColor();
@@ -30,29 +39,46 @@ void init() {
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   circ.lineWidth = 2;
+  radiusSlider.setValue(10);
 }
 
 void display() {
   glClear(GL_COLOR_BUFFER_BIT);
   circ.draw();
-  circ.drawEvolvents(4, slider.getValue() * delta);
-  slider.draw();
+  size_t asd = static_cast<size_t>(1 + (numbersSlider.getValue()*(maxEvolvents-1)/100));
+  circ.drawEvolvents(asd, progressSlider.getValue() * delta);
+  progressSlider.draw();
+  numbersSlider.draw();
+  radiusSlider.draw();
   glutSwapBuffers();
 }
 
 void processMouse(GLint button, GLint action, GLint xMouse, GLint yMouse) {
   if (button == GLUT_LEFT_BUTTON && action == GLUT_DOWN) {
-    slider.checkClick(xMouse, HEIGHT - yMouse, 12);
+    progressSlider.checkClick(xMouse, HEIGHT - yMouse, 12);
+    numbersSlider.checkClick(xMouse, HEIGHT - yMouse, 12);
+    radiusSlider.checkClick(xMouse, HEIGHT - yMouse, 12);
   }
 
   if (button == GLUT_LEFT_BUTTON && action == GLUT_UP) {
-    slider.release();
+    progressSlider.release();
+    numbersSlider.release();
+    radiusSlider.release();
   }
 }
 
 void processMouseActiveMotion(GLint xMouse, GLint yMouse) {
-  if (slider.isDragging()) {
-    slider.setHandlePos(xMouse);
+  if (progressSlider.isDragging()) {
+    progressSlider.setHandlePos(xMouse);
+  }
+
+  if (numbersSlider.isDragging()) {
+    numbersSlider.setHandlePos(xMouse);
+  }
+
+  if (radiusSlider.isDragging()) {
+    radiusSlider.setHandlePos(xMouse);
+    circ.setRadius(radiusSlider.getValue());
   }
 
   glutPostRedisplay();

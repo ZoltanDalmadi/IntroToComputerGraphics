@@ -38,7 +38,7 @@ class Slider {
   virtual ~Slider() {}
 
   inline void setValue(int val) {
-    this->value = val;
+    this->setHandlePos(this->body.x1() + body.dx() / val);
   }
 
   inline int getValue() const {

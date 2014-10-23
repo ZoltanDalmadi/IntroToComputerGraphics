@@ -26,6 +26,7 @@ class Circle : public Ellipse <T> {
   inline void setRadius(T radius) {
     this->rx = radius;
     this->ry = radius;
+    recalcPoints();
   }
 
   /// Recalculate points (more efficient algorithm, but only for circles).
