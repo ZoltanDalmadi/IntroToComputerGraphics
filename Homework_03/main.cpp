@@ -15,7 +15,7 @@ const GLsizei HEIGHT = 720;
 // Constants.
 const size_t revolutions = 5;
 const size_t circlePoints = 48;
-const double delta = static_cast<double>(circlePoints * revolutions) / 100;
+const double delta = static_cast<double>(circlePoints) * revolutions / 100;
 
 const size_t maxEvolvents = 30;
 
@@ -45,7 +45,8 @@ void init() {
 void display() {
   glClear(GL_COLOR_BUFFER_BIT);
   circ.draw();
-  size_t asd = static_cast<size_t>(1 + (numbersSlider.getValue()*(maxEvolvents-1)/100));
+  size_t asd = static_cast<size_t>(1 + (numbersSlider.getValue() *
+                                        (maxEvolvents - 1) / 100));
   circ.drawEvolvents(asd, progressSlider.getValue() * delta);
   progressSlider.draw();
   numbersSlider.draw();

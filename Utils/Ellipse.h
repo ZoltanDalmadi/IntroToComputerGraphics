@@ -223,7 +223,7 @@ class Ellipse {
 
   /// Draw evolvents from this ellipse.
   /// n: number of evolvents
-  /// m: draw until this point. Depends on member value of "points".
+  /// m: draw until this point. Depends on value of member variable "points".
   void drawEvolvents(size_t n, double m) const {
     glLineWidth(lineWidth);
     color.setGLColor();
@@ -238,16 +238,17 @@ class Ellipse {
 
     for (size_t j = 0; j < n; j++) {
       alpha = j * gap2;
-        
+
       glBegin(GL_LINE_STRIP);
+
       for (double i = 0; i <= m; i++) {
         theta = i * gap;
         at = alpha + theta;
         glVertex2<T>(Point2D<T>(cx + rx * (cos(at) + theta * sin(at)),
                                 cy + ry * (sin(at) - theta * cos(at))));
       }
-      glEnd();
 
+      glEnd();
     }
   }
 
