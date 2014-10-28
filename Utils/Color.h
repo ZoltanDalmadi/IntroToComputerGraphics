@@ -35,7 +35,7 @@ class Color {
 
  public:
   // Initialize with RGBA values.
-  inline Color(int r, int g, int b, int a = 0) : r(r), g(g), b(b), a(a) {}
+  inline Color(int r, int g, int b, int a = 255) : r(r), g(g), b(b), a(a) {}
 
   // Initialize with hex string.
   Color(std::string hexString) {
@@ -61,22 +61,22 @@ class Color {
   // Initialize with a predefined color.
   Color(namedColor color) {
     int colors[][4] = {
-      { 0, 0, 0, 0 }, // BLACK
-      { 255, 255, 255, 0 }, // WHITE
-      { 255, 0, 0, 0 }, // RED
-      { 0, 255, 0, 0 }, // GREEN
-      { 0, 0, 255, 0 }, // BLUE
-      { 255, 255, 0, 0 }, // YELLOW
-      { 255, 0, 255, 0 }, // MAGENTA
-      { 0, 255, 255, 0 }, // CYAN
-      { 128, 128, 128, 0 }, // MEDIUM_GRAY
-      { 160, 160, 160, 0 }, // LIGHT_GRAY
-      { 128, 0, 0, 0 }, // DARK_RED
-      { 0, 128, 0, 0 }, // DARK_GREEN
-      { 0, 0, 128, 0 }, // DARK_BLUE
-      { 0, 128, 128, 0 }, // DARK_CYAN
-      { 128, 0, 128, 0 }, // DARK_MAGENTA
-      { 128, 128, 0, 0 }  // DARK_YELLOW
+      { 0, 0, 0, 255 }, // BLACK
+      { 255, 255, 255, 255 }, // WHITE
+      { 255, 0, 0, 255 }, // RED
+      { 0, 255, 0, 255 }, // GREEN
+      { 0, 0, 255, 255 }, // BLUE
+      { 255, 255, 0, 255 }, // YELLOW
+      { 255, 0, 255, 255 }, // MAGENTA
+      { 0, 255, 255, 255 }, // CYAN
+      { 128, 128, 128, 255 }, // MEDIUM_GRAY
+      { 160, 160, 160, 255 }, // LIGHT_GRAY
+      { 128, 0, 0, 255 }, // DARK_RED
+      { 0, 128, 0, 255 }, // DARK_GREEN
+      { 0, 0, 128, 255 }, // DARK_BLUE
+      { 0, 128, 128, 255 }, // DARK_CYAN
+      { 128, 0, 128, 255 }, // DARK_MAGENTA
+      { 128, 128, 0, 255 }  // DARK_YELLOW
     };
 
     r = colors[color][0];
@@ -107,7 +107,7 @@ class Color {
 
   // Set active OpenGL color.
   inline void setGLColor() const {
-    glColor3ub(r, g, b);
+    glColor4ub(r, g, b, a);
   }
 
   // Set OpenGL clear color.
