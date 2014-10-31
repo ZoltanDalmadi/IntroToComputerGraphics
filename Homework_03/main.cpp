@@ -9,7 +9,7 @@ typedef Utils::Slider Slider;
 typedef Utils::Circle<GLdouble> Circle;
 
 // Window size.
-const GLsizei WIDTH = 1280;
+const GLsizei WIDTH = 720;
 const GLsizei HEIGHT = 720;
 
 // Constants.
@@ -24,9 +24,9 @@ const Utils::Color bgColor(Utils::WHITE);
 
 // Items.
 Circle circ(WIDTH / 2, HEIGHT / 2, 10, circlePoints);
-Slider progressSlider(100, 40, 1180, 40);
-Slider numbersSlider(100, 80, 1180, 80);
-Slider radiusSlider(100, 120, 1180, 120);
+Slider progressSlider(100, 40, WIDTH-100, 40);
+Slider numbersSlider(100, 80, WIDTH-100, 80);
+Slider radiusSlider(100, 120, WIDTH-100, 120);
 
 void init() {
   bgColor.setGLClearColor();
