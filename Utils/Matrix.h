@@ -69,21 +69,9 @@ public:
     return *this;
   }
 
-  template<size_t NN, size_t M1, size_t M2, typename TT>
+  template<int NN, int M1, int M2, typename TT>
   friend Matrix<M1, M2, TT> operator*(const Matrix<NN, M2, TT>& m1,
-                                      const Matrix<M1, NN, TT>& m2) {
-
-    Matrix<M1, M2, T> result;
-    for(size_t row = 0; row < M2; ++row) {
-      for(size_t col = 0; col < M1; ++col) {
-        T sum = 0.0f;
-        for(size_t j = 0; j < N; ++j)
-          sum += m1.data[j][row] * m2.data[col][j];
-        result.data[col][row] = sum;
-      }
-    }
-    return result;
-  }
+                                      const Matrix<M1, NN, TT>& m2);
 
   // 4x4 only
   Matrix<N, M, T> inverse() {
@@ -212,5 +200,23 @@ public:
   }
 
 }; // end class Matrix
+
+template <int N, int M1, int M2, typename T>
+Matrix<M1, M2, T> operator*(const Matrix<N, M2, T>& m1,
+                            const Matrix<M1, N, T>& m2)
+{
+  Matrix<M1, M2, T> result;
+  for(int row = 0; row < M2; ++row)
+  {
+    for(int col = 0; col < M1; ++col)
+    {
+      T sum(0.0f);
+      for(int j = 0; j < N; ++j)
+        sum += m1.data[j][row] * m2.data[col][j];
+      result.data[col][row] = sum;
+    }
+  }
+  return result;
+}
 
 } // end namespace Utils
