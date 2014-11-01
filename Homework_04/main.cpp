@@ -2,6 +2,7 @@
 #include <iostream>
 #include <cmath>
 #include "Color.h"
+#include "Matrix.h"
 
 // Window size.
 const GLsizei WIDTH = 720;
@@ -9,6 +10,19 @@ const GLsizei HEIGHT = 720;
 
 // Colors.
 const Utils::Color bgColor(Utils::WHITE);
+
+GLdouble fos[16] = { 1, 5,  9, 13,
+                     2, 6, 10, 14,
+                     3, 7, 11, 15,
+                     4, 8, 12, 16 };
+
+GLdouble kaka[16] = { 17, 21, 25, 29,
+                      18, 22, 26, 30,
+                      19, 23, 27, 31,
+                      20, 24, 28, 32 };
+
+Utils::Matrix<4, 4, GLdouble> mat1(fos);
+Utils::Matrix<4, 4, GLdouble> mat2(kaka);
 
 void init() {
   bgColor.setGLClearColor();
@@ -20,6 +34,9 @@ void init() {
   glEnable(GL_POINT_SMOOTH);
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  std::cout << mat1(1, 0) << std::endl;
+  mat1.print(std::cout);
+  (mat1 * mat2).print(std::cout);
 }
 
 void display() {
