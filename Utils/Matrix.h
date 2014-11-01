@@ -12,20 +12,13 @@ protected:
 public:
   Matrix() {}
 
-  Matrix(const Matrix<N, M, T>& rhs) {
-    for(size_t col = 0; col < N; ++col)
-      for(size_t row = 0; row < M; ++row)
-        data[col][row] = rhs.data[col][row];
-  }
-
-  explicit Matrix(const T *values) {
+  explicit Matrix(const T *values)
+  {
     for(size_t col = 0; col < N; ++col)
       for(size_t row = 0; row < M; ++row)
         data[col][row] = values[row * N + col];
   }
 
-  virtual ~Matrix() {}
-  
   const T& operator()(size_t row, size_t column) const {
     if(row >= 0 && row < M && column >= 0 && column < N)
       return data[column][row];
