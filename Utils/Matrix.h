@@ -62,6 +62,13 @@ public:
     }
   }
 
+  Matrix<N, M, T>& operator*=(T factor) {
+    for(size_t row = 0; row < M; ++row)
+      for(size_t col = 0; col < N; ++col)
+        data[col][row] *= factor;
+    return *this;
+  }
+
   template<size_t NN, size_t M1, size_t M2, typename TT>
   friend Matrix<M1, M2, TT> operator*(const Matrix<NN, M2, TT>& m1,
                                       const Matrix<M1, NN, TT>& m2) {
@@ -78,8 +85,130 @@ public:
     return result;
   }
 
-  Matrix<N, M, T>& inverse() {
-    // TODO
+  // 4x4 only
+  Matrix<N, M, T> inverse() {
+    Matrix<N, M, T> inv;
+    inv.data[0][0] = data[1][1] * data[2][2] * data[3][3] -
+                     data[1][1] * data[3][2] * data[2][3] -
+                     data[1][2] * data[2][1] * data[3][3] +
+                     data[1][2] * data[3][1] * data[2][3] +
+                     data[1][3] * data[2][1] * data[3][2] -
+                     data[1][3] * data[3][1] * data[2][2];
+
+    inv.data[0][1] = -data[0][1] * data[2][2] * data[3][3] +
+                      data[0][1] * data[3][2] * data[2][3] +
+                      data[0][2] * data[2][1] * data[3][3] -
+                      data[0][2] * data[3][1] * data[2][3] -
+                      data[0][3] * data[2][1] * data[3][2] +
+                      data[0][3] * data[3][1] * data[2][2];
+
+    inv.data[0][2] = data[0][1] * data[1][2] * data[3][3] -
+                     data[0][1] * data[3][2] * data[1][3] -
+                     data[0][2] * data[1][1] * data[3][3] +
+                     data[0][2] * data[3][1] * data[1][3] +
+                     data[0][3] * data[1][1] * data[3][2] -
+                     data[0][3] * data[3][1] * data[1][2];
+
+    inv.data[0][3] = -data[0][1] * data[1][2] * data[2][3] +
+                      data[0][1] * data[2][2] * data[1][3] +
+                      data[0][2] * data[1][1] * data[2][3] -
+                      data[0][2] * data[2][1] * data[1][3] -
+                      data[0][3] * data[1][1] * data[2][2] +
+                      data[0][3] * data[2][1] * data[1][2];
+
+    inv.data[1][0] = -data[1][0] * data[2][2] * data[3][3] +
+                      data[1][0] * data[3][2] * data[2][3] +
+                      data[1][2] * data[2][0] * data[3][3] -
+                      data[1][2] * data[3][0] * data[2][3] -
+                      data[1][3] * data[2][0] * data[3][2] +
+                      data[1][3] * data[3][0] * data[2][2];
+
+    inv.data[1][1] = data[0][0] * data[2][2] * data[3][3] -
+                     data[0][0] * data[3][2] * data[2][3] -
+                     data[0][2] * data[2][0] * data[3][3] +
+                     data[0][2] * data[3][0] * data[2][3] +
+                     data[0][3] * data[2][0] * data[3][2] -
+                     data[0][3] * data[3][0] * data[2][2];
+
+    inv.data[1][2] = -data[0][0] * data[1][2] * data[3][3] +
+                      data[0][0] * data[3][2] * data[1][3] +
+                      data[0][2] * data[1][0] * data[3][3] -
+                      data[0][2] * data[3][0] * data[1][3] -
+                      data[0][3] * data[1][0] * data[3][2] +
+                      data[0][3] * data[3][0] * data[1][2];
+
+    inv.data[1][3] = data[0][0] * data[1][2] * data[2][3] -
+                     data[0][0] * data[2][2] * data[1][3] -
+                     data[0][2] * data[1][0] * data[2][3] +
+                     data[0][2] * data[2][0] * data[1][3] +
+                     data[0][3] * data[1][0] * data[2][2] -
+                     data[0][3] * data[2][0] * data[1][2];
+
+    inv.data[2][0] = data[1][0] * data[2][1] * data[3][3] -
+                     data[1][0] * data[3][1] * data[2][3] -
+                     data[1][1] * data[2][0] * data[3][3] +
+                     data[1][1] * data[3][0] * data[2][3] +
+                     data[1][3] * data[2][0] * data[3][1] -
+                     data[1][3] * data[3][0] * data[2][1];
+
+    inv.data[2][1] = -data[0][0] * data[2][1] * data[3][3] +
+                      data[0][0] * data[3][1] * data[2][3] +
+                      data[0][1] * data[2][0] * data[3][3] -
+                      data[0][1] * data[3][0] * data[2][3] -
+                      data[0][3] * data[2][0] * data[3][1] +
+                      data[0][3] * data[3][0] * data[2][1];
+
+    inv.data[2][2] = data[0][0] * data[1][1] * data[3][3] -
+                     data[0][0] * data[3][1] * data[1][3] -
+                     data[0][1] * data[1][0] * data[3][3] +
+                     data[0][1] * data[3][0] * data[1][3] +
+                     data[0][3] * data[1][0] * data[3][1] -
+                     data[0][3] * data[3][0] * data[1][1];
+
+    inv.data[2][3] = -data[0][0] * data[1][1] * data[2][3] +
+                      data[0][0] * data[2][1] * data[1][3] +
+                      data[0][1] * data[1][0] * data[2][3] -
+                      data[0][1] * data[2][0] * data[1][3] -
+                      data[0][3] * data[1][0] * data[2][1] +
+                      data[0][3] * data[2][0] * data[1][1];
+
+    inv.data[3][0] = -data[1][0] * data[2][1] * data[3][2] +
+                      data[1][0] * data[3][1] * data[2][2] +
+                      data[1][1] * data[2][0] * data[3][2] -
+                      data[1][1] * data[3][0] * data[2][2] -
+                      data[1][2] * data[2][0] * data[3][1] +
+                      data[1][2] * data[3][0] * data[2][1];
+
+    inv.data[3][1] = data[0][0] * data[2][1] * data[3][2] -
+                     data[0][0] * data[3][1] * data[2][2] -
+                     data[0][1] * data[2][0] * data[3][2] +
+                     data[0][1] * data[3][0] * data[2][2] +
+                     data[0][2] * data[2][0] * data[3][1] -
+                     data[0][2] * data[3][0] * data[2][1];
+
+    inv.data[3][2] = -data[0][0] * data[1][1] * data[3][2] +
+                      data[0][0] * data[3][1] * data[1][2] +
+                      data[0][1] * data[1][0] * data[3][2] -
+                      data[0][1] * data[3][0] * data[1][2] -
+                      data[0][2] * data[1][0] * data[3][1] +
+                      data[0][2] * data[3][0] * data[1][1];
+
+    inv.data[3][3] = data[0][0] * data[1][1] * data[2][2] -
+                     data[0][0] * data[2][1] * data[1][2] -
+                     data[0][1] * data[1][0] * data[2][2] +
+                     data[0][1] * data[2][0] * data[1][2] +
+                     data[0][2] * data[1][0] * data[2][1] -
+                     data[0][2] * data[2][0] * data[1][1];
+
+    T det = data[0][0] * inv.data[0][0] +
+            data[1][0] * inv.data[0][1] +
+            data[2][0] * inv.data[0][2] +
+            data[3][0] * inv.data[0][3];
+
+    det = 1.0f / det;
+
+    inv *= det;
+    return inv;
   }
 
 }; // end class Matrix

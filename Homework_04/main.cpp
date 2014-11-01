@@ -11,18 +11,16 @@ const GLsizei HEIGHT = 720;
 // Colors.
 const Utils::Color bgColor(Utils::WHITE);
 
-GLdouble fos[16] = { 1, 5,  9, 13,
-                     2, 6, 10, 14,
-                     3, 7, 11, 15,
-                     4, 8, 12, 16 };
-
-GLdouble kaka[16] = { 17, 21, 25, 29,
-                      18, 22, 26, 30,
-                      19, 23, 27, 31,
-                      20, 24, 28, 32 };
+//GLdouble fos[16] = { -1, 0, 1, 8,
+//                      1, 0, 1, 4,
+//                     -1, 0, 1, 2,
+//                      1, 1, 1, 1 };
+GLdouble fos[16] = { -10, 8, 9, 4,
+                      0, -3, -5, -2,
+                      3, 4, -3, -5,
+                      -2, -3, 6, 6 };
 
 Utils::Matrix<4, 4, GLdouble> mat1(fos);
-Utils::Matrix<4, 4, GLdouble> mat2(kaka);
 
 void init() {
   bgColor.setGLClearColor();
@@ -34,9 +32,8 @@ void init() {
   glEnable(GL_POINT_SMOOTH);
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  std::cout << mat1(1, 0) << std::endl;
   mat1.print(std::cout);
-  (mat1 * mat2).print(std::cout);
+  mat1.inverse().print(std::cout);
 }
 
 void display() {
@@ -45,10 +42,10 @@ void display() {
 }
 
 void processMouse(GLint button, GLint action, GLint xMouse, GLint yMouse) {
-  if (button == GLUT_LEFT_BUTTON && action == GLUT_DOWN) {
+  if(button == GLUT_LEFT_BUTTON && action == GLUT_DOWN) {
   }
 
-  if (button == GLUT_LEFT_BUTTON && action == GLUT_UP) {
+  if(button == GLUT_LEFT_BUTTON && action == GLUT_UP) {
   }
 }
 
