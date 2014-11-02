@@ -68,7 +68,7 @@ void calcTangent2()
   T(3, 0) = 0;
   temp = G1 * M * T;
 
-  // instert tangent point to second curve segment's geometry matrix
+  // insert tangent point to second curve segment's geometry matrix
   G2(0, 3) = temp(0, 0);
   G2(1, 3) = temp(1, 0);
 }
