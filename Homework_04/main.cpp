@@ -27,67 +27,50 @@ const GLfloat lineWidth = 2.0;
 
 // Points ---------------------------------------------------------------------
 Line tangent(100, 150, 300, 550);
-Point2D tangent2;
 Point2D P3(300, 350);
 Point2D P4(500, 400);
 Point2D P5(800, 600);
 Point2D P6(1000, 150);
 
+// Parameters -----------------------------------------------------------------
 GLdouble minParam = -2.0f;
 GLdouble maxParam = 2.0f;
 GLdouble t1 = -1.0f;
 GLdouble t2 = 0.0f;
 GLdouble t3 = 1.0f;
 
+// Matrices -------------------------------------------------------------------
 Matrix3x4 G1;
 Matrix3x4 G2;
 Matrix4x4 preM;
 Matrix4x4 M;
+// these are vectors essentially, but we use single column matrices instead
 Vector4x1 T;
 Vector3x1 temp;
 
-Slider t1Slider(100, 40, WIDTH-100, 40);
-Slider t2Slider(100, 40, WIDTH-100, 40);
-Slider t3Slider(100, 40, WIDTH-100, 40);
+// Sliders --------------------------------------------------------------------
+Slider t1Slider(100, 40, WIDTH - 100, 40);
+Slider t2Slider(100, 40, WIDTH - 100, 40);
+Slider t3Slider(100, 40, WIDTH - 100, 40);
 
-Line sliderLine(100, 40, WIDTH-100, 40);
+Line sliderLine(100, 40, WIDTH - 100, 40);
 Point2D notch1(sliderLine.pointAt(0.25));
 Point2D notch2(sliderLine.pointAt(0.5));
 Point2D notch3(sliderLine.pointAt(0.75));
 
 void calcTangent2()
 {
-  T(0, 0) = 3*t3*t3;
-  T(1, 0) = 2*t3;
+  // first curve segment endpoint -> corresponding param: t3
+  // calculate tangent by deriving T vector
+  T(0, 0) = 3 * t3 * t3;
+  T(1, 0) = 2 * t3;
   T(2, 0) = 1;
   T(3, 0) = 0;
   temp = G1 * M * T;
-  tangent2.setX(temp(0, 0));
-  tangent2.setY(temp(1, 0));
-}
 
-void updateG1Matrix()
-{
-  G1(0, 0) = tangent.x1();
-  G1(1, 0) = tangent.y1();
-  G1(0, 1) = P3.x();
-  G1(1, 1) = P3.y();
-  G1(0, 2) = P4.x();
-  G1(1, 2) = P4.y();
-  G1(0, 3) = tangent.dx();
-  G1(1, 3) = tangent.dy();
-}
-
-void updateG2Matrix()
-{
-  G2(0, 0) = P4.x();
-  G2(1, 0) = P4.y();
-  G2(0, 1) = P5.x();
-  G2(1, 1) = P5.y();
-  G2(0, 2) = P6.x();
-  G2(1, 2) = P6.y();
-  G2(0, 3) = tangent2.x();
-  G2(1, 3) = tangent2.y();
+  // instert tangent point to second curve segment's geometry matrix
+  G2(0, 3) = temp(0, 0);
+  G2(1, 3) = temp(1, 0);
 }
 
 void updateMMatrix()
@@ -140,29 +123,75 @@ void init()
   preM(2, 3) = 1.0;
   preM(3, 3) = 0.0;
 
-  // update matrices
+  // fill matrices
   updateMMatrix();
-  updateG1Matrix();
-  calcTangent2();
-  updateG2Matrix();
+  G1(0, 0) = tangent.x1();
+  G1(1, 0) = tangent.y1();
+  G1(0, 1) = P3.x();
+  G1(1, 1) = P3.y();
+  G1(0, 2) = P4.x();
+  G1(1, 2) = P4.y();
+  G1(0, 3) = tangent.dx();
+  G1(1, 3) = tangent.dy();
 
+  G2(0, 0) = P4.x();
+  G2(1, 0) = P4.y();
+  G2(0, 1) = P5.x();
+  G2(1, 1) = P5.y();
+  G2(0, 2) = P6.x();
+  G2(1, 2) = P6.y();
+  calcTangent2();
+
+  // initial slider positions
   t1Slider.setValue(25);
   t2Slider.setValue(50);
   t3Slider.setValue(75);
-  
+
+  // slider looks
   sliderLine.pointsColor = Utils::BLACK;
   t1Slider.setHandleSize(6);
   t2Slider.setHandleSize(6);
   t3Slider.setHandleSize(6);
 }
 
+void drawGrid(int width, int height, int gap, GLfloat lineWidth,
+              const Utils::Color& color)
+{
+  color.setGLColor();
+  glLineWidth(lineWidth);
+  glEnable(GL_LINE_STIPPLE);
+  glLineStipple(1, 0xAAAA);
+  glBegin(GL_LINES);
+  for(int i = gap; i < width; i += gap)
+  {
+    glVertex2i(i, 0);
+    glVertex2i(i, height);
+  }
+
+  for(int i = gap; i < height; i += gap)
+  {
+    glVertex2i(0, i);
+    glVertex2i(width, i);
+  }
+
+  glEnd();
+  glDisable(GL_LINE_STIPPLE);
+}
+
 void display()
 {
   glClear(GL_COLOR_BUFFER_BIT);
+
+  // draw grid to into background
+  drawGrid(WIDTH, HEIGHT, 32, 1, Utils::VERY_LIGHT_GRAY);
+
+  // draw curve
   curveColor.setGLColor();
   glLineWidth(lineWidth);
+
   glBegin(GL_LINE_STRIP);
 
+  // first curve segment
   Matrix3x4 C = G1 * M;
   for(GLdouble t = t1; t <= t3; t += 0.01f)
   {
@@ -174,8 +203,8 @@ void display()
     glVertex2d(temp(0, 0), temp(1, 0));
   }
 
+  // second curve segment
   C = G2 * M;
-
   for(GLdouble t = t1; t <= t3; t += 0.01f)
   {
     T(0, 0) = t*t*t;
@@ -187,13 +216,18 @@ void display()
   }
 
   glEnd();
+
+  // draw tangent line
   tangent.draw();
   tangent.drawPoints();
+
+  // draw curve points
   P3.draw();
   P4.draw();
   P5.draw();
   P6.draw();
 
+  // draw sliders
   sliderLine.draw();
   sliderLine.drawPoints();
   notch1.draw();
@@ -239,84 +273,128 @@ void processMouseActiveMotion(GLint xMouse, GLint yMouse)
 {
   if(tangent.rp1().clicked)
   {
+    // cache difference vector between p1 & p2
     GLdouble dx = tangent.dx();
     GLdouble dy = tangent.dy();
+
     tangent.rp1().setX(xMouse);
     tangent.rp1().setY(HEIGHT - yMouse);
+
+    // translate other point with difference vector
     tangent.rp2().setX(xMouse + dx);
     tangent.rp2().setY(HEIGHT - yMouse + dy);
-    updateG1Matrix();
+
+    // update G1 matrix
+    G1(0, 0) = tangent.x1();
+    G1(1, 0) = tangent.y1();
+
+    // update second tangent
     calcTangent2();
-    updateG2Matrix();
   }
 
   if(tangent.rp2().clicked)
   {
     tangent.rp2().setX(xMouse);
     tangent.rp2().setY(HEIGHT - yMouse);
-    updateG1Matrix();
+
+    // update G1 matrix
+    G1(0, 3) = tangent.dx();
+    G1(1, 3) = tangent.dy();
+
+    // update second tangent
     calcTangent2();
-    updateG2Matrix();
   }
 
   if(P3.clicked)
   {
     P3.setX(xMouse);
     P3.setY(HEIGHT - yMouse);
-    updateG1Matrix();
+
+    // update G1 matrix
+    G1(0, 1) = P3.x();
+    G1(1, 1) = P3.y();
+
+    // update second tangent
     calcTangent2();
-    updateG2Matrix();
   }
 
   if(P4.clicked)
   {
     P4.setX(xMouse);
     P4.setY(HEIGHT - yMouse);
-    updateG1Matrix();
+
+    // update G1 matrix
+    G1(0, 2) = P4.x();
+    G1(1, 2) = P4.y();
+
+    // update G2 matrix (this point is also starting point of curve segment 2)
+    G2(0, 0) = P4.x();
+    G2(1, 0) = P4.y();
+
+    // update second tangent
     calcTangent2();
-    updateG2Matrix();
   }
 
   if(P5.clicked)
   {
     P5.setX(xMouse);
     P5.setY(HEIGHT - yMouse);
-    updateG1Matrix();
+
+    // update G2 matrix
+    G2(0, 1) = P5.x();
+    G2(1, 1) = P5.y();
+
+    // update second tangent
     calcTangent2();
-    updateG2Matrix();
   }
 
   if(P6.clicked)
   {
     P6.setX(xMouse);
     P6.setY(HEIGHT - yMouse);
-    updateG1Matrix();
+
+    // update G2 matrix
+    G2(0, 2) = P6.x();
+    G2(1, 2) = P6.y();
+
+    // update second tangent
     calcTangent2();
-    updateG2Matrix();
   }
-  
-  if (t1Slider.isDragging()) {
+
+  if(t1Slider.isDragging())
+  {
     t1Slider.setHandlePos(xMouse);
-    t1 = minParam + (t1Slider.getValue()*(maxParam-minParam))/100;
-    calcTangent2();
-    updateG2Matrix();
+    t1 = minParam + (t1Slider.getValue()*(maxParam - minParam)) / 100;
+
+    // update parameter matrix
     updateMMatrix();
+
+    // update second tangent
+    calcTangent2();
   }
 
-  if (t2Slider.isDragging()) {
+  if(t2Slider.isDragging())
+  {
     t2Slider.setHandlePos(xMouse);
-    t2 = minParam + (t2Slider.getValue()*(maxParam-minParam))/100;
-    calcTangent2();
-    updateG2Matrix();
+    t2 = minParam + (t2Slider.getValue()*(maxParam - minParam)) / 100;
+
+    // update parameter matrix
     updateMMatrix();
+
+    // update second tangent
+    calcTangent2();
   }
 
-  if (t3Slider.isDragging()) {
+  if(t3Slider.isDragging())
+  {
     t3Slider.setHandlePos(xMouse);
-    t3 = minParam + (t3Slider.getValue()*(maxParam-minParam))/100;
-    calcTangent2();
-    updateG2Matrix();
+    t3 = minParam + (t3Slider.getValue()*(maxParam - minParam)) / 100;
+
+    // update parameter matrix
     updateMMatrix();
+
+    // update second tangent
+    calcTangent2();
   }
 
   glutPostRedisplay();
