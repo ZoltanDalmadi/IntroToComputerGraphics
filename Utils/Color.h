@@ -17,6 +17,7 @@ enum namedColor {
   CYAN,
   MEDIUM_GRAY,
   LIGHT_GRAY,
+  VERY_LIGHT_GRAY,
   DARK_RED,
   DARK_GREEN,
   DARK_BLUE,
@@ -71,6 +72,7 @@ class Color {
       { 0, 255, 255, 255 }, // CYAN
       { 128, 128, 128, 255 }, // MEDIUM_GRAY
       { 160, 160, 160, 255 }, // LIGHT_GRAY
+      { 192, 192, 192, 255 }, // VERY_LIGHT_GRAY
       { 128, 0, 0, 255 }, // DARK_RED
       { 0, 128, 0, 255 }, // DARK_GREEN
       { 0, 0, 128, 255 }, // DARK_BLUE
