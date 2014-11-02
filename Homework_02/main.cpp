@@ -72,7 +72,8 @@ Point2D food2(disX(gen), disY(gen));
 bool keyStates[256];
 
 // Init function --------------------------------------------------------------
-void init() {
+void init()
+{
   // Background color setup
   bgColor.setGLClearColor();
 
@@ -105,105 +106,128 @@ void init() {
 }
 
 // Keyboard handling ----------------------------------------------------------
-void keyPressed(unsigned char key, int x, int y) {
+void keyPressed(unsigned char key, int x, int y)
+{
   keyStates[key] = true;
 }
 
-void keyUp(unsigned char key, int x, int y) {
+void keyUp(unsigned char key, int x, int y)
+{
   keyStates[key] = false;
 }
 
-void keyOperations() {
-  if (keyStates['a']) {
+void keyOperations()
+{
+  if (keyStates['a'])
+  {
     // if on top wall
-    if (line.x1() >= 0 && line.x1() <= WIDTH && line.y1() == HEIGHT) {
+    if (line.x1() >= 0 && line.x1() <= WIDTH && line.y1() == HEIGHT)
+    {
       line.rp1().changeX(-delta);
     }
 
     // if on bottom wall
-    if (line.x1() >= 0 && line.x1() <= WIDTH && line.y1() == 0) {
+    if (line.x1() >= 0 && line.x1() <= WIDTH && line.y1() == 0)
+    {
       line.rp1().changeX(delta);
     }
 
     // if on left wall
-    if (line.x1() == 0 && line.y1() >= 0 && line.y1() <= HEIGHT) {
+    if (line.x1() == 0 && line.y1() >= 0 && line.y1() <= HEIGHT)
+    {
       line.rp1().changeY(-delta);
     }
 
     // if on right wall
-    if (line.x1() == WIDTH && line.y1() >= 0 && line.y1() <= HEIGHT) {
+    if (line.x1() == WIDTH && line.y1() >= 0 && line.y1() <= HEIGHT)
+    {
       line.rp1().changeY(delta);
     }
 
     lineVector.set(line.dx(), line.dy());
   }
 
-  if (keyStates['d']) {
+  if (keyStates['d'])
+  {
     // if on top wall
-    if (line.x1() >= 0 && line.x1() <= WIDTH && line.y1() == HEIGHT) {
+    if (line.x1() >= 0 && line.x1() <= WIDTH && line.y1() == HEIGHT)
+    {
       line.rp1().changeX(delta);
     }
 
     // if on bottom wall
-    if (line.x1() >= 0 && line.x1() <= WIDTH && line.y1() == 0) {
+    if (line.x1() >= 0 && line.x1() <= WIDTH && line.y1() == 0)
+    {
       line.rp1().changeX(-delta);
     }
 
     // if on left wall
-    if (line.x1() == 0 && line.y1() >= 0 && line.y1() <= HEIGHT) {
+    if (line.x1() == 0 && line.y1() >= 0 && line.y1() <= HEIGHT)
+    {
       line.rp1().changeY(delta);
     }
 
     // if on right wall
-    if (line.x1() == WIDTH && line.y1() >= 0 && line.y1() <= HEIGHT) {
+    if (line.x1() == WIDTH && line.y1() >= 0 && line.y1() <= HEIGHT)
+    {
       line.rp1().changeY(-delta);
     }
 
     lineVector.set(line.dx(), line.dy());
   }
 
-  if (keyStates['4']) {
+  if (keyStates['4'])
+  {
     // if on top wall
-    if (line.x2() >= 0 && line.x2() <= WIDTH && line.y2() == HEIGHT) {
+    if (line.x2() >= 0 && line.x2() <= WIDTH && line.y2() == HEIGHT)
+    {
       line.rp2().changeX(delta);
     }
 
     // if on bottom wall
-    if (line.x2() >= 0 && line.x2() <= WIDTH && line.y2() == 0) {
+    if (line.x2() >= 0 && line.x2() <= WIDTH && line.y2() == 0)
+    {
       line.rp2().changeX(-delta);
     }
 
     // if on left wall
-    if (line.x2() == 0 && line.y2() >= 0 && line.y2() <= HEIGHT) {
+    if (line.x2() == 0 && line.y2() >= 0 && line.y2() <= HEIGHT)
+    {
       line.rp2().changeY(delta);
     }
 
     // if on right wall
-    if (line.x2() == WIDTH && line.y2() >= 0 && line.y2() <= HEIGHT) {
+    if (line.x2() == WIDTH && line.y2() >= 0 && line.y2() <= HEIGHT)
+    {
       line.rp2().changeY(-delta);
     }
 
     lineVector.set(line.dx(), line.dy());
   }
 
-  if (keyStates['6']) {
+  if (keyStates['6'])
+  {
     // if on top wall
-    if (line.x2() >= 0 && line.x2() <= WIDTH && line.y2() == HEIGHT) {
+    if (line.x2() >= 0 && line.x2() <= WIDTH && line.y2() == HEIGHT)
+    {
       line.rp2().changeX(-delta);
     }
 
     // if on bottom wall
-    if (line.x2() >= 0 && line.x2() <= WIDTH && line.y2() == 0) {
+    if (line.x2() >= 0 && line.x2() <= WIDTH && line.y2() == 0)
+    {
       line.rp2().changeX(delta);
     }
 
     // if on left wall
-    if (line.x2() == 0 && line.y2() >= 0 && line.y2() <= HEIGHT) {
+    if (line.x2() == 0 && line.y2() >= 0 && line.y2() <= HEIGHT)
+    {
       line.rp2().changeY(-delta);
     }
 
     // if on right wall
-    if (line.x2() == WIDTH && line.y2() >= 0 && line.y2() <= HEIGHT) {
+    if (line.x2() == WIDTH && line.y2() >= 0 && line.y2() <= HEIGHT)
+    {
       line.rp2().changeY(delta);
     }
 
@@ -211,20 +235,24 @@ void keyOperations() {
   }
 }
 
-void checkGameStatus() {
-  if (ball1.getPoints() < 3 || ball2.getPoints() > 19) {
+void checkGameStatus()
+{
+  if (ball1.getPoints() < 3 || ball2.getPoints() > 19)
+  {
     std::cout << "Red player wins!" << std::endl;
     glutLeaveMainLoop();
   }
 
-  if (ball2.getPoints() < 3 || ball1.getPoints() > 19) {
+  if (ball2.getPoints() < 3 || ball1.getPoints() > 19)
+  {
     std::cout << "Blue player wins!" << std::endl;
     glutLeaveMainLoop();
   }
 }
 
 // Collision detection --------------------------------------------------------
-void detectLineCollision() {
+void detectLineCollision()
+{
   if (c1->distanceToLineSquared(line) <= ballSizeSquared)
     vec1.reflectFrom(lineVector);
 
@@ -232,7 +260,8 @@ void detectLineCollision() {
     vec2.reflectFrom(lineVector);
 }
 
-void detectWallCollision() {
+void detectWallCollision()
+{
   if (c1->distanceToLineSquared(leftWall) <= ballSizeSquared)
     vec1.reflectFrom(leftWallVector);
 
@@ -258,29 +287,34 @@ void detectWallCollision() {
     vec2.reflectFrom(bottomWallVector);
 }
 
-void detectFoodCollision() {
-  if (Point2D::distance2(*c1, food1) < ballSizeSquared) {
+void detectFoodCollision()
+{
+  if (Point2D::distance2(*c1, food1) < ballSizeSquared)
+  {
     food1.setX(disX(gen));
     food1.setY(disY(gen));
     ball1++;
     checkGameStatus();
   }
 
-  if (Point2D::distance2(*c1, food2) < ballSizeSquared) {
+  if (Point2D::distance2(*c1, food2) < ballSizeSquared)
+  {
     food2.setX(disX(gen));
     food2.setY(disY(gen));
     ball1--;
     checkGameStatus();
   }
 
-  if (Point2D::distance2(*c2, food1) < ballSizeSquared) {
+  if (Point2D::distance2(*c2, food1) < ballSizeSquared)
+  {
     food1.setX(disX(gen));
     food1.setY(disY(gen));
     ball2--;
     checkGameStatus();
   }
 
-  if (Point2D::distance2(*c2, food2) < ballSizeSquared) {
+  if (Point2D::distance2(*c2, food2) < ballSizeSquared)
+  {
     food2.setX(disX(gen));
     food2.setY(disY(gen));
     ball2++;
@@ -289,7 +323,8 @@ void detectFoodCollision() {
 }
 
 // Display function -----------------------------------------------------------
-void display() {
+void display()
+{
   keyOperations();
   glClear(GL_COLOR_BUFFER_BIT);
 
@@ -313,13 +348,15 @@ void display() {
   detectFoodCollision();
 }
 
-void gameUpdate(int n) {
+void gameUpdate(int n)
+{
   glutPostRedisplay();
   glutTimerFunc(refreshRate, gameUpdate, 0);
 }
 
 // Main function --------------------------------------------------------------
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
   glutInit(&argc, argv);
   glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE,
                 GLUT_ACTION_GLUTMAINLOOP_RETURNS);

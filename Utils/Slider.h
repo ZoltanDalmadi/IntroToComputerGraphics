@@ -4,9 +4,11 @@
 #include "Point2D.h"
 #include "Line.h"
 
-namespace Utils {
+namespace Utils
+{
 
-class Slider {
+class Slider
+{
 private:
   Line<GLint> body;
   Point2D<GLint> handle;
@@ -73,14 +75,14 @@ public:
     GLint x1 = body.x1();
     GLint x2 = body.x2();
 
-    if(pos >= x1 && pos <= x2)
+    if (pos >= x1 && pos <= x2)
     {
       this->handle.setX(pos);
 
-      if(pos < x1)
+      if (pos < x1)
         this->handle.setX(x1);
 
-      if(pos > x2)
+      if (pos > x2)
         this->handle.setX(x2);
 
       updateValue();

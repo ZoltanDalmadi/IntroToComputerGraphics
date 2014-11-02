@@ -53,17 +53,20 @@ size_t handSegments = 16;
 
 // Define hands.
 Line bigHand(CENTER.x(), CENTER.y(), CENTER.x(), CENTER.y() + bigHandLength);
-Line smallHand(CENTER.x(), CENTER.y(), CENTER.x() + smallHandLength, CENTER.y());
+Line smallHand(CENTER.x(), CENTER.y(),
+               CENTER.x() + smallHandLength, CENTER.y());
 
 // Refresh rate in miliseconds.
 size_t refreshRate = 50;
 
 // Degrees to radians.
-GLdouble degToRad(GLdouble deg) {
+GLdouble degToRad(GLdouble deg)
+{
   return deg * (Utils::PI / 180);
 }
 
-void init() {
+void init()
+{
   // Background color setup.
   bgColor.setGLClearColor();
 
@@ -101,13 +104,15 @@ void init() {
 }
 
 // Draw grid function.
-void drawGrid() {
+void drawGrid()
+{
   glLineWidth(gridLineWidth);
   gridColor.setGLColor();
 
   glBegin(GL_LINES);
 
-  for(size_t i = 1; i < handSegments; i++) {
+  for (size_t i = 1; i < handSegments; i++)
+  {
     double seg = static_cast<double>(i) / handSegments;
     Utils::glVertex2<GLdouble>(bigHand.pointAt(seg));
     seg = static_cast<double>(handSegments - i) / handSegments;
@@ -118,7 +123,8 @@ void drawGrid() {
 }
 
 // Main display function.
-void clockDisplay() {
+void clockDisplay()
+{
   glClear(GL_COLOR_BUFFER_BIT);
 
   // Draw Circle.
@@ -139,7 +145,8 @@ void clockDisplay() {
   glutSwapBuffers();
 }
 
-void clockUpdate(int n) {
+void clockUpdate(int n)
+{
   // Calculate new position of big hands endpoint.
   GLdouble rot = degToRad(bigHandRot);
   bigHand.setP2(CENTER.x() + bigHandLength * cos(rot),
@@ -155,7 +162,8 @@ void clockUpdate(int n) {
   smallHandRot -= 1.0 / 12.0;
 
   // reset degrees if one rotation has passed
-  if(bigHandRot == -270.0) {
+  if (bigHandRot == -270.0)
+  {
     bigHandRot = 90.0;
   }
 
@@ -163,7 +171,8 @@ void clockUpdate(int n) {
   glutTimerFunc(refreshRate, clockUpdate, 0);
 }
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv)
+{
   glutInit(&argc, argv);
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
   glutInitWindowSize(WIDTH, HEIGHT);

@@ -3,16 +3,18 @@
 #include <GL/freeglut.h>
 #include "Point2D.h"
 
-namespace Utils {
+namespace Utils
+{
 
 template <typename T>
-class Line {
- private:
+class Line
+{
+private:
   // Endpoints.
   Point2D<T> pt1;
   Point2D<T> pt2;
 
- public:
+public:
   GLfloat lineWidth = 1.0;
   GLfloat pointSize = 10.0;
   Color color = BLACK;
@@ -25,127 +27,151 @@ class Line {
   inline Line(Point2D<T> a, Point2D<T> b) : pt1(a), pt2(b) {}
 
   /// Returns starting point's X coordinate.
-  inline T x1() const {
+  inline T x1() const
+  {
     return pt1.x();
   }
 
   /// Returns ending point's X coordinate.
-  inline T x2() const {
+  inline T x2() const
+  {
     return pt2.x();
   }
 
   /// Returns starting point's Y coordinate.
-  inline T y1() const {
+  inline T y1() const
+  {
     return pt1.y();
   }
 
   /// Returns ending point's Y coordinate.
-  inline T y2() const {
+  inline T y2() const
+  {
     return pt2.y();
   }
 
   /// Returns starting point of Line.
-  inline Point2D<T> p1() const {
+  inline Point2D<T> p1() const
+  {
     return pt1;
   }
 
   /// Returns ending point of Line.
-  inline Point2D<T> p2() const {
+  inline Point2D<T> p2() const
+  {
     return pt2;
   }
 
   /// Returns a pointer to starting point of Line.
-  inline Point2D<T> *pp1() {
+  inline Point2D<T> *pp1()
+  {
     return pt1.getPointer();
   }
 
   /// Returns a pointer to ending point of Line.
-  inline Point2D<T> *pp2() {
+  inline Point2D<T> *pp2()
+  {
     return pt2.getPointer();
   }
 
   /// Returns a reference to starting point of Line.
-  inline Point2D<T>& rp1() {
+  inline Point2D<T>& rp1()
+  {
     return pt1;
   }
 
   /// Returns a reference to ending point of Line.
-  inline Point2D<T>& rp2() {
+  inline Point2D<T>& rp2()
+  {
     return pt2;
   }
 
   /// Set points.
-  inline void setPoints(const Point2D<T>& P1, const Point2D<T>& P2) {
+  inline void setPoints(const Point2D<T>& P1, const Point2D<T>& P2)
+  {
     pt1 = P1;
     pt2 = P2;
   }
 
   /// Set points with raw coordinates.
-  inline void setPoints(T X1, T Y1, T X2, T Y2) {
+  inline void setPoints(T X1, T Y1, T X2, T Y2)
+  {
     pt1 = Point2D<T>(X1, Y1);
     pt2 = Point2D<T>(X2, Y2);
   }
 
   /// Sets starting point.
-  inline void setP1(const Point2D<T>& P1) {
+  inline void setP1(const Point2D<T>& P1)
+  {
     pt1 = P1;
   }
 
   /// Sets starting point. (overload)
-  inline void setP1(T x, T y) {
+  inline void setP1(T x, T y)
+  {
     pt1.setX(x);
     pt1.setY(y);
   }
 
   /// Sets ending point.
-  inline void setP2(const Point2D<T>& P2) {
+  inline void setP2(const Point2D<T>& P2)
+  {
     pt2 = P2;
   }
 
   /// Sets ending point. (overload)
-  inline void setP2(T x, T y) {
+  inline void setP2(T x, T y)
+  {
     pt2.setX(x);
     pt2.setY(y);
   }
 
   /// Translate line with a given point.
-  inline void translate(const Point2D<T>& point) {
+  inline void translate(const Point2D<T>& point)
+  {
     pt1 += point;
     pt2 += point;
   }
 
   /// Translate line with raw coordinates.
-  inline void translate(T adx, T ady) {
+  inline void translate(T adx, T ady)
+  {
     this->translate(Point2D<T>(adx, ady));
   }
 
   /// Returns horizontal component of Line's vector.
-  inline T dx() const {
+  inline T dx() const
+  {
     return x2() - x1();
   }
 
   /// Returns vertical component of Line's vector.
-  inline T dy() const {
+  inline T dy() const
+  {
     return y2() - y1();
   }
 
   /// Returns Line's length.
-  inline T length() const {
+  inline T length() const
+  {
     return Point2D<T>::distance(pt1, pt2);
   }
 
   /// Returns Line's length squared.
-  inline T lengthSquared() const {
+  inline T lengthSquared() const
+  {
     return Point2D<T>::distance2(pt1, pt2);
   }
 
   /// Returns a Point2D at a position between pt1 and pt2 in [0, 1] range.
-  inline Point2D<T> pointAt(T t) const {
+  inline Point2D<T> pointAt(T t) const
+  {
     return Point2D<T>(x1() + dx() * t, y1() + dy() * t);
   }
 
   /// Returns a perpendicular line with the same starting point and length.
-  inline Line<T> normalVector() const {
+  inline Line<T> normalVector() const
+  {
     return Line<T>(pt1, pt1 + Point2D<T>(-dy(), dx()));
   }
 
@@ -153,7 +179,8 @@ class Line {
   /// If returned value = 0, Point is on line.
   /// If returned value > 0, Point is on half plane as normalvector is.
   /// If returned value < 0, Point is on half plane opposite to normalvector.
-  inline T standardEquation(T a, T b) const {
+  inline T standardEquation(T a, T b) const
+  {
     T DX = dx();
     T DY = dy();
     T C = DY * x1() - DX * y1();
@@ -161,12 +188,14 @@ class Line {
   }
 
   /// Standard equation of Line overload.
-  inline T standardEquation(const Point2D<T>& p) const {
+  inline T standardEquation(const Point2D<T>& p) const
+  {
     return this->standardEquation(p.x(), p.y());
   }
 
   /// Returns distance of Point2D to Line. [static]
-  static inline T pDistanceToLine(const Point2D<T>& p, const Line<T>& line) {
+  static inline T pDistanceToLine(const Point2D<T>& p, const Line<T>& line)
+  {
     T DX = line.dx();
     T DY = line.dy();
     return std::abs(line.standardEquation(p.x(), p.y())) / sqrt(DY * DY + DX * DX);
@@ -174,7 +203,8 @@ class Line {
 
   /// Returns distance of Point2D to Line. [static]
   static inline T pDistanceToLineSquared(const Point2D<T>& p,
-                                         const Line<T>& line) {
+                                         const Line<T>& line)
+  {
     T DX = line.dx();
     T DY = line.dy();
     T e = line.standardEquation(p.x(), p.y());
@@ -182,12 +212,14 @@ class Line {
   }
 
   /// Returns dot product of two lines interpreted as vectors. [static]
-  static inline T dotProduct(const Line<T>& l1, const Line<T>& l2) {
+  static inline T dotProduct(const Line<T>& l1, const Line<T>& l2)
+  {
     return l1.dx() * l2.dx() + l1.dy() * l2.dy();
   }
 
   /// Draw Line with OpenGL calls.
-  void draw() const {
+  void draw() const
+  {
     glLineWidth(lineWidth);
     color.setGLColor();
     glBegin(GL_LINES);
@@ -197,7 +229,8 @@ class Line {
   }
 
   /// Draw Line's endpoints with OpenGL calls.
-  void drawPoints() const {
+  void drawPoints() const
+  {
     glPointSize(pointSize);
     pointsColor.setGLColor();
     glBegin(GL_POINTS);
@@ -207,12 +240,14 @@ class Line {
   }
 
   /// Prints line to a stream.
-  friend inline std::ostream& operator<<(std::ostream& os, const Line<T>& line) {
+  friend inline std::ostream& operator<<(std::ostream& os, const Line<T>& line)
+  {
     return os << "[" << line.p1() << " : " << line.p2() << "]" << std::endl;
   }
 
   /// Unary negate operator overload. Flips line direction.
-  inline friend Line<T> operator-(const Line<T>& line) {
+  inline friend Line<T> operator-(const Line<T>& line)
+  {
     return Line<T>(line.x1(), line.y1(),
                    line.x2() - 2 * line.dx(),
                    line.y2() - 2 * line.dy());

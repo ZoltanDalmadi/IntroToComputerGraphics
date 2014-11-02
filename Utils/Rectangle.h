@@ -4,17 +4,19 @@
 #include "Point2D.h"
 #include "Color.h"
 
-namespace Utils {
+namespace Utils
+{
 
 template <typename T>
-class Rectangle {
- private:
+class Rectangle
+{
+private:
   Point2D<T> topLeft;
   Point2D<T> topRight;
   Point2D<T> bottomRight;
   Point2D<T> bottomLeft;
 
- public:
+public:
   Color color = RED;
 
   Rectangle(const Point2D<T>& topleft, const Point2D<T>& topright,
@@ -28,15 +30,18 @@ class Rectangle {
 
   virtual ~Rectangle() {}
 
-  inline T width() {
+  inline T width()
+  {
     return bottomRight.x() - topLeft.x();
   }
 
-  inline T height() {
+  inline T height()
+  {
     return bottomRight.y() - topLeft.y();
   }
 
-  void draw() {
+  void draw()
+  {
     this->color.setGLColor();
     glBegin(GL_POLYGON);
     glVertex2<T>(topLeft);

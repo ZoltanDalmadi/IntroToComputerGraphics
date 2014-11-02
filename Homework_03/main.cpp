@@ -24,11 +24,12 @@ const Utils::Color bgColor(Utils::WHITE);
 
 // Items.
 Circle circ(WIDTH / 2, HEIGHT / 2, 10, circlePoints);
-Slider progressSlider(100, 40, WIDTH-100, 40);
-Slider numbersSlider(100, 80, WIDTH-100, 80);
-Slider radiusSlider(100, 120, WIDTH-100, 120);
+Slider progressSlider(100, 40, WIDTH - 100, 40);
+Slider numbersSlider(100, 80, WIDTH - 100, 80);
+Slider radiusSlider(100, 120, WIDTH - 100, 120);
 
-void init() {
+void init()
+{
   bgColor.setGLClearColor();
 
   // Display settings
@@ -42,7 +43,8 @@ void init() {
   radiusSlider.setValue(10);
 }
 
-void display() {
+void display()
+{
   glClear(GL_COLOR_BUFFER_BIT);
   circ.draw();
   size_t asd = static_cast<size_t>(1 + (numbersSlider.getValue() *
@@ -54,30 +56,37 @@ void display() {
   glutSwapBuffers();
 }
 
-void processMouse(GLint button, GLint action, GLint xMouse, GLint yMouse) {
-  if (button == GLUT_LEFT_BUTTON && action == GLUT_DOWN) {
+void processMouse(GLint button, GLint action, GLint xMouse, GLint yMouse)
+{
+  if (button == GLUT_LEFT_BUTTON && action == GLUT_DOWN)
+  {
     progressSlider.checkClick(xMouse, HEIGHT - yMouse, 12);
     numbersSlider.checkClick(xMouse, HEIGHT - yMouse, 12);
     radiusSlider.checkClick(xMouse, HEIGHT - yMouse, 12);
   }
 
-  if (button == GLUT_LEFT_BUTTON && action == GLUT_UP) {
+  if (button == GLUT_LEFT_BUTTON && action == GLUT_UP)
+  {
     progressSlider.release();
     numbersSlider.release();
     radiusSlider.release();
   }
 }
 
-void processMouseActiveMotion(GLint xMouse, GLint yMouse) {
-  if (progressSlider.isDragging()) {
+void processMouseActiveMotion(GLint xMouse, GLint yMouse)
+{
+  if (progressSlider.isDragging())
+  {
     progressSlider.setHandlePos(xMouse);
   }
 
-  if (numbersSlider.isDragging()) {
+  if (numbersSlider.isDragging())
+  {
     numbersSlider.setHandlePos(xMouse);
   }
 
-  if (radiusSlider.isDragging()) {
+  if (radiusSlider.isDragging())
+  {
     radiusSlider.setHandlePos(xMouse);
     circ.setRadius(radiusSlider.getValue());
   }
@@ -85,7 +94,8 @@ void processMouseActiveMotion(GLint xMouse, GLint yMouse) {
   glutPostRedisplay();
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
   glutInit(&argc, argv);
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
   glutInitWindowSize(WIDTH, HEIGHT);

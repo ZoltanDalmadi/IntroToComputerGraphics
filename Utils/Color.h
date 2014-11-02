@@ -3,10 +3,12 @@
 #include <GL/glut.h>
 #include <string>
 
-namespace Utils {
+namespace Utils
+{
 
 // Predefined colors.
-enum namedColor {
+enum namedColor
+{
   BLACK,
   WHITE,
   RED,
@@ -26,31 +28,36 @@ enum namedColor {
   DARK_YELLOW
 };
 
-class Color {
- private:
+class Color
+{
+private:
   // Color components.
   int r;
   int g;
   int b;
   int a;
 
- public:
+public:
   // Initialize with RGBA values.
   inline Color(int r, int g, int b, int a = 255) : r(r), g(g), b(b), a(a) {}
 
   // Initialize with hex string.
-  Color(std::string hexString) {
+  Color(std::string hexString)
+  {
     size_t startpos = 0;
 
-    if (hexString.front() == '#') {
+    if (hexString.front() == '#')
+    {
       startpos = 1;
     }
 
-    if (hexString.length() == 6 || hexString.length() == 7) {
+    if (hexString.length() == 6 || hexString.length() == 7)
+    {
       a = 0;
     }
 
-    if (hexString.length() == 8 || hexString.length() == 9) {
+    if (hexString.length() == 8 || hexString.length() == 9)
+    {
       a = std::stoul(hexString.substr(startpos + 6, 2), 0, 16);
     }
 
@@ -60,8 +67,10 @@ class Color {
   }
 
   // Initialize with a predefined color.
-  Color(namedColor color) {
-    int colors[][4] = {
+  Color(namedColor color)
+  {
+    int colors[][4] =
+    {
       { 0, 0, 0, 255 }, // BLACK
       { 255, 255, 255, 255 }, // WHITE
       { 255, 0, 0, 255 }, // RED
@@ -88,32 +97,38 @@ class Color {
   }
 
   // Returns red component.
-  inline int red() const {
+  inline int red() const
+  {
     return r;
   }
 
   // Returns green component.
-  inline int green() const {
+  inline int green() const
+  {
     return g;
   }
 
   // Returns blue component.
-  inline int blue() const {
+  inline int blue() const
+  {
     return b;
   }
 
   // Returns alpha component.
-  inline int alpha() const {
+  inline int alpha() const
+  {
     return a;
   }
 
   // Set active OpenGL color.
-  inline void setGLColor() const {
+  inline void setGLColor() const
+  {
     glColor4ub(r, g, b, a);
   }
 
   // Set OpenGL clear color.
-  inline void setGLClearColor() const {
+  inline void setGLClearColor() const
+  {
     glClearColor(static_cast<GLclampf>(r) / 255,
                  static_cast<GLclampf>(g) / 255,
                  static_cast<GLclampf>(b) / 255,
