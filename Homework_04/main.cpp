@@ -126,12 +126,16 @@ void init()
 void display()
 {
   glClear(GL_COLOR_BUFFER_BIT);
-  Matrix3x4 C = G * M;
   curveColor.setGLColor();
   glLineWidth(lineWidth);
   glBegin(GL_LINE_STRIP);
 
-  for(GLdouble t = -1.0f; t <= 1.0f; t += 0.01f)
+  t1 = minParam + (t1Slider.getValue()*(maxParam-minParam))/100;
+  t2 = minParam + (t2Slider.getValue()*(maxParam-minParam))/100;
+  t3 = minParam + (t3Slider.getValue()*(maxParam-minParam))/100;
+  updateMMatrix();
+  Matrix3x4 C = G * M;
+  for(GLdouble t = t1; t <= t3; t += 0.01f)
   {
     T(0, 0) = t*t*t;
     T(1, 0) = t*t;
@@ -167,6 +171,9 @@ void processMouse(GLint button, GLint action, GLint xMouse, GLint yMouse)
     tangent.rp2().checkClick(xMouse, HEIGHT - yMouse, 12);
     P3.checkClick(xMouse, HEIGHT - yMouse, 12);
     P4.checkClick(xMouse, HEIGHT - yMouse, 12);
+    t1Slider.checkClick(xMouse, HEIGHT - yMouse, 12);
+    t2Slider.checkClick(xMouse, HEIGHT - yMouse, 12);
+    t3Slider.checkClick(xMouse, HEIGHT - yMouse, 12);
   }
 
   if(button == GLUT_LEFT_BUTTON && action == GLUT_UP)
@@ -175,6 +182,9 @@ void processMouse(GLint button, GLint action, GLint xMouse, GLint yMouse)
     tangent.rp2().release();
     P3.release();
     P4.release();
+    t1Slider.release();
+    t2Slider.release();
+    t3Slider.release();
   }
 }
 
@@ -216,6 +226,18 @@ void processMouseActiveMotion(GLint xMouse, GLint yMouse)
     P4.setY(HEIGHT - yMouse);
     G(0, 2) = P4.x();
     G(1, 2) = P4.y();
+  }
+  
+  if (t1Slider.isDragging()) {
+    t1Slider.setHandlePos(xMouse);
+  }
+
+  if (t2Slider.isDragging()) {
+    t2Slider.setHandlePos(xMouse);
+  }
+
+  if (t3Slider.isDragging()) {
+    t3Slider.setHandlePos(xMouse);
   }
 
   glutPostRedisplay();
