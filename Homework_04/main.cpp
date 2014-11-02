@@ -1,6 +1,7 @@
 #include <GL/glut.h>
 #include <iostream>
-#include <cmath>
+#include <sstream>
+#include <string>
 #include "Line.h"
 #include "Matrix.h"
 #include "Slider.h"
@@ -24,6 +25,7 @@ const Utils::Color curveColor(Utils::BLUE);
 
 // Sizes ----------------------------------------------------------------------
 const GLfloat lineWidth = 2.0;
+const int gridSize = 40;
 
 // Points ---------------------------------------------------------------------
 Line tangent(100, 150, 300, 550);
@@ -57,6 +59,10 @@ Line sliderLine(100, 40, WIDTH - 100, 40);
 Point2D notch1(sliderLine.pointAt(0.25));
 Point2D notch2(sliderLine.pointAt(0.5));
 Point2D notch3(sliderLine.pointAt(0.75));
+
+// Info text ------------------------------------------------------------------
+std::string tText;
+std::stringstream ss;
 
 void calcTangent2()
 {
@@ -178,12 +184,28 @@ void drawGrid(int width, int height, int gap, GLfloat lineWidth,
   glDisable(GL_LINE_STIPPLE);
 }
 
+void drawInfoText(GLint x, GLint y, const Utils::Color& color)
+{
+  ss << "t1: " << t1 << std::endl;
+  ss << "t2: " << t2 << std::endl;
+  ss << "t3: " << t3 << std::endl;
+  tText = ss.str();
+  ss.str("");
+
+  color.setGLColor();
+  glRasterPos2i(x, y);
+  glutBitmapString(GLUT_BITMAP_HELVETICA_18, (unsigned char*)tText.c_str());
+}
+
 void display()
 {
   glClear(GL_COLOR_BUFFER_BIT);
 
   // draw grid to into background
-  drawGrid(WIDTH, HEIGHT, 32, 1, Utils::VERY_LIGHT_GRAY);
+  drawGrid(WIDTH, HEIGHT, gridSize, 1, Utils::VERY_LIGHT_GRAY);
+
+  // draw info text
+  drawInfoText(10, HEIGHT-24, Utils::BLACK);
 
   // draw curve
   curveColor.setGLColor();
