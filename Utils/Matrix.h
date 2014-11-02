@@ -22,11 +22,15 @@ public:
   const T& operator()(size_t row, size_t column) const {
     if(row >= 0 && row < M && column >= 0 && column < N)
       return data[column][row];
+    else
+      return data[0][0];
   }
 
   T& operator()(size_t row, size_t column) {
     if(row >= 0 && row < M && column >= 0 && column < N)
       return data[column][row];
+    else
+      return data[0][0];
   }
 
   void setToIdentity() {
