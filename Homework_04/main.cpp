@@ -22,6 +22,7 @@ const GLsizei HEIGHT = 720;
 // Colors ---------------------------------------------------------------------
 const Utils::Color bgColor(Utils::WHITE);
 const Utils::Color curveColor(Utils::BLUE);
+const Utils::Color curveColor2(Utils::MAGENTA);
 
 // Sizes ----------------------------------------------------------------------
 const GLfloat lineWidth = 2.0;
@@ -227,6 +228,7 @@ void display()
 
   // second curve segment
   C = G2 * M;
+  curveColor2.setGLColor();
   for(GLdouble t = t1; t <= t3; t += 0.01f)
   {
     T(0, 0) = t*t*t;
