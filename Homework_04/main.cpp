@@ -22,7 +22,7 @@ const Utils::Color curveColor(Utils::BLUE);
 const Utils::Color curveColor2(Utils::MAGENTA);
 
 // Sizes ----------------------------------------------------------------------
-const GLfloat lineWidth = 3.0;
+const GLfloat lineWidth = 2.0f;
 const int gridSize = 40;
 
 // Points ---------------------------------------------------------------------
@@ -107,7 +107,7 @@ void init()
   glMatrixMode(GL_PROJECTION);
   gluOrtho2D(0.0, WIDTH, 0.0, HEIGHT);
   glEnable(GL_LINE_SMOOTH);
-  // glEnable(GL_POINT_SMOOTH);
+  glEnable(GL_POINT_SMOOTH);
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   tangent.lineWidth = lineWidth;
