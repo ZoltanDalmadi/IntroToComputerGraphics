@@ -1,29 +1,50 @@
 #pragma once
 
 #include <iostream>
+#include <vector>
 
 namespace Utils
 {
 
-template <size_t N, size_t M, typename T>
+template <typename T>
 class Matrix
 {
 protected:
-  T data[N][M];
+  size_t rows;
+  size_t cols;
+  std::vector<std::vector<T>> data;
 
 public:
-  Matrix() {}
-
-  explicit Matrix(const T *values)
+  inline size_t getRows() const
   {
-    for (size_t col = 0; col < N; ++col)
-      for (size_t row = 0; row < M; ++row)
-        data[col][row] = values[row * N + col];
+    return this->rows;
+  }
+
+  inline size_t getCols() const
+  {
+    return this->cols;
+  }
+
+  Matrix(size_t N, size_t M) : rows(N), cols(M)
+  {
+    data.resize(M);
+
+    for (size_t i = 0; i < data.size(); ++i)
+    {
+      data[i].resize(N);
+    }
+  }
+
+  explicit Matrix(size_t N, size_t M, const T *values) : Matrix(N, M)
+  {
+    for (size_t col = 0; col < cols; ++col)
+      for (size_t row = 0; row < rows; ++row)
+        data[col][row] = values[row * cols + col];
   }
 
   const T& operator()(size_t row, size_t column) const
   {
-    if (row >= 0 && row < M && column >= 0 && column < N)
+    if (row >= 0 && row < rows && column >= 0 && column < cols)
       return data[column][row];
     else
       return data[0][0];
@@ -31,7 +52,7 @@ public:
 
   T& operator()(size_t row, size_t column)
   {
-    if (row >= 0 && row < M && column >= 0 && column < N)
+    if (row >= 0 && row < rows && column >= 0 && column < cols)
       return data[column][row];
     else
       return data[0][0];
@@ -39,9 +60,9 @@ public:
 
   void setToIdentity()
   {
-    for (size_t col = 0; col < N; ++col)
+    for (size_t col = 0; col < cols; ++col)
     {
-      for (size_t row = 0; row < M; ++row)
+      for (size_t row = 0; row < rows; ++row)
       {
         if (row == col)
           data[col][row] = 1.0f;
@@ -53,15 +74,15 @@ public:
 
   void print(std::ostream& os)
   {
-    for (size_t row = 0; row < M; ++row)
+    for (size_t row = 0; row < rows; ++row)
     {
       os << "|";
 
-      for (size_t col = 0; col < N; ++col)
+      for (size_t col = 0; col < cols; ++col)
       {
         os << data[col][row];
 
-        if (col == N - 1)
+        if (col == cols - 1)
           os << "|" << std::endl;
         else
           os << " ";
@@ -69,23 +90,39 @@ public:
     }
   }
 
-  Matrix<N, M, T>& operator*=(T factor)
+  Matrix<T>& operator*=(T factor)
   {
-    for (size_t row = 0; row < M; ++row)
-      for (size_t col = 0; col < N; ++col)
+    for (size_t row = 0; row < rows; ++row)
+      for (size_t col = 0; col < cols; ++col)
         data[col][row] *= factor;
 
     return *this;
   }
 
-  template<int NN, int M1, int M2, typename TT>
-  friend Matrix<M1, M2, TT> operator*(const Matrix<NN, M2, TT>& m1,
-                                      const Matrix<M1, NN, TT>& m2);
+  Matrix<T> operator*(const Matrix<T>& rhs)
+  {
+    Matrix<T> result(this->rows, rhs.cols);
+
+    for (size_t row = 0; row < this->rows; ++row)
+    {
+      for (size_t col = 0; col < rhs.cols; ++col)
+      {
+        T sum = 0.0f;
+
+        for (size_t j = 0; j < this->cols; ++j)
+          sum += this->data[j][row] * rhs.data[col][j];
+
+        result.data[col][row] = sum;
+      }
+    }
+
+    return result;
+  }
 
   // 4x4 only
-  Matrix<N, M, T> inverse()
+  Matrix<T> inverse()
   {
-    Matrix<N, M, T> inv;
+    Matrix<T> inv(this->rows, this->cols);
     inv.data[0][0] = data[1][1] * data[2][2] * data[3][3] -
                      data[1][1] * data[3][2] * data[2][3] -
                      data[1][2] * data[2][1] * data[3][3] +
@@ -210,27 +247,5 @@ public:
   }
 
 }; // end class Matrix
-
-template <int N, int M1, int M2, typename T>
-Matrix<M1, M2, T> operator*(const Matrix<N, M2, T>& m1,
-                            const Matrix<M1, N, T>& m2)
-{
-  Matrix<M1, M2, T> result;
-
-  for (int row = 0; row < M2; ++row)
-  {
-    for (int col = 0; col < M1; ++col)
-    {
-      T sum(0.0f);
-
-      for (int j = 0; j < N; ++j)
-        sum += m1.data[j][row] * m2.data[col][j];
-
-      result.data[col][row] = sum;
-    }
-  }
-
-  return result;
-}
 
 } // end namespace Utils
