@@ -9,10 +9,7 @@
 // Typedefs -------------------------------------------------------------------
 typedef Utils::Point2D<GLdouble> Point2D;
 typedef Utils::Line<GLdouble> Line;
-typedef Utils::Matrix<4, 4, GLdouble> Matrix4x4;
-typedef Utils::Matrix<4, 3, GLdouble> Matrix3x4;
-typedef Utils::Matrix<1, 4, GLdouble> Vector4x1;
-typedef Utils::Matrix<1, 3, GLdouble> Vector3x1;
+typedef Utils::Matrix<GLdouble> Matrix;
 typedef Utils::Slider Slider;
 
 // Window size ----------------------------------------------------------------
@@ -25,7 +22,7 @@ const Utils::Color curveColor(Utils::BLUE);
 const Utils::Color curveColor2(Utils::MAGENTA);
 
 // Sizes ----------------------------------------------------------------------
-const GLfloat lineWidth = 2.0;
+const GLfloat lineWidth = 3.0;
 const int gridSize = 40;
 
 // Points ---------------------------------------------------------------------
@@ -43,13 +40,13 @@ GLdouble t2 = 0.0f;
 GLdouble t3 = 1.0f;
 
 // Matrices -------------------------------------------------------------------
-Matrix3x4 G1;
-Matrix3x4 G2;
-Matrix4x4 preM;
-Matrix4x4 M;
+Matrix G1(3, 4);
+Matrix G2(3, 4);
+Matrix preM(4, 4);
+Matrix M(4, 4);
 // these are vectors essentially, but we use single column matrices instead
-Vector4x1 T;
-Vector3x1 temp;
+Matrix T(4, 1);
+Matrix temp(3, 1);
 
 // Sliders --------------------------------------------------------------------
 Slider t1Slider(100, 40, WIDTH - 100, 40);
@@ -110,7 +107,7 @@ void init()
   glMatrixMode(GL_PROJECTION);
   gluOrtho2D(0.0, WIDTH, 0.0, HEIGHT);
   glEnable(GL_LINE_SMOOTH);
-  glEnable(GL_POINT_SMOOTH);
+  // glEnable(GL_POINT_SMOOTH);
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   tangent.lineWidth = lineWidth;
@@ -156,6 +153,7 @@ void init()
 
   // slider looks
   sliderLine.pointsColor = Utils::BLACK;
+  sliderLine.lineWidth = lineWidth;
   t1Slider.setHandleSize(6);
   t2Slider.setHandleSize(6);
   t3Slider.setHandleSize(6);
@@ -169,13 +167,14 @@ void drawGrid(int width, int height, int gap, GLfloat lineWidth,
   glEnable(GL_LINE_STIPPLE);
   glLineStipple(1, 0xAAAA);
   glBegin(GL_LINES);
-  for(int i = gap; i < width; i += gap)
+
+  for (int i = gap; i < width; i += gap)
   {
     glVertex2i(i, 0);
     glVertex2i(i, height);
   }
 
-  for(int i = gap; i < height; i += gap)
+  for (int i = gap; i < height; i += gap)
   {
     glVertex2i(0, i);
     glVertex2i(width, i);
@@ -195,7 +194,7 @@ void drawInfoText(GLint x, GLint y, const Utils::Color& color)
 
   color.setGLColor();
   glRasterPos2i(x, y);
-  glutBitmapString(GLUT_BITMAP_HELVETICA_18, (unsigned char*)tText.c_str());
+  glutBitmapString(GLUT_BITMAP_HELVETICA_18, (unsigned char *)tText.c_str());
 }
 
 void display()
@@ -203,10 +202,10 @@ void display()
   glClear(GL_COLOR_BUFFER_BIT);
 
   // draw grid to into background
-  drawGrid(WIDTH, HEIGHT, gridSize, 1, Utils::VERY_LIGHT_GRAY);
+  drawGrid(WIDTH, HEIGHT, gridSize, lineWidth, Utils::VERY_LIGHT_GRAY);
 
   // draw info text
-  drawInfoText(10, HEIGHT-24, Utils::BLACK);
+  drawInfoText(10, HEIGHT - 24, Utils::BLACK);
 
   // draw curve
   curveColor.setGLColor();
@@ -215,11 +214,12 @@ void display()
   glBegin(GL_LINE_STRIP);
 
   // first curve segment
-  Matrix3x4 C = G1 * M;
-  for(GLdouble t = t1; t <= t3; t += 0.01f)
+  Matrix C = G1 * M;
+
+  for (GLdouble t = t1; t <= t3; t += 0.01f)
   {
-    T(0, 0) = t*t*t;
-    T(1, 0) = t*t;
+    T(0, 0) = t * t * t;
+    T(1, 0) = t * t;
     T(2, 0) = t;
     T(3, 0) = 1;
     temp = C * T;
@@ -229,10 +229,11 @@ void display()
   // second curve segment
   C = G2 * M;
   curveColor2.setGLColor();
-  for(GLdouble t = t1; t <= t3; t += 0.01f)
+
+  for (GLdouble t = t1; t <= t3; t += 0.01f)
   {
-    T(0, 0) = t*t*t;
-    T(1, 0) = t*t;
+    T(0, 0) = t * t * t;
+    T(1, 0) = t * t;
     T(2, 0) = t;
     T(3, 0) = 1;
     temp = C * T;
@@ -266,7 +267,7 @@ void display()
 
 void processMouse(GLint button, GLint action, GLint xMouse, GLint yMouse)
 {
-  if(button == GLUT_LEFT_BUTTON && action == GLUT_DOWN)
+  if (button == GLUT_LEFT_BUTTON && action == GLUT_DOWN)
   {
     tangent.rp1().checkClick(xMouse, HEIGHT - yMouse, 12);
     tangent.rp2().checkClick(xMouse, HEIGHT - yMouse, 12);
@@ -279,7 +280,7 @@ void processMouse(GLint button, GLint action, GLint xMouse, GLint yMouse)
     t3Slider.checkClick(xMouse, HEIGHT - yMouse, 12);
   }
 
-  if(button == GLUT_LEFT_BUTTON && action == GLUT_UP)
+  if (button == GLUT_LEFT_BUTTON && action == GLUT_UP)
   {
     tangent.rp1().release();
     tangent.rp2().release();
@@ -295,7 +296,7 @@ void processMouse(GLint button, GLint action, GLint xMouse, GLint yMouse)
 
 void processMouseActiveMotion(GLint xMouse, GLint yMouse)
 {
-  if(tangent.rp1().clicked)
+  if (tangent.rp1().clicked)
   {
     // cache difference vector between p1 & p2
     GLdouble dx = tangent.dx();
@@ -316,7 +317,7 @@ void processMouseActiveMotion(GLint xMouse, GLint yMouse)
     calcTangent2();
   }
 
-  if(tangent.rp2().clicked)
+  if (tangent.rp2().clicked)
   {
     tangent.rp2().setX(xMouse);
     tangent.rp2().setY(HEIGHT - yMouse);
@@ -329,7 +330,7 @@ void processMouseActiveMotion(GLint xMouse, GLint yMouse)
     calcTangent2();
   }
 
-  if(P3.clicked)
+  if (P3.clicked)
   {
     P3.setX(xMouse);
     P3.setY(HEIGHT - yMouse);
@@ -342,7 +343,7 @@ void processMouseActiveMotion(GLint xMouse, GLint yMouse)
     calcTangent2();
   }
 
-  if(P4.clicked)
+  if (P4.clicked)
   {
     P4.setX(xMouse);
     P4.setY(HEIGHT - yMouse);
@@ -359,7 +360,7 @@ void processMouseActiveMotion(GLint xMouse, GLint yMouse)
     calcTangent2();
   }
 
-  if(P5.clicked)
+  if (P5.clicked)
   {
     P5.setX(xMouse);
     P5.setY(HEIGHT - yMouse);
@@ -372,7 +373,7 @@ void processMouseActiveMotion(GLint xMouse, GLint yMouse)
     calcTangent2();
   }
 
-  if(P6.clicked)
+  if (P6.clicked)
   {
     P6.setX(xMouse);
     P6.setY(HEIGHT - yMouse);
@@ -385,10 +386,10 @@ void processMouseActiveMotion(GLint xMouse, GLint yMouse)
     calcTangent2();
   }
 
-  if(t1Slider.isDragging())
+  if (t1Slider.isDragging())
   {
     t1Slider.setHandlePos(xMouse);
-    t1 = minParam + (t1Slider.getValue()*(maxParam - minParam)) / 100;
+    t1 = minParam + (t1Slider.getValue() * (maxParam - minParam)) / 100;
 
     // update parameter matrix
     updateMMatrix();
@@ -397,10 +398,10 @@ void processMouseActiveMotion(GLint xMouse, GLint yMouse)
     calcTangent2();
   }
 
-  if(t2Slider.isDragging())
+  if (t2Slider.isDragging())
   {
     t2Slider.setHandlePos(xMouse);
-    t2 = minParam + (t2Slider.getValue()*(maxParam - minParam)) / 100;
+    t2 = minParam + (t2Slider.getValue() * (maxParam - minParam)) / 100;
 
     // update parameter matrix
     updateMMatrix();
@@ -409,10 +410,10 @@ void processMouseActiveMotion(GLint xMouse, GLint yMouse)
     calcTangent2();
   }
 
-  if(t3Slider.isDragging())
+  if (t3Slider.isDragging())
   {
     t3Slider.setHandlePos(xMouse);
-    t3 = minParam + (t3Slider.getValue()*(maxParam - minParam)) / 100;
+    t3 = minParam + (t3Slider.getValue() * (maxParam - minParam)) / 100;
 
     // update parameter matrix
     updateMMatrix();
