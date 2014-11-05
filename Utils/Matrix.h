@@ -248,4 +248,28 @@ public:
 
 }; // end class Matrix
 
+template <typename T>
+class Transform2D : public Matrix<T>
+{
+
+}; // end class TransformationMatrix
+
+template <typename T>
+class Translate2D : public Transform2D<T>
+{
+
+}; // end class Translate2D
+
+template <typename T>
+class Scale2D : public Transform2D<T>
+{
+
+}; // end class Scale2D
+
+template <typename T>
+class Rotate2D : public Transform2D<T>
+{
+
+}; // end class Rotate2D
+
 } // end namespace Utils
