@@ -37,14 +37,14 @@ public:
 
   explicit Matrix(size_t N, size_t M, const T *values) : Matrix(N, M)
   {
-    for (size_t col = 0; col < cols; ++col)
-      for (size_t row = 0; row < rows; ++row)
-        data[col][row] = values[row * cols + col];
+    for (size_t col = 0; col < this->cols; ++col)
+      for (size_t row = 0; row < this->rows; ++row)
+        data[col][row] = values[row * this->cols + col];
   }
 
   const T& operator()(size_t row, size_t column) const
   {
-    if (row >= 0 && row < rows && column >= 0 && column < cols)
+    if (row >= 0 && row < this->rows && column >= 0 && column < this->cols)
       return data[column][row];
     else
       return data[0][0];
@@ -52,7 +52,7 @@ public:
 
   T& operator()(size_t row, size_t column)
   {
-    if (row >= 0 && row < rows && column >= 0 && column < cols)
+    if (row >= 0 && row < this->rows && column >= 0 && column < this->cols)
       return data[column][row];
     else
       return data[0][0];
@@ -60,9 +60,9 @@ public:
 
   void setToIdentity()
   {
-    for (size_t col = 0; col < cols; ++col)
+    for (size_t col = 0; col < this->cols; ++col)
     {
-      for (size_t row = 0; row < rows; ++row)
+      for (size_t row = 0; row < this->rows; ++row)
       {
         if (row == col)
           data[col][row] = 1.0f;
@@ -74,15 +74,15 @@ public:
 
   void print(std::ostream& os)
   {
-    for (size_t row = 0; row < rows; ++row)
+    for (size_t row = 0; row < this->rows; ++row)
     {
       os << "|";
 
-      for (size_t col = 0; col < cols; ++col)
+      for (size_t col = 0; col < this->cols; ++col)
       {
         os << data[col][row];
 
-        if (col == cols - 1)
+        if (col == this->cols - 1)
           os << "|" << std::endl;
         else
           os << " ";
@@ -92,8 +92,8 @@ public:
 
   Matrix<T>& operator*=(T factor)
   {
-    for (size_t row = 0; row < rows; ++row)
-      for (size_t col = 0; col < cols; ++col)
+    for (size_t row = 0; row < this->rows; ++row)
+      for (size_t col = 0; col < this->cols; ++col)
         data[col][row] *= factor;
 
     return *this;
