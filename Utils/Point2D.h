@@ -3,6 +3,7 @@
 #include <ostream>
 #include <cmath>
 #include "Color.h"
+#include "Matrix.h"
 
 namespace Utils
 {
@@ -246,6 +247,14 @@ public:
     glBegin(GL_POINTS);
     glVertex2<T>(*this);
     glEnd();
+  }
+
+  inline void transform(const Matrix<T>& m)
+  {
+    T oldX = xp;
+    T oldY = yp;
+    xp = m(0, 0) * oldX + m(0, 1) * oldY + m(0, 2);
+    yp = m(1, 0) * oldX + m(1, 1) * oldY + m(1, 2);
   }
 
 }; // end class Point2D
