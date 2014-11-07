@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <vector>
+#include <cmath>
 
 namespace Utils
 {
@@ -267,22 +268,22 @@ protected:
 
   void updateTransform()
   {
-    data[0][0] = Xfactor;
-    data[1][1] = Yfactor;
-    data[2][2] = 1.0f;
+    this->data[0][0] = Xfactor;
+    this->data[1][1] = Yfactor;
+    this->data[2][2] = 1.0f;
   }
 
 public:
   /// Uniform scale
   Scale2D(double lambda)
-    : Matrix(3, 3), Xfactor(lambda), Yfactor(lambda)
+    : Matrix<T>(3, 3), Xfactor(lambda), Yfactor(lambda)
   {
     updateTransform();
   }
 
   /// Non-Uniform scale
   Scale2D(double lambda1, double lambda2)
-    : Matrix(3, 3), Xfactor(lambda1), Yfactor(lambda2)
+    : Matrix<T>(3, 3), Xfactor(lambda1), Yfactor(lambda2)
   {
     updateTransform();
   }
@@ -330,15 +331,15 @@ protected:
 
   void updateTransform()
   {
-    data[0][0] = cos(angle);
-    data[0][1] = sin(angle);
-    data[1][0] = -sin(angle);
-    data[1][1] = cos(angle);
-    data[2][2] = 1.0f;
+    this->data[0][0] = cos(angle);
+    this->data[0][1] = sin(angle);
+    this->data[1][0] = -sin(angle);
+    this->data[1][1] = cos(angle);
+    this->data[2][2] = 1.0f;
   }
 
 public:
-  Rotate2D(double alpha) : Matrix(3, 3), angle(alpha)
+  Rotate2D(double alpha) : Matrix<T>(3, 3), angle(alpha)
   {
     updateTransform();
   }
