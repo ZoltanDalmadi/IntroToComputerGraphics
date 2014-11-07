@@ -256,6 +256,51 @@ public:
 template <typename T>
 class Translate2D : public Matrix<T>
 {
+protected:
+  T deltaX;
+  T deltaY;
+
+  void updateTransform()
+  {
+    this->data[0][2] = deltaX;
+    this->data[1][2] = deltaY;
+  }
+
+public:
+  Translate2D(T delta1, T delta2)
+    : Matrix<T>(3, 3), deltaX(delta1), deltaY(delta2)
+  {
+    this->data[0][0] = 1.0f;
+    this->data[1][1] = 1.0f;
+    this->data[2][2] = 1.0f;
+    updateTransform();
+  }
+
+  virtual ~Translate2D()
+  {
+  }
+
+  inline void setDeltaX(double delta)
+  {
+    this->deltaX = delta;
+    updateTransform();
+  }
+
+  inline void setDeltaY(double delta)
+  {
+    this->deltaY = delta;
+    updateTransform();
+  }
+
+  inline T getDeltaX() const
+  {
+    return deltaX;
+  }
+
+  inline T getDeltaY() const
+  {
+    return deltaY;
+  }
 
 }; // end class Translate2D
 
@@ -270,7 +315,6 @@ protected:
   {
     this->data[0][0] = Xfactor;
     this->data[1][1] = Yfactor;
-    this->data[2][2] = 1.0f;
   }
 
 public:
@@ -278,6 +322,7 @@ public:
   Scale2D(double lambda)
     : Matrix<T>(3, 3), Xfactor(lambda), Yfactor(lambda)
   {
+    this->data[2][2] = 1.0f;
     updateTransform();
   }
 
@@ -335,12 +380,12 @@ protected:
     this->data[0][1] = sin(angle);
     this->data[1][0] = -sin(angle);
     this->data[1][1] = cos(angle);
-    this->data[2][2] = 1.0f;
   }
 
 public:
   Rotate2D(double alpha) : Matrix<T>(3, 3), angle(alpha)
   {
+    this->data[2][2] = 1.0f;
     updateTransform();
   }
 
