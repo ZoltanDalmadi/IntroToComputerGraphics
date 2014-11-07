@@ -216,7 +216,7 @@ void display()
   // first curve segment
   Matrix C = G1 * M;
 
-  for (GLdouble t = t1; t <= t3; t += (t3 - t1)/1000)
+  for (GLdouble t = t1; t <= t3; t += (t3 - t1)/100)
   {
     T(0, 0) = t * t * t;
     T(1, 0) = t * t;
@@ -230,7 +230,7 @@ void display()
   C = G2 * M;
   curveColor2.setGLColor();
 
-  for (GLdouble t = t1; t <= t3; t += (t3 - t1)/1000)
+  for (GLdouble t = t1; t <= t3; t += (t3 - t1)/100)
   {
     T(0, 0) = t * t * t;
     T(1, 0) = t * t;
@@ -239,6 +239,8 @@ void display()
     temp = C * T;
     glVertex2d(temp(0, 0), temp(1, 0));
   }
+
+  glVertex2d(P6.x(), P6.y());
 
   glEnd();
 
