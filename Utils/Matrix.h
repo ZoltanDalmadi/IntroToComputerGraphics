@@ -42,6 +42,10 @@ public:
         data[col][row] = values[row * this->cols + col];
   }
 
+  virtual ~Matrix()
+  {
+  }
+
   const T& operator()(size_t row, size_t column) const
   {
     if (row >= 0 && row < this->rows && column >= 0 && column < this->cols)
@@ -257,6 +261,64 @@ class Translate2D : public Matrix<T>
 template <typename T>
 class Scale2D : public Matrix<T>
 {
+protected:
+  double Xfactor; // he-he
+  double Yfactor;
+
+  void updateTransform()
+  {
+    data[0][0] = Xfactor;
+    data[1][1] = Yfactor;
+    data[2][2] = 1.0f;
+  }
+
+public:
+  /// Uniform scale
+  Scale2D(double lambda)
+    : Matrix(3, 3), Xfactor(lambda), Yfactor(lambda)
+  {
+    updateTransform();
+  }
+
+  /// Non-Uniform scale
+  Scale2D(double lambda1, double lambda2)
+    : Matrix(3, 3), Xfactor(lambda1), Yfactor(lambda2)
+  {
+    updateTransform();
+  }
+
+  virtual ~Scale2D()
+  {
+  }
+
+  inline void setXFactor(double lambda)
+  {
+    this->Xfactor = lambda;
+    updateTransform();
+  }
+
+  inline void setYFactor(double lambda)
+  {
+    this->Yfactor = lambda;
+    updateTransform();
+  }
+
+  inline void setFactor(double lambda)
+  {
+    this->Xfactor = lambda;
+    this->Yfactor = lambda;
+    updateTransform();
+  }
+
+  inline double getXFactor() const
+  {
+    return Xfactor;
+  }
+
+  inline double getYFactor() const
+  {
+    return Yfactor;
+  }
 
 }; // end class Scale2D
 
@@ -279,6 +341,10 @@ public:
   Rotate2D(double alpha) : Matrix(3, 3), angle(alpha)
   {
     updateTransform();
+  }
+
+  virtual ~Rotate2D()
+  {
   }
 
   inline void setAngle(double alpha)
