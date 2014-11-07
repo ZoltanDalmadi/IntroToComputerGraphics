@@ -124,6 +124,20 @@ public:
     --outer;
   }
 
+  /// Transform PolyStar with a transformation matrix.
+  void transform(const Matrix<T>& transform)
+  {
+    for (auto& point : inner.pointsContainer)
+    {
+      point.transform(transform);
+      }
+
+    for (auto& point : outer.pointsContainer)
+    {
+      point.transform(transform);
+    }
+  }
+
   /// Draw PolyStar with OpenGL calls.
   void draw() const
   {
