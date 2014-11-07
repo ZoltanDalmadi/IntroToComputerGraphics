@@ -191,6 +191,14 @@ public:
     }
   }
 
+  void transform(const Matrix<T>& transform)
+  {
+    for (auto& point : pointsContainer)
+    {
+      point.transform(transform);
+    }
+  }
+
   /// Draw Ellipse with OpenGL calls.
   void draw() const
   {
