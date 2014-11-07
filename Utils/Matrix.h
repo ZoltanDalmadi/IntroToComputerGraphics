@@ -249,26 +249,33 @@ public:
 }; // end class Matrix
 
 template <typename T>
-class Transform2D : public Matrix<T>
-{
-
-}; // end class TransformationMatrix
-
-template <typename T>
-class Translate2D : public Transform2D<T>
+class Translate2D : public Matrix<T>
 {
 
 }; // end class Translate2D
 
 template <typename T>
-class Scale2D : public Transform2D<T>
+class Scale2D : public Matrix<T>
 {
 
 }; // end class Scale2D
 
 template <typename T>
-class Rotate2D : public Transform2D<T>
+class Rotate2D : public Matrix<T>
 {
+protected:
+  double alpha;
+
+public:
+  Rotate2D(double alpha) : Matrix(3, 3), alpha(alpha)
+  {
+    data[0][0] = cos(alpha);
+    data[0][1] = sin(alpha);
+    data[1][0] = -sin(alpha);
+    data[1][1] = cos(alpha);
+    data[2][2] = 1.0f;
+  }
+
 
 }; // end class Rotate2D
 
