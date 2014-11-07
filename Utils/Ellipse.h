@@ -191,6 +191,7 @@ public:
     }
   }
 
+  /// Transform Ellipse with a transformation matrix.
   void transform(const Matrix<T>& transform)
   {
     for(auto& point : pointsContainer)
