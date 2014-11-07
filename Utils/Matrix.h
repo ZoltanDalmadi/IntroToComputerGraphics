@@ -264,18 +264,33 @@ template <typename T>
 class Rotate2D : public Matrix<T>
 {
 protected:
-  double alpha;
+  double angle;
 
-public:
-  Rotate2D(double alpha) : Matrix(3, 3), alpha(alpha)
+  void updateTransform()
   {
-    data[0][0] = cos(alpha);
-    data[0][1] = sin(alpha);
-    data[1][0] = -sin(alpha);
-    data[1][1] = cos(alpha);
+    data[0][0] = cos(angle);
+    data[0][1] = sin(angle);
+    data[1][0] = -sin(angle);
+    data[1][1] = cos(angle);
     data[2][2] = 1.0f;
   }
 
+public:
+  Rotate2D(double alpha) : Matrix(3, 3), angle(alpha)
+  {
+    updateTransform();
+  }
+
+  inline void setAngle(double alpha)
+  {
+    this->angle = alpha;
+    updateTransform();
+  }
+
+  inline double getAngle() const
+  {
+    return angle;
+  }
 
 }; // end class Rotate2D
 
