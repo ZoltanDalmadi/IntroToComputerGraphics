@@ -184,7 +184,7 @@ public:
     this->pointsContainer.clear();
     double gap = 2 * PI / points;
 
-    for (size_t i = 0; i <= points; ++i)
+    for(size_t i = 0; i <= points; ++i)
     {
       pointsContainer.emplace_back(static_cast<T>(rx * cos(i * gap)),
                                    static_cast<T>(ry * sin(i * gap)));
@@ -193,7 +193,7 @@ public:
 
   void transform(const Matrix<T>& transform)
   {
-    for (auto& point : pointsContainer)
+    for(auto& point : pointsContainer)
     {
       point.transform(transform);
     }
@@ -205,12 +205,12 @@ public:
     glLineWidth(lineWidth);
     color.setGLColor();
 
-    if (filled)
+    if(filled)
       glBegin(GL_POLYGON);
     else
       glBegin(GL_LINE_LOOP);
 
-    for (const auto& point : pointsContainer)
+    for(const auto& point : pointsContainer)
     {
       glVertex2<T>(centre + point);
     }
@@ -226,7 +226,7 @@ public:
 
     glBegin(GL_POINTS);
 
-    for (const auto& point : pointsContainer)
+    for(const auto& point : pointsContainer)
     {
       glVertex2<T>(centre + point);
     }
@@ -252,9 +252,9 @@ public:
 
     glBegin(GL_LINES);
 
-    for (size_t i = 0; i < points; i++)
+    for(size_t i = 0; i < points; i++)
     {
-      for (size_t j = i + 1; j < points; j++)
+      for(size_t j = i + 1; j < points; j++)
       {
         glVertex2<T>(centre + pointsContainer[i]);
         glVertex2<T>(centre + pointsContainer[j]);
@@ -280,18 +280,18 @@ public:
     double alpha;
     double at;
 
-    for (size_t j = 0; j < n; j++)
+    for(size_t j = 0; j < n; j++)
     {
       alpha = j * gap2;
 
       glBegin(GL_LINE_STRIP);
 
-      for (double i = 0; i <= m; i++)
+      for(double i = 0; i <= m; i++)
       {
         theta = i * gap;
         at = alpha + theta;
         glVertex2<T>(Point2D<T>(cx + rx * (cos(at) + theta * sin(at)),
-                                cy + ry * (sin(at) - theta * cos(at))));
+          cy + ry * (sin(at) - theta * cos(at))));
       }
 
       glEnd();
