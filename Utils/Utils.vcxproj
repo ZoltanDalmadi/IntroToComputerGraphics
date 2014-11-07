@@ -87,6 +87,7 @@
     <ClInclude Include="Line.h" />
     <ClInclude Include="Matrix.h" />
     <ClInclude Include="Point2D.h" />
+    <ClInclude Include="PolyStar.h" />
     <ClInclude Include="Rectangle.h" />
     <ClInclude Include="Slider.h" />
     <ClInclude Include="Vector2D.h" />
