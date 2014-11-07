@@ -127,15 +127,8 @@ public:
   /// Transform PolyStar with a transformation matrix.
   void transform(const Matrix<T>& transform)
   {
-    for (auto& point : inner.pointsContainer)
-    {
-      point.transform(transform);
-      }
-
-    for (auto& point : outer.pointsContainer)
-    {
-      point.transform(transform);
-    }
+    inner.transform(transform);
+    outer.transform(transform);
   }
 
   /// Draw PolyStar with OpenGL calls.
@@ -147,7 +140,7 @@ public:
     size_t spikes = this->getSpikes();
     Point2D<T> centre = inner.c();
 
-    if (filled)
+    if(filled)
       glBegin(GL_POLYGON);
     else
       glBegin(GL_LINE_LOOP);
