@@ -56,9 +56,11 @@ void init()
 
 void display()
 {
+  frames++;
   glClear(GL_COLOR_BUFFER_BIT);
   star1.draw();
   star2.draw();
+  star2.rc().draw();
   glutSwapBuffers();
 
   star1.transform(T1);
@@ -67,15 +69,12 @@ void display()
 
 void appUpdate(int n)
 {
-  frames++;
-
   if (frames == 90)
   {
     T1 = rot1 * scale2;
     T2 = rot2 * scale2;
   }
-
-  if (frames == 180)
+  else if (frames == 180)
   {
     T1 = rot1 * scale1;
     T2 = rot2 * scale1;
