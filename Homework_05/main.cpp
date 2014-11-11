@@ -4,6 +4,7 @@
 
 // Typedefs -------------------------------------------------------------------
 typedef Utils::Matrix<GLdouble> Matrix;
+typedef Utils::Translate2D<GLdouble> Translate2D;
 typedef Utils::Rotate2D<GLdouble> Rotate2D;
 typedef Utils::Scale2D<GLdouble> Scale2D;
 typedef Utils::PolyStar<GLdouble> PolyStar;
@@ -26,6 +27,8 @@ PolyStar star1(WIDTH / 2, HEIGHT / 2, 6, 80, 200);
 PolyStar star2(WIDTH / 2, HEIGHT / 2, 6, 200, 300);
 
 // Matrices -------------------------------------------------------------------
+Translate2D tr1(-WIDTH / 2, -HEIGHT / 2);
+Translate2D tr2(WIDTH / 2, HEIGHT / 2);
 Rotate2D rot1((2 * Utils::PI) / 360);
 Rotate2D rot2(-(2 * Utils::PI) / 360);
 Scale2D scale1(0.99);
@@ -48,8 +51,8 @@ void init()
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-  T1 = rot1 * scale1;
-  T2 = rot2 * scale1;
+  T1 = tr2 * scale1 * rot1 * tr1;
+  T2 = tr2 * scale1 * rot2 * tr1;
   star1.lineWidth = lineWidth;
   star2.lineWidth = lineWidth;
 }
@@ -71,13 +74,13 @@ void appUpdate(int n)
 {
   if (frames == 90)
   {
-    T1 = rot1 * scale2;
-    T2 = rot2 * scale2;
+    T1 = tr2 * rot1 * scale2 * tr1;
+    T2 = tr2 * rot2 * scale2 * tr1;
   }
   else if (frames == 180)
   {
-    T1 = rot1 * scale1;
-    T2 = rot2 * scale1;
+    T1 = tr2 * rot1 * scale1 * tr1;
+    T2 = tr2 * rot2 * scale1 * tr1;
     frames = 0;
   }
 
