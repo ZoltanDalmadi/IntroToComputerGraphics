@@ -23,8 +23,7 @@ public:
     : outer(cx, cy, outerRadius, spikes), inner(cx, cy, innerRadius, spikes)
   {
     double alpha = 2 * PI / (spikes * 2);
-    Rotate2D<T> rot(alpha);
-    inner.transform(rot);
+    inner.rotate(alpha);
   }
 
   /// Returns center point's X coordinate.
@@ -147,8 +146,8 @@ public:
 
     for(size_t i = 0; i < spikes; i++)
     {
-      glVertex2<T>(centre + outer.pointsContainer[i]);
-      glVertex2<T>(centre + inner.pointsContainer[i]);
+      glVertex2<T>(outer.pointsContainer[i]);
+      glVertex2<T>(inner.pointsContainer[i]);
     }
 
     glEnd();
@@ -167,8 +166,8 @@ public:
 
     for(size_t i = 0; i < spikes; i++)
     {
-      glVertex2<T>(centre + outer.pointsContainer[i]);
-      glVertex2<T>(centre + inner.pointsContainer[i]);
+      glVertex2<T>(outer.pointsContainer[i]);
+      glVertex2<T>(inner.pointsContainer[i]);
     }
 
     glEnd();
