@@ -262,8 +262,8 @@ protected:
 
   void updateTransform()
   {
-    this->data[0][2] = deltaX;
-    this->data[1][2] = deltaY;
+    this->data[2][0] = deltaX;
+    this->data[2][1] = deltaY;
   }
 
 public:
