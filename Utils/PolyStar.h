@@ -137,7 +137,6 @@ public:
     color.setGLColor();
 
     size_t spikes = this->getSpikes();
-    Point2D<T> centre = inner.c();
 
     if(filled)
       glBegin(GL_POLYGON);
@@ -160,7 +159,6 @@ public:
     pointColor.setGLColor();
 
     size_t spikes = this->getSpikes();
-    Point2D<T> centre = inner.c();
 
     glBegin(GL_POINTS);
 
