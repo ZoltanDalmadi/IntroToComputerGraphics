@@ -47,7 +47,8 @@ public:
 
     for (size_t i = 0; i < this->points; i++)
     {
-      this->pointsContainer.emplace_back(static_cast<T>(x), static_cast<T>(y));
+      this->pointsContainer.emplace_back(centre.x() + static_cast<T>(x),
+                                         centre.y() + static_cast<T>(y));
 
       //apply the rotation matrix
       temp = x;
