@@ -186,8 +186,8 @@ public:
 
     for(size_t i = 0; i <= points; ++i)
     {
-      pointsContainer.emplace_back(static_cast<T>(rx * cos(i * gap)),
-                                   static_cast<T>(ry * sin(i * gap)));
+      pointsContainer.emplace_back(static_cast<T>(centre.x() + rx * cos(i * gap)),
+                                   static_cast<T>(centre.y() + ry * sin(i * gap)));
     }
   }
 
@@ -197,6 +197,18 @@ public:
     for(auto& point : pointsContainer)
     {
       point.transform(transform);
+    }
+  }
+
+  void rotate(double alpha)
+  {
+    this->pointsContainer.clear();
+    double gap = 2 * PI / points;
+
+    for(size_t i = 0; i <= points; ++i)
+    {
+      pointsContainer.emplace_back(static_cast<T>(centre.x() + rx * cos(i * gap + alpha)),
+                                   static_cast<T>(centre.y() + ry * sin(i * gap + alpha)));
     }
   }
 
@@ -213,7 +225,7 @@ public:
 
     for(const auto& point : pointsContainer)
     {
-      glVertex2<T>(centre + point);
+      glVertex2<T>(point);
     }
 
     glEnd();
@@ -229,7 +241,7 @@ public:
 
     for(const auto& point : pointsContainer)
     {
-      glVertex2<T>(centre + point);
+      glVertex2<T>(point);
     }
 
     glEnd();
