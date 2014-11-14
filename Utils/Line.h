@@ -179,18 +179,44 @@ public:
   /// If returned value = 0, Point is on line.
   /// If returned value > 0, Point is on half plane as normalvector is.
   /// If returned value < 0, Point is on half plane opposite to normalvector.
-  inline T standardEquation(T a, T b) const
+  inline T standardEquation(T x, T y) const
   {
     T DX = dx();
     T DY = dy();
     T C = DY * x1() - DX * y1();
-    return -DY * a + DX * b + C;
+    return -DY * x + DX * y + C;
   }
 
   /// Standard equation of Line overload.
   inline T standardEquation(const Point2D<T>& p) const
   {
     return this->standardEquation(p.x(), p.y());
+  }
+
+  /// Standard equation of Line overload. [static]
+  /// p1 and p2 defines a line, p3 is the point to check.
+  static inline T standardEquation(const Point2D<T>& p1,
+                                   const Point2D<T>& p2,
+                                   const Point2D<T>& p3)
+  {
+    T DX = p2.x() - p1.x();
+    T DY = p2.y() - p1.y();
+    T C = DY * p1.x() - DX * p1.y();
+    return -DY * p3.x() + DX * p3.y() + C;
+  }
+
+  /// Get line's parameters.
+  inline Point2DH<T> getParams() const
+  {
+    return Point2DH<T>(-dy(), dx(), x1() * y2() - x2() * y1());
+  }
+
+  /// Get line's parameters. [static]
+  static inline Point2DH<T> getParams(const Point2D<T>& u, const Point2D<T>& v)
+  {
+    return Point2DH<T> (u.y() - v.y(),
+                        v.x() - u.x(),
+                        u.x() * v.y() - v.x() * u.y());
   }
 
   /// Returns distance of Point2D to Line. [static]
