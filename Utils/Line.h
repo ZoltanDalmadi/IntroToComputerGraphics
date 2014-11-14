@@ -232,6 +232,28 @@ public:
                        u.x() * v.y() - v.x() * u.y()).normalized();
   }
 
+  inline bool isPointLeft(T x, T y) const
+  {
+    return (y - y1())*(x2() - x1()) > (x - x1())*(y2() - y1());
+  }
+
+  inline bool isPointLeft(const Point2D<T>& p) const
+  {
+    return this->isPointLeft(p.x(), p.y());
+  }
+
+  static inline bool isPointLeft(T x, T y,
+                                 const Point2D<T>& p1, const Point2D<T>& p2)
+  {
+    return (y - p1.y())*(p2.x() - p1.x()) > (x - p1.x())*(p2.y() - p1.y());
+  }
+
+  static inline bool isPointLeft(const Point2D<T>& u,
+                                 const Point2D<T>& p1, const Point2D<T>& p2)
+  {
+    return isPointLeft(u.x(), u.y(), p1, p2);
+  }
+
   /// Returns distance of Point2D to Line. [static]
   static inline T pDistanceToLine(const Point2D<T>& p, const Line<T>& line)
   {
