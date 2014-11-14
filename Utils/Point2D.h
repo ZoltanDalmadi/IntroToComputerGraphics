@@ -62,6 +62,20 @@ public:
     yp = value;
   }
 
+  /// Sets X and Y coordinate.
+  inline void setXY(T xValue, T yValue)
+  {
+    xp = xValue;
+    yp = yValue;
+  }
+
+  /// Sets X and Y coordinate from an existing point.
+  inline void setXY(const Point2D<T>& p)
+  {
+    xp = p.x();
+    yp = p.y();
+  }
+
   /// Changes X coordinate by an amount.
   inline void changeX(T value)
   {
