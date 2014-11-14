@@ -231,21 +231,24 @@ public:
     return e * e / (DY * DY + DX * DX);
   }
 
-  inline void checkClick(const Point2D<T>& mousePos, int sens)
+  inline Point2D<T>* checkClick(const Point2D<T>& mousePos, int sens)
   {
+    Point2D<T> *point = nullptr;
     int s = sens * sens;
 
     if (Point2D::distance2(*this, mousePos) < s)
     {
       this->clicked = true;
+      point = this;
     }
+    return point;
   }
 
-  inline void checkClick(GLint xMouse, GLint yMouse, int sens)
+  inline Point2D<T>* checkClick(GLint xMouse, GLint yMouse, int sens)
   {
     Point2D<T> mousePos(static_cast<T>(xMouse),
                         static_cast<T>(yMouse));
-    this->checkClick(mousePos, sens);
+    return this->checkClick(mousePos, sens);
   }
 
   inline void release()
