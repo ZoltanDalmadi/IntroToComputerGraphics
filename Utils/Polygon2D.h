@@ -17,9 +17,10 @@ public:
   std::vector <Point2D<T>> pointsContainer;
   GLfloat lineWidth = 1.0;
   GLfloat pointSize = 6.0;
-  Color pointColor = BLUE;
-  Color color = RED;
+  Color pointColor = RED;
+  Color color = BLACK;
   bool filled = false;
+  bool clicked = false;
 
   Polygon2D() {}
 
@@ -37,49 +38,59 @@ public:
     this->points++;
   }
 
-  inline void checkClick(GLint xMouse, GLint yMouse, int sens)
+  inline Point2D<T>* checkClick(GLint xMouse, GLint yMouse, int sens)
   {
+    Point2D<T> *active = nullptr;
     Point2D<T> mousePos(static_cast<T>(xMouse), static_cast<T>(yMouse));
-    for(auto& point : pointsContainer)
-      point.checkClick(mousePos, sens);
-  }
 
-  inline void checkClick(const Point2D<GLint>& mousePos, int sens)
-  {
-    for(const auto& point : pointsContainer)
-      point.checkClick(mousePos, sens);
-  }
-
-  inline void handleClick(GLint xMouse, GLint yMouse) 
-  {
-    for(auto& point : pointsContainer)
+    for(auto& point : this->pointsContainer)
     {
-      if(point.clicked)
+      if(active = point.checkClick(mousePos, sens))
       {
-        point.setXY(xMouse, yMouse);
+        this->clicked = true;
         break;
       }
     }
+ 
+    return active;
+  }
+
+  inline Point2D<T>* checkClick(const Point2D<GLint>& mousePos, int sens)
+  {
+    Point2D<T> *active = nullptr;
+
+    for(auto& point : this->pointsContainer)
+    {
+      if(active = point.checkClick(mousePos, sens))
+      {
+        this->clicked = true;
+        break;
+      }
+    }
+
+    return active;
   }
 
   inline void release()
   {
-    for(auto& point : pointsContainer)
-    {
+    for(auto& point : this->pointsContainer)
       point.release();
-    }
+
+    this->clicked = false;
   }
 
-  inline void handleClick(const Point2D<GLint>& mousePos)
+  inline void handleClick(GLint xMouse, GLint yMouse,
+                          Point2D<T>* activePoint) 
   {
-    for(auto& point : pointsContainer)
-    {
-      if(point.clicked)
-      {
-        point.setXY(mousePos);
-        break;
-      }
-    }
+    if(this->clicked)
+      activePoint->setXY(xMouse, yMouse);
+  }
+
+  inline void handleClick(const Point2D<GLint>& mousePos,
+                          Point2D<T>* activePoint)
+  {
+    if(this->clicked)
+      activePoint->setXY(mousePos);
   }
 
   void draw() const
@@ -91,6 +102,21 @@ public:
       glBegin(GL_POLYGON);
     else
       glBegin(GL_LINE_LOOP);
+
+    for(const auto& point : pointsContainer)
+    {
+      glVertex2<T>(point);
+    }
+
+    glEnd();
+  }
+
+  void drawPoints() const
+  {
+    glPointSize(pointSize);
+    pointColor.setGLColor();
+
+    glBegin(GL_POINTS);
 
     for(const auto& point : pointsContainer)
     {
