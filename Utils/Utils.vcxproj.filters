@@ -41,5 +41,8 @@
     <ClInclude Include="PolyStar.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Polygon2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
