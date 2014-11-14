@@ -273,6 +273,45 @@ public:
 
 }; // end class Point2D
 
+template <typename T>
+class Point2DH
+{
+private:
+  T xp;
+  T yp;
+  T wp;
+
+public:
+  Point2DH() : xp(0.0f), yp(0.0f), wp(1.0f) {}
+  Point2DH(T x, T y, T w) : xp(x), yp(y), wp(w) {}
+  Point2DH(const Point2D<T>& p) : xp(p.x()), yp(p.y()), wp(1.0f) {}
+
+  /// Returns X coordinate.
+  inline T x() const
+  {
+    return xp;
+  }
+
+  /// Returns Y coordinate.
+  inline T y() const
+  {
+    return yp;
+  }
+
+  /// Returns W coordinate.
+  inline T w() const
+  {
+    return wp;
+  }
+
+  /// Convert to normal coordinates.
+  inline Point2D<T> normalized() const
+  {
+    return Point2D<T>(xp / wp, yp / wp);
+  }
+
+}; // end class Point2DH
+
 /// Type specific OpenGL calls.
 template <> void glVertex2<GLshort>(const Point2D<GLshort>& p)
 {
