@@ -219,6 +219,19 @@ public:
                         u.x() * v.y() - v.x() * u.y());
   }
 
+  inline Point2D<T> computeIntersectionPoint(const Line<T>& other) const
+  {
+    return Line::computeIntersectionPoint(this->getParams(), other.getParams());
+  }
+
+  static inline Point2D<T> computeIntersectionPoint(const Point2DH<T>& u,
+                                                    const Point2DH<T>& v)
+  {
+    return Point2DH<T>(u.y() * v.w() - v.y() * u.w(),
+                       v.x() * u.w() - u.x() * v.w(),
+                       u.x() * v.y() - v.x() * u.y()).normalized();
+  }
+
   /// Returns distance of Point2D to Line. [static]
   static inline T pDistanceToLine(const Point2D<T>& p, const Line<T>& line)
   {
