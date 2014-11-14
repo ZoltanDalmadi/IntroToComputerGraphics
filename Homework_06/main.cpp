@@ -3,17 +3,13 @@
 #include <sstream>
 #include <string>
 #include "Polygon2D.h"
+#include "Line.h"
 
 // Typedefs -------------------------------------------------------------------
 typedef Utils::Point2D<GLdouble> Point2D;
+typedef Utils::Point2DH<GLdouble> Point2DH;
 typedef Utils::Polygon2D<GLdouble> Polygon2D;
-
-struct Point2DH
-{
-  GLdouble x;
-  GLdouble y;
-  GLdouble w;
-};
+typedef Utils::Line<GLdouble> Line;
 
 struct LineH
 {
@@ -49,41 +45,17 @@ Point2D P4(800, 500);
 
 Point2D P5(300, 100);
 
-LineH lineStuff1;
-LineH lineStuff2;
-
-Point2DH asd;
+Point2DH lineStuff1;
+Point2DH lineStuff2;
 
 Polygon2D poly;
 
-LineH crossProduct(Point2DH u, Point2DH v)
+// intersection point
+Point2DH crossProduct(const Point2DH& u, const Point2DH& v)
 {
-  return LineH
-  {
-    u.y * v.w - v.y * u.w,
-    -(u.x * v.w - v.x * u.w),
-    u.x * v.y - v.x * u.y
-  };
-}
-
-Point2DH crossProduct(LineH u, LineH v)
-{
-  return Point2DH
-  {
-    u.b * v.c - v.b * u.c,
-    -(u.a * v.c - v.a * u.c),
-    u.a * v.b - v.a * u.b
-  };
-}
-
-Point2DH crossProduct(Point2DH u, LineH v)
-{
-  return Point2DH
-  {
-    u.y * v.c - v.b * u.w,
-    -(u.x * v.c - v.a * u.w),
-    u.x * v.b - v.a * u.y
-  };
+  return Point2DH(u.y() * v.w() - v.y() * u.w(),
+                  -(u.x() * v.w() - v.x() * u.w()),
+                  u.x() * v.y() - v.x() * u.y());
 }
 
 void init()
@@ -99,12 +71,9 @@ void init()
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glPointSize(10);
   glLineWidth(2);
-  lineStuff1 = crossProduct(Point2DH { P1.x(), P1.y(), 1 },
-                            Point2DH { P2.x(), P2.y(), 1 });
-  lineStuff2 = crossProduct(Point2DH { P3.x(), P3.y(), 1 },
-                            Point2DH { P4.x(), P4.y(), 1 });
+  lineStuff1 = Line::getParams(P1, P2);
+  lineStuff2 = Line::getParams(P3, P4);
 
-  asd = crossProduct(Point2DH { P5.x(), P5.y(), 1 }, lineStuff1);
   poly.addPoint(250, 300);
   poly.addPoint(650, 500);
   poly.addPoint(300, 200);
@@ -112,16 +81,14 @@ void init()
 
 void drawInfoText(GLint x, GLint y, const Utils::Color& color)
 {
-  ss << "Line1 a: " << lineStuff1.a << std::endl;
-  ss << "Line1 b: " << lineStuff1.b << std::endl;
-  ss << "Line1 c: " << lineStuff1.c << std::endl << std::endl;
+  ss << "Line1 a: " << lineStuff1.x() << std::endl;
+  ss << "Line1 b: " << lineStuff1.y() << std::endl;
+  ss << "Line1 c: " << lineStuff1.w() << std::endl << std::endl;
 
-  ss << "Line2 a: " << lineStuff2.a << std::endl;
-  ss << "Line2 b: " << lineStuff2.b << std::endl;
-  ss << "Line2 c: " << lineStuff2.c << std::endl << std::endl;
+  ss << "Line2 a: " << lineStuff2.x() << std::endl;
+  ss << "Line2 b: " << lineStuff2.y() << std::endl;
+  ss << "Line2 c: " << lineStuff2.w() << std::endl << std::endl;
 
-  ss << "Stuff x: " << asd.x/asd.w << std::endl;
-  ss << "Stuff y: " << asd.y/asd.w << std::endl;
   tText = ss.str();
   ss.str("");
 
@@ -162,7 +129,7 @@ void display()
   Point2DH intersection = crossProduct(lineStuff1, lineStuff2);
   ipColor.setGLColor();
   glBegin(GL_POINTS);
-  glVertex2d(intersection.x / intersection.w, intersection.y / intersection.w);
+  Utils::glVertex2<GLdouble>(intersection.normalized());
   glEnd();
 
   P5.draw();
@@ -204,7 +171,6 @@ void processMouseActiveMotion(GLint xMouse, GLint yMouse)
     P1.setY(HEIGHT - yMouse);
     lineStuff1 = crossProduct(Point2DH { P1.x(), P1.y(), 1 },
                               Point2DH { P2.x(), P2.y(), 1 });
-    asd = crossProduct(Point2DH { P5.x(), P5.y(), 1 }, lineStuff1);
   }
 
   if(P2.clicked)
@@ -213,7 +179,6 @@ void processMouseActiveMotion(GLint xMouse, GLint yMouse)
     P2.setY(HEIGHT - yMouse);
     lineStuff1 = crossProduct(Point2DH { P1.x(), P1.y(), 1 },
                               Point2DH { P2.x(), P2.y(), 1 });
-    asd = crossProduct(Point2DH { P5.x(), P5.y(), 1 }, lineStuff1);
   }
 
   if(P3.clicked)
@@ -236,7 +201,6 @@ void processMouseActiveMotion(GLint xMouse, GLint yMouse)
   {
     P5.setX(xMouse);
     P5.setY(HEIGHT - yMouse);
-    asd = crossProduct(Point2DH { P5.x(), P5.y(), 1 }, lineStuff1);
   }
 
   poly.handleClick(xMouse, HEIGHT - yMouse);
