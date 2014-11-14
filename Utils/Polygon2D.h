@@ -31,6 +31,12 @@ public:
     this->points++;
   }
 
+  inline void addPoint(const Point2D<T>& p)
+  {
+    this->pointsContainer.emplace_back(p.x(), p.y());
+    this->points++;
+  }
+
   inline void checkClick(GLint xMouse, GLint yMouse, int sens)
   {
     Point2D<T> mousePos(static_cast<T>(xMouse), static_cast<T>(yMouse));
