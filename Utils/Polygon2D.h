@@ -182,6 +182,24 @@ public:
     glEnd();
   }
 
+  void drawWithOtherColor(Color c) const
+  {
+    glLineWidth(lineWidth);
+    c.setGLColor();
+
+    if(filled)
+      glBegin(GL_POLYGON);
+    else
+      glBegin(GL_LINE_LOOP);
+
+    for(const auto& point : pointsContainer)
+    {
+      glVertex2<T>(point);
+    }
+
+    glEnd();
+  }
+
   void drawPoints() const
   {
     glPointSize(pointSize);
