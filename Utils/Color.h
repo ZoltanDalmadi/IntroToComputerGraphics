@@ -15,6 +15,7 @@ enum namedColor
   GREEN,
   BLUE,
   YELLOW,
+  ORANGE,
   MAGENTA,
   CYAN,
   MEDIUM_GRAY,
@@ -53,7 +54,7 @@ public:
 
     if (hexString.length() == 6 || hexString.length() == 7)
     {
-      a = 0;
+      a = 255;
     }
 
     if (hexString.length() == 8 || hexString.length() == 9)
@@ -77,6 +78,7 @@ public:
       { 0, 255, 0, 255 }, // GREEN
       { 0, 0, 255, 255 }, // BLUE
       { 255, 255, 0, 255 }, // YELLOW
+      { 255, 165, 0, 255 }, // ORANGE
       { 255, 0, 255, 255 }, // MAGENTA
       { 0, 255, 255, 255 }, // CYAN
       { 128, 128, 128, 255 }, // MEDIUM_GRAY
