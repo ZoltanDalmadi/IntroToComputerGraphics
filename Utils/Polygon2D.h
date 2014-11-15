@@ -93,6 +93,32 @@ public:
       activePoint->setXY(mousePos);
   }
 
+  inline void handleRightClick(GLint xMouse, GLint yMouse,
+                               Point2D<T>* activePoint) 
+  {
+    if(this->clicked)
+    {
+      for(auto& point : pointsContainer)
+      {
+        if(activePoint == &point)
+          continue;
+
+        auto dx = point.x() - activePoint->x();
+        auto dy = point.y() - activePoint->y();
+        point.setXY(xMouse + dx, yMouse + dy);
+      }
+
+      activePoint->setXY(xMouse, yMouse);
+    }
+  }
+
+  inline void handleRightClick(const Point2D<GLint>& mousePos,
+                               Point2D<T>* activePoint)
+  {
+    this->handleRightClick(mousePos.x(), mousePos.y());
+  }
+
+
   void draw() const
   {
     glLineWidth(lineWidth);
