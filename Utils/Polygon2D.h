@@ -39,30 +39,30 @@ public:
     this->points++;
   }
 
-  inline Point2D<T>* checkClick(GLint xMouse, GLint yMouse, int sens)
+  inline Point2D<T> *checkClick(GLint xMouse, GLint yMouse, int sens)
   {
     Point2D<T> *active = nullptr;
     Point2D<T> mousePos(static_cast<T>(xMouse), static_cast<T>(yMouse));
 
-    for(auto& point : this->pointsContainer)
+    for (auto& point : this->pointsContainer)
     {
-      if(active = point.checkClick(mousePos, sens))
+      if ((active = point.checkClick(mousePos, sens)))
       {
         this->clicked = true;
         break;
       }
     }
- 
+
     return active;
   }
 
-  inline Point2D<T>* checkClick(const Point2D<GLint>& mousePos, int sens)
+  inline Point2D<T> *checkClick(const Point2D<GLint>& mousePos, int sens)
   {
     Point2D<T> *active = nullptr;
 
-    for(auto& point : this->pointsContainer)
+    for (auto& point : this->pointsContainer)
     {
-      if(active = point.checkClick(mousePos, sens))
+      if (active = point.checkClick(mousePos, sens))
       {
         this->clicked = true;
         break;
@@ -74,34 +74,34 @@ public:
 
   inline void release()
   {
-    for(auto& point : this->pointsContainer)
+    for (auto& point : this->pointsContainer)
       point.release();
 
     this->clicked = false;
   }
 
   inline void handleClick(GLint xMouse, GLint yMouse,
-                          Point2D<T>* activePoint) 
+                          Point2D<T> *activePoint)
   {
-    if(this->clicked)
+    if (this->clicked)
       activePoint->setXY(xMouse, yMouse);
   }
 
   inline void handleClick(const Point2D<GLint>& mousePos,
-                          Point2D<T>* activePoint)
+                          Point2D<T> *activePoint)
   {
-    if(this->clicked)
+    if (this->clicked)
       activePoint->setXY(mousePos);
   }
 
   inline void handleRightClick(GLint xMouse, GLint yMouse,
-                               Point2D<T>* activePoint) 
+                               Point2D<T> *activePoint)
   {
-    if(this->clicked)
+    if (this->clicked)
     {
-      for(auto& point : pointsContainer)
+      for (auto& point : pointsContainer)
       {
-        if(activePoint == &point)
+        if (activePoint == &point)
           continue;
 
         auto dx = point.x() - activePoint->x();
@@ -114,7 +114,7 @@ public:
   }
 
   inline void handleRightClick(const Point2D<GLint>& mousePos,
-                               Point2D<T>* activePoint)
+                               Point2D<T> *activePoint)
   {
     this->handleRightClick(mousePos.x(), mousePos.y());
   }
@@ -124,12 +124,13 @@ public:
     Polygon2D<T> output(*this);
     auto n = clipper.pointsContainer.size();
 
-    for(size_t i = 0; i < n; i++)
+    for (size_t i = 0; i < n; i++)
     {
-      if(output.pointsContainer.size())
+      if (output.pointsContainer.size())
       {
         auto other = i + 1;
-        if(other == n)
+
+        if (other == n)
           other = 0;
 
         Line<T> clipEdge(clipper.pointsContainer[i],
@@ -138,22 +139,24 @@ public:
         Point2D<T> S = output.pointsContainer.back();
         Polygon2D<T> temp;
 
-        for(const auto& point : output.pointsContainer)
+        for (const auto& point : output.pointsContainer)
         {
-          if(clipEdge.isPointLeft(point))
+          if (clipEdge.isPointLeft(point))
           {
-            if(!clipEdge.isPointLeft(S))
+            if (!clipEdge.isPointLeft(S))
             {
               temp.addPoint(Line<T>::computeIntersectionPoint(
-                Line<T>::getParams(S, point), clipEdge.getParams()));
+                              Line<T>::getParams(S, point), clipEdge.getParams()));
             }
+
             temp.addPoint(point);
           }
-          else if(clipEdge.isPointLeft(S))
+          else if (clipEdge.isPointLeft(S))
           {
             temp.addPoint(Line<T>::computeIntersectionPoint(
-              Line<T>::getParams(S, point), clipEdge.getParams()));
+                            Line<T>::getParams(S, point), clipEdge.getParams()));
           }
+
           S = point;
         }
 
@@ -169,12 +172,12 @@ public:
     glLineWidth(lineWidth);
     color.setGLColor();
 
-    if(filled)
+    if (filled)
       glBegin(GL_POLYGON);
     else
       glBegin(GL_LINE_LOOP);
 
-    for(const auto& point : pointsContainer)
+    for (const auto& point : pointsContainer)
     {
       glVertex2<T>(point);
     }
@@ -187,12 +190,12 @@ public:
     glLineWidth(lineWidth);
     c.setGLColor();
 
-    if(filled)
+    if (filled)
       glBegin(GL_POLYGON);
     else
       glBegin(GL_LINE_LOOP);
 
-    for(const auto& point : pointsContainer)
+    for (const auto& point : pointsContainer)
     {
       glVertex2<T>(point);
     }
@@ -207,7 +210,7 @@ public:
 
     glBegin(GL_POINTS);
 
-    for(const auto& point : pointsContainer)
+    for (const auto& point : pointsContainer)
     {
       glVertex2<T>(point);
     }

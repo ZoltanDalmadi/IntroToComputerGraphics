@@ -113,12 +113,12 @@ void display()
 {
   glClear(GL_COLOR_BUFFER_BIT);
 
-  for(const auto& p : polyVector)
+  for (const auto& p : polyVector)
     p.drawWithOtherColor(fadedColor);
 
-  for(const auto& p : polyVector)
+  for (const auto& p : polyVector)
   {
-    for(const auto& glass : glassesVector)
+    for (const auto& glass : glassesVector)
     {
       Polygon2D clipped = p.clipWith(glass);
       clipped.filled = true;
@@ -127,7 +127,7 @@ void display()
     }
   }
 
-  for(const auto& g : glassesVector)
+  for (const auto& g : glassesVector)
     g.draw();
 
   glBegin(GL_LINES);
@@ -140,54 +140,58 @@ void display()
 
 void processMouse(GLint button, GLint action, GLint xMouse, GLint yMouse)
 {
-  if(button == GLUT_LEFT_BUTTON && action == GLUT_DOWN)
+  if (button == GLUT_LEFT_BUTTON && action == GLUT_DOWN)
   {
-    for(auto& p : glassesVector)
+    for (auto& p : glassesVector)
     {
-      if(clicked = p.checkClick(xMouse, HEIGHT - yMouse, 12))
+      if ((clicked = p.checkClick(xMouse, HEIGHT - yMouse, 12)))
         break;
     }
   }
 
-  if(button == GLUT_RIGHT_BUTTON && action == GLUT_DOWN)
+  if (button == GLUT_RIGHT_BUTTON && action == GLUT_DOWN)
   {
-    for(auto& p : glassesVector)
+    for (auto& p : glassesVector)
     {
-      if(rightClicked = p.checkClick(xMouse, HEIGHT - yMouse, 12))
+      if ((rightClicked = p.checkClick(xMouse, HEIGHT - yMouse, 12)))
         break;
     }
   }
 
-  if(button == GLUT_LEFT_BUTTON && action == GLUT_UP)
+  if (button == GLUT_LEFT_BUTTON && action == GLUT_UP)
   {
-    if(clicked)
+    if (clicked)
     {
       clicked = nullptr;
-      for(auto& p : glassesVector)
+
+      for (auto& p : glassesVector)
       {
-        if(p.clicked)
+        if (p.clicked)
         {
           p.release();
           break;
         }
       }
+
       glutPostRedisplay();
     }
   }
 
-  if(button == GLUT_RIGHT_BUTTON && action == GLUT_UP)
+  if (button == GLUT_RIGHT_BUTTON && action == GLUT_UP)
   {
-    if(rightClicked)
+    if (rightClicked)
     {
       rightClicked = nullptr;
-      for(auto& p : glassesVector)
+
+      for (auto& p : glassesVector)
       {
-        if(p.clicked)
+        if (p.clicked)
         {
           p.release();
           break;
         }
       }
+
       glutPostRedisplay();
     }
   }
@@ -195,11 +199,11 @@ void processMouse(GLint button, GLint action, GLint xMouse, GLint yMouse)
 
 void processMouseActiveMotion(GLint xMouse, GLint yMouse)
 {
-  if(clicked)
+  if (clicked)
   {
-    for(auto& p : glassesVector)
+    for (auto& p : glassesVector)
     {
-      if(p.clicked)
+      if (p.clicked)
       {
         p.handleClick(xMouse, HEIGHT - yMouse, clicked);
         break;
@@ -207,13 +211,13 @@ void processMouseActiveMotion(GLint xMouse, GLint yMouse)
     }
   }
 
-  if(rightClicked)
+  if (rightClicked)
   {
-    for(auto& poly : glassesVector)
+    for (auto& poly : glassesVector)
     {
-      for(auto& point : poly.pointsContainer)
+      for (auto& point : poly.pointsContainer)
       {
-        if(rightClicked == &point)
+        if (rightClicked == &point)
           continue;
 
         auto dx = point.x() - rightClicked->x();
