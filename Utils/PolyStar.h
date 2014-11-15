@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Circle.h"
+#include "Polygon2D.h"
 
 namespace Utils
 {
@@ -169,6 +170,24 @@ public:
     }
 
     glEnd();
+  }
+
+  Polygon2D<T> toPolygon2D() const
+  {
+    Polygon2D<T> output;
+    output.color = this->color;
+    output.pointColor = this->pointColor;
+    output.filled = this->filled;
+    output.lineWidth = this->lineWidth;
+    output.pointSize = this->pointSize;
+
+    for(size_t i = 0; i < this->getSpikes(); i++)
+    {
+      output.addPoint(outer.pointsContainer[i]);
+      output.addPoint(inner.pointsContainer[i]);
+    }
+
+    return output;
   }
 
 }; // end class PolyStar
