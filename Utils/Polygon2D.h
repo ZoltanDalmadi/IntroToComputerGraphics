@@ -132,8 +132,8 @@ public:
         if(other == n)
           other = 0;
 
-        Line<T> clipEdge(clipper.pointsContainer[i], clipper.pointsContainer[other]);
-
+        Line<T> clipEdge(clipper.pointsContainer[i],
+                         clipper.pointsContainer[other]);
 
         Point2D<T> S = output.pointsContainer.back();
         Polygon2D<T> temp;
