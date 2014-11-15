@@ -2,6 +2,7 @@
 
 #include <GL/freeglut.h>
 #include "Point2D.h"
+#include "Line.h"
 #include "Color.h"
 
 namespace Utils
@@ -34,7 +35,7 @@ public:
 
   inline void addPoint(const Point2D<T>& p)
   {
-    this->pointsContainer.emplace_back(p.x(), p.y());
+    this->pointsContainer.emplace_back(p);
     this->points++;
   }
 
@@ -118,6 +119,50 @@ public:
     this->handleRightClick(mousePos.x(), mousePos.y());
   }
 
+  Polygon2D<T> clipWith(const Polygon2D<T>& clipper)
+  {
+    Polygon2D<T> output(*this);
+    auto n = clipper.pointsContainer.size();
+
+    for(size_t i = 0; i < n; i++)
+    {
+      if(output.pointsContainer.size())
+      {
+        auto other = i + 1;
+        if(other == n)
+          other = 0;
+
+        Line<T> clipEdge(clipper.pointsContainer[i], clipper.pointsContainer[other]);
+
+
+        Point2D<T> S = output.pointsContainer.back();
+        Polygon2D<T> temp;
+
+        for(const auto& point : output.pointsContainer)
+        {
+          if(clipEdge.isPointLeft(point))
+          {
+            if(!clipEdge.isPointLeft(S))
+            {
+              temp.addPoint(Line<T>::computeIntersectionPoint(
+                Line<T>::getParams(S, point), clipEdge.getParams()));
+            }
+            temp.addPoint(point);
+          }
+          else if(clipEdge.isPointLeft(S))
+          {
+            temp.addPoint(Line<T>::computeIntersectionPoint(
+              Line<T>::getParams(S, point), clipEdge.getParams()));
+          }
+          S = point;
+        }
+
+        output = temp;
+      }
+    }
+
+    return output;
+  }
 
   void draw() const
   {
