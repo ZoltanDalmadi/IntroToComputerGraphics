@@ -22,10 +22,7 @@ const GLsizei HEIGHT = 720;
 
 // Colors ---------------------------------------------------------------------
 const Utils::Color bgColor(Utils::WHITE);
-const Utils::Color pColor(Utils::RED);
-const Utils::Color ipColor(Utils::MAGENTA);
-const Utils::Color spColor(Utils::GREEN);
-const Utils::Color lColor(Utils::BLACK);
+const Utils::Color fadedColor(Utils::VERY_LIGHT_GRAY);
 const Utils::Color sunColor(Utils::ORANGE);
 
 // Sizes ----------------------------------------------------------------------
@@ -37,20 +34,20 @@ std::stringstream ss;
 
 
 // Scene ----------------------------------------------------------------------
-Circle glasses(400, 300, 200, 6);
-auto glasses_poly = glasses.toPolygon2D();
-Circle sun(200, HEIGHT - 150, 60, 12);
+Circle glass1(400, 300, 60, 4);
+Circle glass2(220, 300, 60, 5);
 
 Polygon2D mountain;
 Polygon2D bush;
 Polygon2D tree;
 Polygon2D treeBush;
 
-
+Circle sun(200, HEIGHT - 150, 60, 12);
 
 Point2D *clicked = nullptr;
 Point2D *rightClicked = nullptr;
 std::vector<Polygon2D> polyVector;
+std::vector<Polygon2D> glassesVector;
 
 void init()
 {
@@ -63,15 +60,13 @@ void init()
   glEnable(GL_POINT_SMOOTH);
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  glPointSize(10);
-  glLineWidth(2);
 
   mountain.addPoint(1020, 100);
   mountain.addPoint(840, 560);
   mountain.addPoint(560, 270);
   mountain.addPoint(300, 380);
   mountain.addPoint(200, 100);
-  mountain.color = Utils::LIGHT_GRAY;
+  mountain.color = fadedColor;
   mountain.lineWidth = lineWidth;
   polyVector.push_back(mountain);
 
@@ -80,7 +75,7 @@ void init()
   bush.addPoint(640, 240);
   bush.addPoint(540, 170);
   bush.addPoint(580, 100);
-  bush.color = Utils::LIGHT_GRAY;
+  bush.color = fadedColor;
   bush.lineWidth = lineWidth;
   polyVector.push_back(bush);
 
@@ -88,7 +83,7 @@ void init()
   tree.addPoint(880, 380);
   tree.addPoint(820, 380);
   tree.addPoint(820, 100);
-  tree.color = Utils::LIGHT_GRAY;
+  tree.color = fadedColor;
   tree.lineWidth = lineWidth;
   polyVector.push_back(tree);
 
@@ -98,13 +93,19 @@ void init()
   treeBush.addPoint(750, 440);
   treeBush.addPoint(820, 380);
   treeBush.addPoint(880, 380);
-  treeBush.color = Utils::LIGHT_GRAY;
+  treeBush.color = fadedColor;
   treeBush.lineWidth = lineWidth;
   polyVector.push_back(treeBush);
 
-  sun.color = sunColor;
-  sun.filled = true;
+  sun.color = fadedColor;
+  sun.lineWidth = lineWidth;
   polyVector.push_back(sun.toPolygon2D());
+
+  glass1.lineWidth = lineWidth;
+  glassesVector.push_back(glass1.toPolygon2D());
+
+  glass2.lineWidth = lineWidth;
+  glassesVector.push_back(glass2.toPolygon2D());
 }
 
 void drawInfoText(GLint x, GLint y, const Utils::Color& color)
@@ -138,6 +139,16 @@ void display()
     p.draw();
   }
 
+  for(auto& g : glassesVector)
+  {
+    g.draw();
+  }
+
+  glBegin(GL_LINES);
+  Utils::glVertex2<GLdouble>(glassesVector[0].pointsContainer[2]);
+  Utils::glVertex2<GLdouble>(glassesVector[1].pointsContainer[0]);
+  glEnd();
+
   glutSwapBuffers();
 }
 
@@ -145,7 +156,7 @@ void processMouse(GLint button, GLint action, GLint xMouse, GLint yMouse)
 {
   if(button == GLUT_LEFT_BUTTON && action == GLUT_DOWN)
   {
-    for(auto& p : polyVector)
+    for(auto& p : glassesVector)
     {
       if(clicked = p.checkClick(xMouse, HEIGHT - yMouse, 12))
         break;
@@ -154,7 +165,7 @@ void processMouse(GLint button, GLint action, GLint xMouse, GLint yMouse)
 
   if(button == GLUT_RIGHT_BUTTON && action == GLUT_DOWN)
   {
-    for(auto& p : polyVector)
+    for(auto& p : glassesVector)
     {
       if(rightClicked = p.checkClick(xMouse, HEIGHT - yMouse, 12))
         break;
@@ -166,7 +177,7 @@ void processMouse(GLint button, GLint action, GLint xMouse, GLint yMouse)
     if(clicked)
     {
       clicked = nullptr;
-      for(auto& p : polyVector)
+      for(auto& p : glassesVector)
       {
         if(p.clicked)
         {
@@ -183,7 +194,7 @@ void processMouse(GLint button, GLint action, GLint xMouse, GLint yMouse)
     if(rightClicked)
     {
       rightClicked = nullptr;
-      for(auto& p : polyVector)
+      for(auto& p : glassesVector)
       {
         if(p.clicked)
         {
@@ -200,7 +211,7 @@ void processMouseActiveMotion(GLint xMouse, GLint yMouse)
 {
   if(clicked)
   {
-    for(auto& p : polyVector)
+    for(auto& p : glassesVector)
     {
       if(p.clicked)
       {
@@ -212,14 +223,20 @@ void processMouseActiveMotion(GLint xMouse, GLint yMouse)
 
   if(rightClicked)
   {
-    for(auto& p : polyVector)
+    for(auto& poly : glassesVector)
     {
-      if(p.clicked)
+      for(auto& point : poly.pointsContainer)
       {
-        p.handleRightClick(xMouse, HEIGHT - yMouse, rightClicked);
-        break;
+        if(rightClicked == &point)
+          continue;
+
+        auto dx = point.x() - rightClicked->x();
+        auto dy = point.y() - rightClicked->y();
+        point.setXY(xMouse + dx, HEIGHT - yMouse + dy);
       }
     }
+
+    rightClicked->setXY(xMouse, HEIGHT - yMouse);
   }
 
   glutPostRedisplay();
