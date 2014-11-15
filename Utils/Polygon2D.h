@@ -119,7 +119,7 @@ public:
     this->handleRightClick(mousePos.x(), mousePos.y());
   }
 
-  Polygon2D<T> clipWith(const Polygon2D<T>& clipper)
+  Polygon2D<T> clipWith(const Polygon2D<T>& clipper) const
   {
     Polygon2D<T> output(*this);
     auto n = clipper.pointsContainer.size();
