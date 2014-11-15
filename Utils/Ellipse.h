@@ -6,6 +6,7 @@
 #include "Point2D.h"
 #include "Vector2D.h"
 #include "Color.h"
+#include "Polygon2D.h"
 
 namespace Utils
 {
@@ -33,18 +34,18 @@ public:
 
   inline Ellipse(T cx, T cy, T rx, T ry) : centre(cx, cy), rx(rx), ry(ry)
   {
-    recalcPoints();
+    this->recalcPoints();
   }
 
   inline Ellipse(T cx, T cy, T rx, T ry, size_t points)
     : centre(cx, cy), rx(rx), ry(ry), points(points)
   {
-    recalcPoints();
+    this->recalcPoints();
   }
 
   inline Ellipse(Point2D<T> c, T rx, T ry) : centre(c), rx(rx), ry(ry)
   {
-    recalcPoints();
+    this->recalcPoints();
   }
 
   virtual ~Ellipse() {}
@@ -108,14 +109,14 @@ public:
   inline void setRadiusX(T radius)
   {
     rx = radius;
-    recalcPoints();
+    this->recalcPoints();
   };
 
   /// Sets Y radius.
   inline void setRadiusY(T radius)
   {
     ry = radius;
-    recalcPoints();
+    this->recalcPoints();
   };
 
   /// Returns number of points.
@@ -128,7 +129,7 @@ public:
   inline void setPoints(size_t p)
   {
     points = p;
-    recalcPoints();
+    this->recalcPoints();
   }
 
   /// Translate Ellipse with a given point.
@@ -154,28 +155,28 @@ public:
   inline void operator++(int)
   {
     this->points++;
-    recalcPoints();
+    this->recalcPoints();
   }
 
   /// Decrease Ellipse's points with postfix decrement operator.
   inline void operator--(int)
   {
     this->points--;
-    recalcPoints();
+    this->recalcPoints();
   }
 
   /// Increase Ellipse's points with prefix increment operator.
   inline void operator++()
   {
     this->points++;
-    recalcPoints();
+    this->recalcPoints();
   }
 
   /// Decrease Ellipse's points with prefix decrement operator.
   inline void operator--()
   {
     this->points--;
-    recalcPoints();
+    this->recalcPoints();
   }
 
   /// Recalculate points.
@@ -184,7 +185,7 @@ public:
     this->pointsContainer.clear();
     double gap = 2 * PI / points;
 
-    for(size_t i = 0; i <= points; ++i)
+    for(size_t i = 0; i < points; ++i)
     {
       pointsContainer.emplace_back(static_cast<T>(centre.x() + rx * cos(i * gap)),
                                    static_cast<T>(centre.y() + ry * sin(i * gap)));
@@ -205,7 +206,7 @@ public:
     this->pointsContainer.clear();
     double gap = 2 * PI / points;
 
-    for(size_t i = 0; i <= points; ++i)
+    for(size_t i = 0; i < points; ++i)
     {
       pointsContainer.emplace_back(static_cast<T>(centre.x() + rx * cos(i * gap + alpha)),
                                    static_cast<T>(centre.y() + ry * sin(i * gap + alpha)));
@@ -309,6 +310,21 @@ public:
 
       glEnd();
     }
+  }
+
+  Polygon2D<T> toPolygon2D() const
+  {
+    Polygon2D<T> output;
+    output.color = this->color;
+    output.pointColor = this->pointColor;
+    output.filled = this->filled;
+    output.lineWidth = this->lineWidth;
+    output.pointSize = this->pointSize;
+
+    for(const auto& point : this->pointsContainer)
+      output.addPoint(point);
+
+    return output;
   }
 
 }; // end class Ellipse
