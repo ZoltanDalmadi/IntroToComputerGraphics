@@ -24,7 +24,8 @@ const Utils::Color lColor(Utils::BLACK);
 const GLfloat lineWidth = 2.0f;
 
 Polygon2D poly;
-Point2D *clicked;
+Point2D *clicked = nullptr;
+Point2D *rightClicked = nullptr;
 
 void init()
 {
@@ -43,6 +44,7 @@ void init()
   poly.addPoint(100, HEIGHT - 100);
   poly.addPoint(WIDTH - 100, HEIGHT - 100);
   poly.addPoint(WIDTH - 100, 100);
+  poly.addPoint(500, 50);
   poly.addPoint(100, 100);
   poly.lineWidth = 2;
   poly.pointSize = 10;
@@ -65,6 +67,11 @@ void processMouse(GLint button, GLint action, GLint xMouse, GLint yMouse)
     clicked = poly.checkClick(xMouse, HEIGHT - yMouse, 12);
   }
 
+  if(button == GLUT_RIGHT_BUTTON && action == GLUT_DOWN)
+  {
+    rightClicked = poly.checkClick(xMouse, HEIGHT - yMouse, 12);
+  }
+
   if(button == GLUT_LEFT_BUTTON && action == GLUT_UP)
   {
     if(clicked)
@@ -73,6 +80,16 @@ void processMouse(GLint button, GLint action, GLint xMouse, GLint yMouse)
       poly.release();
     }
   }
+
+  if(button == GLUT_RIGHT_BUTTON && action == GLUT_UP)
+  {
+    if(rightClicked)
+    {
+      rightClicked = nullptr;
+      poly.release();
+    }
+  }
+
 }
 
 void processMouseActiveMotion(GLint xMouse, GLint yMouse)
@@ -81,6 +98,12 @@ void processMouseActiveMotion(GLint xMouse, GLint yMouse)
   {
     poly.handleClick(xMouse, HEIGHT - yMouse, clicked);
   }
+
+  if(rightClicked)
+  {
+    poly.handleRightClick(xMouse, HEIGHT - yMouse, rightClicked);
+  }
+
   glutPostRedisplay();
 }
 
