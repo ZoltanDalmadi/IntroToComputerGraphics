@@ -23,6 +23,9 @@ const GLsizei HEIGHT = 720;
 // Colors ---------------------------------------------------------------------
 const Utils::Color bgColor(Utils::WHITE);
 const Utils::Color fadedColor(Utils::VERY_LIGHT_GRAY);
+const Utils::Color mountainColor("#ADDFFF");
+const Utils::Color bushColor(Utils::DARK_GREEN);
+const Utils::Color treeColor("#966F33");
 const Utils::Color sunColor(Utils::ORANGE);
 
 // Sizes ----------------------------------------------------------------------
@@ -42,7 +45,7 @@ Polygon2D bush;
 Polygon2D tree;
 Polygon2D treeBush;
 
-Circle sun(200, HEIGHT - 150, 60, 12);
+Circle sun(200, HEIGHT - 150, 60, 24);
 
 Point2D *clicked = nullptr;
 Point2D *rightClicked = nullptr;
@@ -66,7 +69,7 @@ void init()
   mountain.addPoint(560, 270);
   mountain.addPoint(300, 380);
   mountain.addPoint(200, 100);
-  mountain.color = fadedColor;
+  mountain.color = mountainColor;
   mountain.lineWidth = lineWidth;
   polyVector.push_back(mountain);
 
@@ -75,7 +78,7 @@ void init()
   bush.addPoint(640, 240);
   bush.addPoint(540, 170);
   bush.addPoint(580, 100);
-  bush.color = fadedColor;
+  bush.color = bushColor;
   bush.lineWidth = lineWidth;
   polyVector.push_back(bush);
 
@@ -83,7 +86,7 @@ void init()
   tree.addPoint(880, 380);
   tree.addPoint(820, 380);
   tree.addPoint(820, 100);
-  tree.color = fadedColor;
+  tree.color = treeColor;
   tree.lineWidth = lineWidth;
   polyVector.push_back(tree);
 
@@ -93,11 +96,11 @@ void init()
   treeBush.addPoint(750, 440);
   treeBush.addPoint(820, 380);
   treeBush.addPoint(880, 380);
-  treeBush.color = fadedColor;
+  treeBush.color = bushColor;
   treeBush.lineWidth = lineWidth;
   polyVector.push_back(treeBush);
 
-  sun.color = fadedColor;
+  sun.color = sunColor;
   sun.lineWidth = lineWidth;
   polyVector.push_back(sun.toPolygon2D());
 
@@ -128,18 +131,23 @@ void display()
 
   drawInfoText(10, HEIGHT - 24, Utils::BLACK);
 
-  //Polygon2D asd = polyVector[0].clipWith(polyVector[1]);
-
-  //asd.filled = true;
-  //asd.color = Utils::RED;
-  //asd.draw();
-
-  for(auto& p : polyVector)
+  for(const auto& p : polyVector)
   {
-    p.draw();
+    p.drawWithOtherColor(fadedColor);
   }
 
-  for(auto& g : glassesVector)
+  for(const auto& p : polyVector)
+  {
+    for(const auto& glass : glassesVector)
+    {
+      Polygon2D clipped = p.clipWith(glass);
+      clipped.filled = true;
+      clipped.color = p.color;
+      clipped.draw();
+    }
+  }
+
+  for(const auto& g : glassesVector)
   {
     g.draw();
   }
