@@ -1,14 +1,20 @@
 #include <GL/freeglut.h>
 #include <iostream>
+#include <sstream>
+#include <string>
 #include <vector>
 #include "Polygon2D.h"
 #include "Line.h"
+#include "Circle.h"
+#include "PolyStar.h"
 
 // Typedefs -------------------------------------------------------------------
 typedef Utils::Point2D<GLdouble> Point2D;
 typedef Utils::Point2DH<GLdouble> Point2DH;
 typedef Utils::Polygon2D<GLdouble> Polygon2D;
 typedef Utils::Line<GLdouble> Line;
+typedef Utils::Circle<GLdouble> Circle;
+typedef Utils::PolyStar<GLdouble> PolyStar;
 
 // Window size ----------------------------------------------------------------
 const GLsizei WIDTH = 1280;
@@ -20,12 +26,28 @@ const Utils::Color pColor(Utils::RED);
 const Utils::Color ipColor(Utils::MAGENTA);
 const Utils::Color spColor(Utils::GREEN);
 const Utils::Color lColor(Utils::BLACK);
+const Utils::Color sunColor(Utils::ORANGE);
 
 // Sizes ----------------------------------------------------------------------
 const GLfloat lineWidth = 2.0f;
 
-Polygon2D poly;
-Polygon2D clipper;
+// Info text ------------------------------------------------------------------
+std::string tText;
+std::stringstream ss;
+
+
+// Scene ----------------------------------------------------------------------
+Circle glasses(400, 300, 200, 6);
+auto glasses_poly = glasses.toPolygon2D();
+Circle sun(200, HEIGHT - 150, 60, 12);
+
+Polygon2D mountain;
+Polygon2D bush;
+Polygon2D tree;
+Polygon2D treeBush;
+
+
+
 Point2D *clicked = nullptr;
 Point2D *rightClicked = nullptr;
 std::vector<Polygon2D> polyVector;
@@ -44,40 +66,76 @@ void init()
   glPointSize(10);
   glLineWidth(2);
 
-  poly.addPoint(WIDTH - 400, HEIGHT - 200);
-  poly.addPoint(400, HEIGHT - 200);
-  poly.addPoint(400, 200);
-  poly.addPoint(WIDTH - 400, 200);
-  poly.addPoint(600, 300);
-  poly.lineWidth = 2;
-  poly.pointSize = 10;
+  mountain.addPoint(1020, 100);
+  mountain.addPoint(840, 560);
+  mountain.addPoint(560, 270);
+  mountain.addPoint(300, 380);
+  mountain.addPoint(200, 100);
+  mountain.color = Utils::LIGHT_GRAY;
+  mountain.lineWidth = lineWidth;
+  polyVector.push_back(mountain);
 
-  clipper.addPoint(WIDTH - 200, HEIGHT - 300);
-  clipper.addPoint(200, HEIGHT - 100);
-  clipper.addPoint(300, 100);
-  clipper.addPoint(WIDTH - 200, 300);
-  clipper.lineWidth = 2;
-  clipper.pointSize = 10;
-  clipper.pointColor = Utils::BLUE;
-  clipper.color = ipColor;
+  bush.addPoint(700, 100);
+  bush.addPoint(740, 160);
+  bush.addPoint(640, 240);
+  bush.addPoint(540, 170);
+  bush.addPoint(580, 100);
+  bush.color = Utils::LIGHT_GRAY;
+  bush.lineWidth = lineWidth;
+  polyVector.push_back(bush);
 
-  polyVector.push_back(poly);
-  polyVector.push_back(clipper);
+  tree.addPoint(880, 100);
+  tree.addPoint(880, 380);
+  tree.addPoint(820, 380);
+  tree.addPoint(820, 100);
+  tree.color = Utils::LIGHT_GRAY;
+  tree.lineWidth = lineWidth;
+  polyVector.push_back(tree);
+
+  treeBush.addPoint(990, 500);
+  treeBush.addPoint(850, 600);
+  treeBush.addPoint(720, 540);
+  treeBush.addPoint(750, 440);
+  treeBush.addPoint(820, 380);
+  treeBush.addPoint(880, 380);
+  treeBush.color = Utils::LIGHT_GRAY;
+  treeBush.lineWidth = lineWidth;
+  polyVector.push_back(treeBush);
+
+  sun.color = sunColor;
+  sun.filled = true;
+  polyVector.push_back(sun.toPolygon2D());
+}
+
+void drawInfoText(GLint x, GLint y, const Utils::Color& color)
+{
+  if(clicked)
+    ss << "Active point's coordinates: " << clicked->x() << ", " << clicked->y() << std::endl;
+  else
+    ss << "No active point selected" << std::endl;
+  tText = ss.str();
+  ss.str("");
+
+  color.setGLColor();
+  glRasterPos2i(x, y);
+  glutBitmapString(GLUT_BITMAP_HELVETICA_18, (unsigned char *)tText.c_str());
 }
 
 void display()
 {
   glClear(GL_COLOR_BUFFER_BIT);
 
-  Polygon2D asd = polyVector[0].clipWith(polyVector[1]);
-  asd.filled = true;
-  asd.color = Utils::RED;
-  asd.draw();
+  drawInfoText(10, HEIGHT - 24, Utils::BLACK);
+
+  //Polygon2D asd = polyVector[0].clipWith(polyVector[1]);
+
+  //asd.filled = true;
+  //asd.color = Utils::RED;
+  //asd.draw();
 
   for(auto& p : polyVector)
   {
     p.draw();
-    p.drawPoints();
   }
 
   glutSwapBuffers();
@@ -116,6 +174,7 @@ void processMouse(GLint button, GLint action, GLint xMouse, GLint yMouse)
           break;
         }
       }
+      glutPostRedisplay();
     }
   }
 
@@ -132,6 +191,7 @@ void processMouse(GLint button, GLint action, GLint xMouse, GLint yMouse)
           break;
         }
       }
+      glutPostRedisplay();
     }
   }
 }
