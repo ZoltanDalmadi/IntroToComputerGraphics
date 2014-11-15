@@ -1,8 +1,5 @@
 #include <GL/freeglut.h>
 #include <iostream>
-#include <sstream>
-#include <string>
-#include <vector>
 #include "Polygon2D.h"
 #include "Line.h"
 #include "Circle.h"
@@ -31,11 +28,6 @@ const Utils::Color sunColor(Utils::ORANGE);
 // Sizes ----------------------------------------------------------------------
 const GLfloat lineWidth = 2.0f;
 
-// Info text ------------------------------------------------------------------
-std::string tText;
-std::stringstream ss;
-
-
 // Scene ----------------------------------------------------------------------
 Circle glass1(400, 300, 60, 4);
 Circle glass2(220, 300, 60, 5);
@@ -45,7 +37,8 @@ Polygon2D bush;
 Polygon2D tree;
 Polygon2D treeBush;
 
-Circle sun(200, HEIGHT - 150, 60, 24);
+Circle sun1(200, HEIGHT - 150, 60, 3);
+Circle sun2(200, HEIGHT - 150, 60, 3);
 
 Point2D *clicked = nullptr;
 Point2D *rightClicked = nullptr;
@@ -100,9 +93,14 @@ void init()
   treeBush.lineWidth = lineWidth;
   polyVector.push_back(treeBush);
 
-  sun.color = sunColor;
-  sun.lineWidth = lineWidth;
-  polyVector.push_back(sun.toPolygon2D());
+  sun1.color = sunColor;
+  sun1.lineWidth = lineWidth;
+  polyVector.push_back(sun1.toPolygon2D());
+
+  sun2.color = sunColor;
+  sun2.lineWidth = lineWidth;
+  sun2.rotate(2 * Utils::PI / 6);
+  polyVector.push_back(sun2.toPolygon2D());
 
   glass1.lineWidth = lineWidth;
   glassesVector.push_back(glass1.toPolygon2D());
@@ -111,30 +109,12 @@ void init()
   glassesVector.push_back(glass2.toPolygon2D());
 }
 
-void drawInfoText(GLint x, GLint y, const Utils::Color& color)
-{
-  if(clicked)
-    ss << "Active point's coordinates: " << clicked->x() << ", " << clicked->y() << std::endl;
-  else
-    ss << "No active point selected" << std::endl;
-  tText = ss.str();
-  ss.str("");
-
-  color.setGLColor();
-  glRasterPos2i(x, y);
-  glutBitmapString(GLUT_BITMAP_HELVETICA_18, (unsigned char *)tText.c_str());
-}
-
 void display()
 {
   glClear(GL_COLOR_BUFFER_BIT);
 
-  drawInfoText(10, HEIGHT - 24, Utils::BLACK);
-
   for(const auto& p : polyVector)
-  {
     p.drawWithOtherColor(fadedColor);
-  }
 
   for(const auto& p : polyVector)
   {
@@ -148,9 +128,7 @@ void display()
   }
 
   for(const auto& g : glassesVector)
-  {
     g.draw();
-  }
 
   glBegin(GL_LINES);
   Utils::glVertex2<GLdouble>(glassesVector[0].pointsContainer[2]);
