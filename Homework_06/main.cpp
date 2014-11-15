@@ -1,5 +1,6 @@
 #include <GL/freeglut.h>
 #include <iostream>
+#include <vector>
 #include "Polygon2D.h"
 #include "Line.h"
 
@@ -24,8 +25,10 @@ const Utils::Color lColor(Utils::BLACK);
 const GLfloat lineWidth = 2.0f;
 
 Polygon2D poly;
+Polygon2D clipper;
 Point2D *clicked = nullptr;
 Point2D *rightClicked = nullptr;
+std::vector<Polygon2D> polyVector;
 
 void init()
 {
@@ -41,21 +44,41 @@ void init()
   glPointSize(10);
   glLineWidth(2);
 
-  poly.addPoint(100, HEIGHT - 100);
-  poly.addPoint(WIDTH - 100, HEIGHT - 100);
-  poly.addPoint(WIDTH - 100, 100);
-  poly.addPoint(500, 50);
-  poly.addPoint(100, 100);
+  poly.addPoint(WIDTH - 400, HEIGHT - 200);
+  poly.addPoint(400, HEIGHT - 200);
+  poly.addPoint(400, 200);
+  poly.addPoint(WIDTH - 400, 200);
+  poly.addPoint(600, 300);
   poly.lineWidth = 2;
   poly.pointSize = 10;
+
+  clipper.addPoint(WIDTH - 200, HEIGHT - 300);
+  clipper.addPoint(200, HEIGHT - 100);
+  clipper.addPoint(300, 100);
+  clipper.addPoint(WIDTH - 200, 300);
+  clipper.lineWidth = 2;
+  clipper.pointSize = 10;
+  clipper.pointColor = Utils::BLUE;
+  clipper.color = ipColor;
+
+  polyVector.push_back(poly);
+  polyVector.push_back(clipper);
 }
 
 void display()
 {
   glClear(GL_COLOR_BUFFER_BIT);
 
-  poly.draw();
-  poly.drawPoints();
+  Polygon2D asd = polyVector[0].clipWith(polyVector[1]);
+  asd.filled = true;
+  asd.color = Utils::RED;
+  asd.draw();
+
+  for(auto& p : polyVector)
+  {
+    p.draw();
+    p.drawPoints();
+  }
 
   glutSwapBuffers();
 }
@@ -64,12 +87,20 @@ void processMouse(GLint button, GLint action, GLint xMouse, GLint yMouse)
 {
   if(button == GLUT_LEFT_BUTTON && action == GLUT_DOWN)
   {
-    clicked = poly.checkClick(xMouse, HEIGHT - yMouse, 12);
+    for(auto& p : polyVector)
+    {
+      if(clicked = p.checkClick(xMouse, HEIGHT - yMouse, 12))
+        break;
+    }
   }
 
   if(button == GLUT_RIGHT_BUTTON && action == GLUT_DOWN)
   {
-    rightClicked = poly.checkClick(xMouse, HEIGHT - yMouse, 12);
+    for(auto& p : polyVector)
+    {
+      if(rightClicked = p.checkClick(xMouse, HEIGHT - yMouse, 12))
+        break;
+    }
   }
 
   if(button == GLUT_LEFT_BUTTON && action == GLUT_UP)
@@ -77,7 +108,14 @@ void processMouse(GLint button, GLint action, GLint xMouse, GLint yMouse)
     if(clicked)
     {
       clicked = nullptr;
-      poly.release();
+      for(auto& p : polyVector)
+      {
+        if(p.clicked)
+        {
+          p.release();
+          break;
+        }
+      }
     }
   }
 
@@ -86,22 +124,42 @@ void processMouse(GLint button, GLint action, GLint xMouse, GLint yMouse)
     if(rightClicked)
     {
       rightClicked = nullptr;
-      poly.release();
+      for(auto& p : polyVector)
+      {
+        if(p.clicked)
+        {
+          p.release();
+          break;
+        }
+      }
     }
   }
-
 }
 
 void processMouseActiveMotion(GLint xMouse, GLint yMouse)
 {
   if(clicked)
   {
-    poly.handleClick(xMouse, HEIGHT - yMouse, clicked);
+    for(auto& p : polyVector)
+    {
+      if(p.clicked)
+      {
+        p.handleClick(xMouse, HEIGHT - yMouse, clicked);
+        break;
+      }
+    }
   }
 
   if(rightClicked)
   {
-    poly.handleRightClick(xMouse, HEIGHT - yMouse, rightClicked);
+    for(auto& p : polyVector)
+    {
+      if(p.clicked)
+      {
+        p.handleRightClick(xMouse, HEIGHT - yMouse, rightClicked);
+        break;
+      }
+    }
   }
 
   glutPostRedisplay();
