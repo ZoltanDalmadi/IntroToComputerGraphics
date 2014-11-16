@@ -24,24 +24,16 @@ const Utils::Color mountainColor("#ADDFFF");
 const Utils::Color bushColor(Utils::DARK_GREEN);
 const Utils::Color treeColor("#966F33");
 const Utils::Color sunColor(Utils::ORANGE);
+const Utils::Color glassesColor("#00000014");
 
 // Sizes ----------------------------------------------------------------------
 const GLfloat lineWidth = 2.0f;
 
-// Scene ----------------------------------------------------------------------
-Circle glass1(400, 300, 60, 4);
-Circle glass2(220, 300, 60, 5);
-
-Polygon2D mountain;
-Polygon2D bush;
-Polygon2D tree;
-Polygon2D treeBush;
-
-Circle sun1(200, HEIGHT - 150, 60, 3);
-Circle sun2(200, HEIGHT - 150, 60, 3);
-
+// Active points --------------------------------------------------------------
 Point2D *clicked = nullptr;
 Point2D *rightClicked = nullptr;
+
+// Object containers ----------------------------------------------------------
 std::vector<Polygon2D> polyVector;
 std::vector<Polygon2D> glassesVector;
 
@@ -57,65 +49,86 @@ void init()
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-  mountain.addPoint(1020, 100);
-  mountain.addPoint(840, 560);
-  mountain.addPoint(560, 270);
-  mountain.addPoint(300, 380);
-  mountain.addPoint(200, 100);
-  mountain.color = mountainColor;
-  mountain.lineWidth = lineWidth;
-  polyVector.push_back(mountain);
+  // Assemble scene -----------------------------------------------------------
+  // mountain
+  polyVector.emplace_back();
+  polyVector[0].addPoint(1020, 100);
+  polyVector[0].addPoint(840, 560);
+  polyVector[0].addPoint(560, 270);
+  polyVector[0].addPoint(300, 380);
+  polyVector[0].addPoint(200, 100);
+  polyVector[0].color = mountainColor;
+  polyVector[0].lineWidth = lineWidth;
 
-  bush.addPoint(700, 100);
-  bush.addPoint(740, 160);
-  bush.addPoint(640, 240);
-  bush.addPoint(540, 170);
-  bush.addPoint(580, 100);
-  bush.color = bushColor;
-  bush.lineWidth = lineWidth;
-  polyVector.push_back(bush);
+  // bush
+  polyVector.emplace_back();
+  polyVector[1].addPoint(700, 100);
+  polyVector[1].addPoint(740, 160);
+  polyVector[1].addPoint(640, 240);
+  polyVector[1].addPoint(540, 170);
+  polyVector[1].addPoint(580, 100);
+  polyVector[1].color = bushColor;
+  polyVector[1].lineWidth = lineWidth;
 
-  tree.addPoint(880, 100);
-  tree.addPoint(880, 380);
-  tree.addPoint(820, 380);
-  tree.addPoint(820, 100);
-  tree.color = treeColor;
-  tree.lineWidth = lineWidth;
-  polyVector.push_back(tree);
+  // tree
+  polyVector.emplace_back();
+  polyVector[2].addPoint(880, 100);
+  polyVector[2].addPoint(880, 380);
+  polyVector[2].addPoint(820, 380);
+  polyVector[2].addPoint(820, 100);
+  polyVector[2].color = treeColor;
+  polyVector[2].lineWidth = lineWidth;
 
-  treeBush.addPoint(990, 500);
-  treeBush.addPoint(850, 600);
-  treeBush.addPoint(720, 540);
-  treeBush.addPoint(750, 440);
-  treeBush.addPoint(820, 380);
-  treeBush.addPoint(880, 380);
-  treeBush.color = bushColor;
-  treeBush.lineWidth = lineWidth;
-  polyVector.push_back(treeBush);
+  // tree bush
+  polyVector.emplace_back();
+  polyVector[3].addPoint(990, 500);
+  polyVector[3].addPoint(850, 600);
+  polyVector[3].addPoint(720, 540);
+  polyVector[3].addPoint(750, 440);
+  polyVector[3].addPoint(820, 380);
+  polyVector[3].addPoint(880, 380);
+  polyVector[3].color = bushColor;
+  polyVector[3].lineWidth = lineWidth;
 
-  sun1.color = sunColor;
-  sun1.lineWidth = lineWidth;
-  polyVector.push_back(sun1.toPolygon2D());
+  // sun1
+  Circle sun1(200, HEIGHT - 150, 60, 3);
+  polyVector.emplace_back(sun1.toPolygon2D());
+  polyVector[4].color = sunColor;
+  polyVector[4].lineWidth = lineWidth;
 
-  sun2.color = sunColor;
-  sun2.lineWidth = lineWidth;
+  // sun2
+  Circle sun2(200, HEIGHT - 150, 60, 3);
   sun2.rotate(2 * Utils::PI / 6);
-  polyVector.push_back(sun2.toPolygon2D());
+  polyVector.emplace_back(sun2.toPolygon2D());
+  polyVector[5].color = sunColor;
+  polyVector[5].lineWidth = lineWidth;
 
-  glass1.lineWidth = lineWidth;
-  glassesVector.push_back(glass1.toPolygon2D());
+  // glasses
+  Circle glass1(400, 300, 60, 4);
+  glassesVector.emplace_back(glass1.toPolygon2D());
+  glassesVector[0].lineWidth = lineWidth;
 
-  glass2.lineWidth = lineWidth;
+  Circle glass2(220, 300, 60, 5);
   glassesVector.push_back(glass2.toPolygon2D());
+  glassesVector[1].lineWidth = lineWidth;
+
+  // --------------------------------------------------------------------------
 }
 
 void display()
 {
   glClear(GL_COLOR_BUFFER_BIT);
 
+  glEnable(GL_LINE_STIPPLE);
+  glLineStipple(1, 0xFF00);
+
+  // draw background items
   for (const auto& p : polyVector)
     p.drawWithOtherColor(fadedColor);
 
+  glDisable(GL_LINE_STIPPLE);
+
+  // draw clipped polygons in glasses
   for (const auto& p : polyVector)
   {
     for (const auto& glass : glassesVector)
@@ -124,12 +137,28 @@ void display()
       clipped.filled = true;
       clipped.color = p.color;
       clipped.draw();
+
+      // draw outline
+      clipped.filled = false;
+      clipped.lineWidth = lineWidth;
+      clipped.draw();
     }
   }
 
-  for (const auto& g : glassesVector)
+  // draw glasses
+  for (auto& g : glassesVector)
+  {
+    g.color = glassesColor;
+    g.filled = true;
     g.draw();
 
+    // draw outline
+    g.filled = false;
+    g.color = Utils::BLACK;
+    g.draw();
+  }
+
+  // draw line between the 2 glass
   glBegin(GL_LINES);
   Utils::glVertex2<GLdouble>(glassesVector[0].pointsContainer[2]);
   Utils::glVertex2<GLdouble>(glassesVector[1].pointsContainer[0]);
@@ -172,8 +201,6 @@ void processMouse(GLint button, GLint action, GLint xMouse, GLint yMouse)
           break;
         }
       }
-
-      glutPostRedisplay();
     }
   }
 
@@ -191,8 +218,6 @@ void processMouse(GLint button, GLint action, GLint xMouse, GLint yMouse)
           break;
         }
       }
-
-      glutPostRedisplay();
     }
   }
 }
@@ -211,6 +236,7 @@ void processMouseActiveMotion(GLint xMouse, GLint yMouse)
     }
   }
 
+  // move both glasses on right click
   if (rightClicked)
   {
     for (auto& poly : glassesVector)
@@ -220,12 +246,16 @@ void processMouseActiveMotion(GLint xMouse, GLint yMouse)
         if (rightClicked == &point)
           continue;
 
+        // cache difference vector between current and dragged point
         auto dx = point.x() - rightClicked->x();
         auto dy = point.y() - rightClicked->y();
+
+        // translate current point with difference vector
         point.setXY(xMouse + dx, HEIGHT - yMouse + dy);
       }
     }
 
+    // translate dragged point itself
     rightClicked->setXY(xMouse, HEIGHT - yMouse);
   }
 
