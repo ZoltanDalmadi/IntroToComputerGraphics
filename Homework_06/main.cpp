@@ -5,6 +5,12 @@
 #include "Circle.h"
 #include "PolyStar.h"
 
+#ifndef WIN32
+typedef GLvoid(*CallBack)(...);
+#else
+typedef GLvoid(_stdcall *CallBack)();
+#endif
+
 // Typedefs -------------------------------------------------------------------
 typedef Utils::Point2D<GLdouble> Point2D;
 typedef Utils::Point2DH<GLdouble> Point2DH;
@@ -36,6 +42,18 @@ Point2D *rightClicked = nullptr;
 // Object containers ----------------------------------------------------------
 std::vector<Polygon2D> polyVector;
 std::vector<Polygon2D> glassesVector;
+
+// Tessellator pointer --------------------------------------------------------
+GLUtesselator *tess;
+
+// Tessellator init and register callbacks
+void updateTess()
+{
+  tess = gluNewTess();
+  gluTessCallback(tess, GLU_TESS_BEGIN, (CallBack) glBegin);
+  gluTessCallback(tess, GLU_TESS_VERTEX, (CallBack) glVertex3dv);
+  gluTessCallback(tess, GLU_TESS_END, (CallBack) glEnd);
+}
 
 void init()
 {
@@ -90,18 +108,11 @@ void init()
   polyVector[3].color = bushColor;
   polyVector[3].lineWidth = lineWidth;
 
-  // sun1
-  Circle sun1(200, HEIGHT - 150, 60, 3);
-  polyVector.emplace_back(sun1.toPolygon2D());
+  // sun
+  PolyStar sun(150, HEIGHT - 150, 8, 30, 100);
+  polyVector.emplace_back(sun.toPolygon2D());
   polyVector[4].color = sunColor;
   polyVector[4].lineWidth = lineWidth;
-
-  // sun2
-  Circle sun2(200, HEIGHT - 150, 60, 3);
-  sun2.rotate(2 * Utils::PI / 6);
-  polyVector.emplace_back(sun2.toPolygon2D());
-  polyVector[5].color = sunColor;
-  polyVector[5].lineWidth = lineWidth;
 
   // glasses
   Circle glass1(400, 300, 60, 4);
@@ -134,12 +145,34 @@ void display()
     for (const auto& glass : glassesVector)
     {
       Polygon2D clipped = p.clipWith(glass);
-      clipped.filled = true;
-      clipped.color = p.color;
-      clipped.draw();
+      p.color.setGLColor();
+      
+      // start tessellation
+      updateTess();
+      gluTessBeginPolygon(tess, NULL);
+
+      // construct temporary point container
+      std::vector<std::vector<GLdouble>> tempPoly;
+      size_t numofPoints = clipped.getPoints();
+      tempPoly.resize(numofPoints);
+
+      for (size_t i = 0; i < numofPoints; ++i)
+      {
+        tempPoly[i].emplace_back(clipped.pointsContainer[i].x());
+        tempPoly[i].emplace_back(clipped.pointsContainer[i].y());
+        tempPoly[i].emplace_back(0.0);
+      }
+
+      // give each point to the tessellator
+      for (size_t i = 0; i < tempPoly.size(); ++i)
+      {
+        gluTessVertex(tess, tempPoly[i].data(), tempPoly[i].data());
+      }
+
+      // end tessellation
+      gluTessEndPolygon(tess);
 
       // draw outline
-      clipped.filled = false;
       clipped.lineWidth = lineWidth;
       clipped.draw();
     }
