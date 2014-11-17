@@ -39,6 +39,11 @@ public:
     this->points++;
   }
 
+  inline size_t getPoints() const
+  {
+    return this->points;
+  }
+
   inline Point2D<T> *checkClick(GLint xMouse, GLint yMouse, int sens)
   {
     Point2D<T> *active = nullptr;
