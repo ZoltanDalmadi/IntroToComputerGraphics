@@ -6,7 +6,7 @@
 #include "PolyStar.h"
 
 #ifndef WIN32
-typedef GLvoid(*CallBack)(...);
+typedef GLvoid(*CallBack)();
 #else
 typedef GLvoid(_stdcall *CallBack)();
 #endif
@@ -191,7 +191,7 @@ void display()
     g.draw();
   }
 
-  // draw line between the 2 glass
+  // draw line between the 2 glasses
   glBegin(GL_LINES);
   Utils::glVertex2<GLdouble>(glassesVector[0].pointsContainer[2]);
   Utils::glVertex2<GLdouble>(glassesVector[1].pointsContainer[0]);
