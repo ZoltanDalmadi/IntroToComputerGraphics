@@ -34,6 +34,7 @@ public:
   GLfloat pointSize = 6.0;
   Color pointColor = RED;
   Color curveColor = BLACK;
+  Color controlPolygonColor = VERY_LIGHT_GRAY;
   bool clicked = false;
 
   Bezier2D() {}
@@ -115,6 +116,9 @@ public:
 
   void drawBernstein() const
   {
+    if (!this->points)
+      return;
+
     glLineWidth(lineWidth);
     curveColor.setGLColor();
 
@@ -156,8 +160,11 @@ public:
 
   void draw() const
   {
+    if (!this->points)
+      return;
+
     glLineWidth(lineWidth);
-    curveColor.setGLColor();
+    this->curveColor.setGLColor();
 
     glBegin(GL_LINE_STRIP);
 
@@ -173,12 +180,15 @@ public:
 
   void drawPoints() const
   {
+    if (!this->points)
+      return;
+
     glPointSize(pointSize);
-    pointColor.setGLColor();
+    this->pointColor.setGLColor();
 
     glBegin(GL_POINTS);
 
-    for (const auto& point : controlPoints)
+    for (const auto& point : this->controlPoints)
     {
       glVertex2<T>(point);
     }
@@ -188,9 +198,13 @@ public:
 
   void drawControlPolygon() const
   {
+    if (!this->points)
+      return;
+
+    this->controlPolygonColor.setGLColor();
     glBegin(GL_LINE_STRIP);
 
-    for (const auto& point : controlPoints)
+    for (const auto& point : this->controlPoints)
     {
       glVertex2<T>(point);
     }
