@@ -67,7 +67,7 @@ public:
 
     for (auto& point : this->pointsContainer)
     {
-      if (active = point.checkClick(mousePos, sens))
+      if ((active = point.checkClick(mousePos, sens)))
       {
         this->clicked = true;
         break;
