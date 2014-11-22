@@ -45,7 +45,8 @@ void init()
 void display()
 {
   glClear(GL_COLOR_BUFFER_BIT);
-  b1.drawBernstein();
+  //b1.drawBernstein();
+  b1.draw();
   b1.drawPoints();
   glutSwapBuffers();
 }
