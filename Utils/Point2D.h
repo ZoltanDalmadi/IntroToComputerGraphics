@@ -12,6 +12,7 @@ namespace Utils
 template <typename T> class Point2D;
 template <typename T> class Line;
 template <typename T> void glVertex2(const Point2D<T>& p);
+template <typename T> void glVertex2(T x, T y);
 
 template <typename T>
 class Point2D
@@ -321,9 +322,19 @@ template <> void glVertex2<GLshort>(const Point2D<GLshort>& p)
   glVertex2s(p.x(), p.y());
 }
 
+template <> void glVertex2<GLshort>(GLshort x, GLshort y)
+{
+  glVertex2s(x, y);
+}
+
 template <> void glVertex2<GLint>(const Point2D<GLint>& p)
 {
   glVertex2i(p.x(), p.y());
+}
+
+template <> void glVertex2<GLint>(GLint x, GLint y)
+{
+  glVertex2i(x, y);
 }
 
 template <> void glVertex2<GLfloat>(const Point2D<GLfloat>& p)
@@ -331,9 +342,19 @@ template <> void glVertex2<GLfloat>(const Point2D<GLfloat>& p)
   glVertex2f(p.x(), p.y());
 }
 
+template <> void glVertex2<GLfloat>(GLfloat x, GLfloat y)
+{
+  glVertex2f(x, y);
+}
+
 template <> void glVertex2<GLdouble>(const Point2D<GLdouble>& p)
 {
   glVertex2d(p.x(), p.y());
+}
+
+template <> void glVertex2<GLdouble>(GLdouble x, GLdouble y)
+{
+  glVertex2d(x, y);
 }
 
 } // end namespace Utils
