@@ -44,5 +44,8 @@
     <ClInclude Include="Polygon2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Bezier2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
