@@ -163,10 +163,17 @@ public:
     return Point2D<T>::distance2(pt1, pt2);
   }
 
-  /// Returns a Point2D at a position between pt1 and pt2 in [0, 1] range.
+  /// Returns Point at position between pt1 and pt2 in [0, 1] range.
   inline Point2D<T> pointAt(T t) const
   {
     return Point2D<T>(x1() + dx() * t, y1() + dy() * t);
+  }
+
+  /// Returns Point at position between pt1 and pt2 in [0, 1] range. [static]
+  static inline Point2D<T> pointAt(T t, const Point2D<T> &p1, const Point2D<T> &p2)
+  {
+    return Point2D<T>(p1.x() + (p2.x() - p1.x()) * t,
+                      p1.y() + (p2.y() - p1.y()) * t);
   }
 
   /// Returns a perpendicular line with the same starting point and length.
