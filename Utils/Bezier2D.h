@@ -142,6 +142,35 @@ public:
     glEnd();
   }
 
+  Point2D<T> calcPointOnCurve(double t) const
+  {
+    auto n = this->controlPoints.size();
+    auto temp = this->controlPoints;
+
+    for (size_t r = 1; r < n; r++)
+      for (size_t i = 0; i < n - r; i++)
+        temp[i] = (1 - t) * temp[i] + t * temp[i + 1];
+
+    return temp[0];
+  }
+
+  void draw() const
+  {
+    glLineWidth(lineWidth);
+    curveColor.setGLColor();
+
+    glBegin(GL_LINE_STRIP);
+
+    for (double t = 0.0f; t <= 1.0; t += 0.01)
+    {
+      glVertex2<T>(calcPointOnCurve(t));
+    }
+
+    glVertex2<T>(this->controlPoints.back());
+
+    glEnd();
+  }
+
   void drawPoints() const
   {
     glPointSize(pointSize);
