@@ -35,19 +35,21 @@ void init()
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-  b1.addPoint(200, 300);
-  b1.addPoint(300, 700);
-  b1.addPoint(600, 600);
-  b1.addPoint(800, 200);
+  //b1.addPoint(200, 300);
+  //b1.addPoint(300, 700);
+  //b1.addPoint(600, 600);
+  //b1.addPoint(800, 200);
   b1.lineWidth = lineWidth;
 }
 
 void display()
 {
   glClear(GL_COLOR_BUFFER_BIT);
-  //b1.drawBernstein();
+  b1.drawControlPolygon();
   b1.draw();
+  //b1.drawBernstein();
   b1.drawPoints();
+
   glutSwapBuffers();
 }
 
@@ -56,6 +58,14 @@ void processMouse(GLint button, GLint action, GLint xMouse, GLint yMouse)
   if (button == GLUT_LEFT_BUTTON && action == GLUT_DOWN)
   {
     clicked = b1.checkClick(xMouse, HEIGHT - yMouse, 12);
+    //if (b1.getPoints() < 3)
+    if (!clicked)
+    {
+      b1.addPoint(xMouse, HEIGHT - yMouse);
+    }
+    //else
+    //{
+    //}
   }
 
   if (button == GLUT_LEFT_BUTTON && action == GLUT_UP)
