@@ -30,14 +30,21 @@ protected:
 
 public:
   std::vector <Point2D<T>> controlPoints;
-  GLfloat lineWidth = 1.0;
-  GLfloat pointSize = 6.0;
+  std::vector <Color> colorCycle;
+  GLfloat lineWidth = 2.0;
+  GLfloat interpolationLinesWidth = 1.0;
+  GLfloat pointSize = 8.0;
   Color pointColor = RED;
   Color curveColor = BLACK;
   Color controlPolygonColor = VERY_LIGHT_GRAY;
   bool clicked = false;
 
-  Bezier2D() {}
+  Bezier2D()
+  {
+    this->colorCycle.emplace_back(GREEN);
+    this->colorCycle.emplace_back(BLUE);
+    this->colorCycle.emplace_back(MAGENTA);
+  }
 
   virtual ~Bezier2D()
   {}
@@ -211,6 +218,61 @@ public:
 
     glEnd();
   }
+
+  void drawInterPolations(double t, bool points = true) const
+  {
+    if (!this->points)
+      return;
+
+    glLineWidth(interpolationLinesWidth);
+
+    auto n = this->controlPoints.size();
+    auto temp = this->controlPoints;
+
+    auto colorIterator = colorCycle.begin();
+
+    for (size_t r = 1; r < n; r++)
+    {
+      for (size_t i = 0; i < n - r; i++)
+      {
+        temp[i] = (1 - t) * temp[i] + t * temp[i + 1];
+      }
+
+      if (colorIterator == colorCycle.end())
+        colorIterator = colorCycle.begin();
+
+      colorIterator->setGLColor(); 
+
+      glBegin(GL_LINE_STRIP);
+
+      for (size_t j = 0; j < n - r; j++)
+      {
+        glVertex2<T>(temp[j]);
+      }
+
+      glEnd();
+
+      if (points)
+      {
+        glPointSize(pointSize - 2);
+        glBegin(GL_POINTS);
+
+        for (size_t j = 0; j < n - r; j++)
+        {
+          glVertex2<T>(temp[j]);
+        }
+
+        glEnd();
+      }
+
+      colorIterator++;
+    }
+    this->curveColor.setGLColor();
+    glBegin(GL_POINTS);
+    glVertex2<T>(temp[0]);
+    glEnd();
+  }
+
 
 }; // end class Bezier2D
 
