@@ -8,13 +8,6 @@ namespace Utils
 template <typename T>
 class Circle : public Ellipse <T>
 {
-private:
-  // hide unneeded methods from base class
-  inline void setRadiusX(T radius);
-  inline void setRadiusY(T radius);
-  inline T getRadiusX() const;
-  inline T getRadiusY() const;
-
 public:
   inline Circle(T cx, T cy, T r) : Ellipse<T>(cx, cy, r, r) {}
   inline Circle(T cx, T cy, T r, size_t points) : Ellipse<T>(cx, cy, r, r,
