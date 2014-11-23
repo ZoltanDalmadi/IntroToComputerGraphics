@@ -1,9 +1,12 @@
 #pragma once
 #include <cmath>
-#include "Line.h"
+//#include "Line.h"
+#include "Point2D.h"
+#include "Color.h"
 
 namespace Utils
 {
+template <typename T> class Point2D;
 
 template <typename T>
 class Vector2D
@@ -12,6 +15,8 @@ private:
   T xp, yp;
 
 public:
+  GLfloat lineWidth = 2.0;
+  Color color = BLACK;
 
   inline Vector2D(T x, T y) : xp(x), yp(y) {}
 
@@ -165,9 +170,36 @@ public:
     return Vector2D<T>(-u + c * v);
   }
 
-  inline Line<T> toLine(T x, T y) const
+  void draw(const Point2D<T>& p, T arrowLength, double arrowDeg) const
   {
-    return Line<T>(x, y, x + xp, y + yp);
+    auto endPoint = p.translated(*this);
+
+    double angle = std::atan2(yp, xp) + Utils::PI;
+    Point2D<T> left(endPoint.x() + arrowLength * std::cos(angle - arrowDeg),
+                    endPoint.y() + arrowLength * std::sin(angle - arrowDeg));
+
+    Point2D<T> right(endPoint.x() + arrowLength * std::cos(angle + arrowDeg),
+                     endPoint.y() + arrowLength * std::sin(angle + arrowDeg));
+
+    glLineWidth(lineWidth);
+    color.setGLColor();
+
+    glBegin(GL_LINES);
+    glVertex2<T>(p);
+    glVertex2<T>(endPoint);
+    glEnd();
+
+    glBegin(GL_POLYGON);
+    glVertex2<T>(endPoint);
+    glVertex2<T>(left);
+    glVertex2<T>(right);
+    glEnd();
+
+    glBegin(GL_LINE_LOOP);
+    glVertex2<T>(endPoint);
+    glVertex2<T>(left);
+    glVertex2<T>(right);
+    glEnd();
   }
 
 }; // end class Vector2D
