@@ -1,47 +1,60 @@
 #include <GL/freeglut.h>
 #include <sstream>
 #include <string>
-#include "Polygon2D.h"
-#include "Line.h"
 #include "Bezier2D.h"
 #include "Slider.h"
 #include "Vector2D.h"
 
-// Typedefs -------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// Typedefs
+// ----------------------------------------------------------------------------
 typedef Utils::Point2D<GLdouble> Point2D;
-typedef Utils::Line<GLdouble> Line;
 typedef Utils::Bezier2D<GLdouble> Bezier2D;
 typedef Utils::Vector2D<GLdouble> Vector2D;
 typedef Utils::Slider Slider;
 
-// Window size ----------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// Window size
+// ----------------------------------------------------------------------------
 const GLsizei WIDTH = 1280;
 const GLsizei HEIGHT = 720;
 
-// Colors ---------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// Colors
+// ----------------------------------------------------------------------------
 const Utils::Color bgColor(Utils::WHITE);
 
-// Sizes ----------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// Sizes
+// ----------------------------------------------------------------------------
 const GLfloat lineWidth = 2.0f;
 const int gridSize = 40;
 
-// Active points --------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// Active point
+// ----------------------------------------------------------------------------
 Point2D *clicked = nullptr;
 
-// Info text ------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// Info text
+// ----------------------------------------------------------------------------
 std::string tText;
 std::stringstream ss;
 
+// ----------------------------------------------------------------------------
+// Curves
+// ----------------------------------------------------------------------------
 Bezier2D b1;
 Bezier2D b2;
 
+// ----------------------------------------------------------------------------
+// Slider
+// ----------------------------------------------------------------------------
 Slider slider(100, 40, WIDTH - 100, 40);
 
 void init()
 {
   bgColor.setGLClearColor();
-
-  // Display settings
   glMatrixMode(GL_PROJECTION);
   gluOrtho2D(0.0, WIDTH, 0.0, HEIGHT);
   glEnable(GL_LINE_SMOOTH);
@@ -50,6 +63,9 @@ void init()
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
+// ----------------------------------------------------------------------------
+// Info test function. Shows current value of t
+// ----------------------------------------------------------------------------
 void drawInfoText(GLint x, GLint y, const Utils::Color& color)
 {
   ss << "t: " << static_cast<double>(slider.getValue()) / 100 << std::endl;
@@ -61,6 +77,9 @@ void drawInfoText(GLint x, GLint y, const Utils::Color& color)
   glutBitmapString(GLUT_BITMAP_HELVETICA_18, (unsigned char *)tText.c_str());
 }
 
+// ----------------------------------------------------------------------------
+// Draw grid to background
+// ----------------------------------------------------------------------------
 void drawGrid(int width, int height, int gap, GLfloat lineWidth,
               const Utils::Color& color)
 {
@@ -70,13 +89,13 @@ void drawGrid(int width, int height, int gap, GLfloat lineWidth,
   glLineStipple(1, 0xAAAA);
   glBegin(GL_LINES);
 
-  for(int i = gap; i < width; i += gap)
+  for (int i = gap; i < width; i += gap)
   {
     glVertex2i(i, 0);
     glVertex2i(i, height);
   }
 
-  for(int i = gap; i < height; i += gap)
+  for (int i = gap; i < height; i += gap)
   {
     glVertex2i(0, i);
     glVertex2i(width, i);
@@ -86,6 +105,9 @@ void drawGrid(int width, int height, int gap, GLfloat lineWidth,
   glDisable(GL_LINE_STIPPLE);
 }
 
+// ----------------------------------------------------------------------------
+// Main display function
+// ----------------------------------------------------------------------------
 void display()
 {
   glClear(GL_COLOR_BUFFER_BIT);
@@ -96,79 +118,115 @@ void display()
   // draw info text
   drawInfoText(10, HEIGHT - 24, Utils::BLACK);
 
+  // draw first curve
   b1.drawControlPolygon();
   b1.drawBernstein();
   b1.drawPoints();
 
+  // draw second curve
   b2.drawControlPolygon();
   b2.draw();
   b2.drawInterPolations(static_cast<double>(slider.getValue()) / 100.0f);
   b2.drawPoints();
 
+  // draw slider
   slider.draw();
 
   glutSwapBuffers();
 }
 
+// ----------------------------------------------------------------------------
+// Main mouse button handler
+// ----------------------------------------------------------------------------
 void processMouse(GLint button, GLint action, GLint xMouse, GLint yMouse)
 {
   if (button == GLUT_LEFT_BUTTON && action == GLUT_DOWN)
   {
+    // check for first curve click
     clicked = b1.checkClick(xMouse, HEIGHT - yMouse, 12);
 
     if (!clicked)
+      // check for second curve click
       clicked = b2.checkClick(xMouse, HEIGHT - yMouse, 12);
 
     if (!clicked)
     {
+      // check for slider click
       slider.checkClick(xMouse, HEIGHT - yMouse, 12);
+
       if (!slider.isDragging())
       {
+        // first curve has less than 2 points
         if (b1.getPoints() < 2)
         {
           b1.addPoint(xMouse, HEIGHT - yMouse);
         }
+        // first curve has more than 2 points, but less than all points
         else if (b1.getPoints() < 5)
         {
+          // add point at click location
           b1.addPoint(xMouse, HEIGHT - yMouse);
 
-          Vector2D q(b1.controlPoints.at(1), b1.controlPoints.front());
+          // calculate vector between second and first point
+          Vector2D q(b1.controlPoints[1], b1.controlPoints[0]);
 
-          b1.addPoint(b1.controlPoints.front().translated(q));
+          // translate first point with vector & add
+          b1.addPoint(b1.controlPoints[0].translated(q));
+
+          // set color and disable point
           b1.controlPoints.back().color = Utils::LIGHT_GRAY;
           b1.controlPoints.back().disabled = true;
 
-          b1.addPoint(b1.controlPoints.front().x(),
-                      b1.controlPoints.front().y());
+          // add last point (identical to first) & disable
+          b1.addPoint(b1.controlPoints[0]);
           b1.controlPoints.back().disabled = true;
         }
+        // second curve has no points
         else if (b2.getPoints() < 1)
         {
           b2.addPoint(xMouse, HEIGHT - yMouse);
         }
+        // second curve has more than 1 points, but less than all points
         else if (b2.getPoints() < 6)
         {
+          // save previously placed point
           auto r2 = b2.controlPoints.back();
-          Point2D r3(xMouse, HEIGHT - yMouse);
+
+          // remove previous point
           b2.controlPoints.pop_back();
 
-          b2.addPoint(b1.controlPoints.front());
-          b2.controlPoints.back().disabled = true;
-          
-          Vector2D q(b1.controlPoints.front(), b1.controlPoints.at(1));
+          // save clicked point
+          Point2D r3(xMouse, HEIGHT - yMouse);
 
-          b2.addPoint(b1.controlPoints.front().translated(0.8 * q));
+          // add first point (identical to first curve's last) & disable
+          b2.addPoint(b1.controlPoints[0]);
+          b2.controlPoints.back().disabled = true;
+
+          // calculate vector between fist curve's first and second point
+          Vector2D q(b1.controlPoints[0], b1.controlPoints[1]);
+
+          // translate first curve's first point w/ vector & multiply with
+          // first curve's degree / second curve's degree (4/5 = 0.8)
+          b2.addPoint(b1.controlPoints[0].translated(0.8 * q));
+
+          // set color & disable point
           b2.controlPoints.back().color = Utils::LIGHT_GRAY;
           b2.controlPoints.back().disabled = true;
 
-          b2.addPoint(r2);
-          b2.addPoint(r3);
+          // move in previously saved points
+          b2.movePoint(r2);
+          b2.movePoint(r3);
 
-          b2.addPoint(b2.controlPoints.front().translated(0.8 * -q));
+          // translate first curve's first point w/ -vector & multiply with
+          // first curve's degree / second curve's degree (4/5 = 0.8)
+          b2.addPoint(b2.controlPoints[0].translated(0.8 * -q));
+
+          // set color & disable point
           b2.controlPoints.back().color = Utils::LIGHT_GRAY;
           b2.controlPoints.back().disabled = true;
 
-          b2.addPoint(b1.controlPoints.front());
+          // add last point (identical to first curve's first point) & disable
+          b2.addPoint(b1.controlPoints[0]);
           b2.controlPoints.back().disabled = true;
         }
       }
@@ -194,34 +252,54 @@ void processMouse(GLint button, GLint action, GLint xMouse, GLint yMouse)
   }
 }
 
+// ----------------------------------------------------------------------------
+// Main mouse movement handler
+// ----------------------------------------------------------------------------
 void processMouseActiveMotion(GLint xMouse, GLint yMouse)
 {
   if (clicked)
   {
     if (b1.clicked)
     {
+      // handle clicked point on first curve
       b1.handleClick(xMouse, HEIGHT - yMouse, clicked);
 
-      Vector2D q(b1.controlPoints.at(1), b1.controlPoints.front());
+      // calculate vector between second and first point
+      Vector2D q(b1.controlPoints[1], b1.controlPoints[0]);
 
-      b1.controlPoints.at(3).setXY(b1.controlPoints.at(1).translated(2 * q));
-      b1.controlPoints.back().setXY(b1.controlPoints.front());
+      // move penultimate point with vector's opposite
+      b1.controlPoints[3].setXY(b1.controlPoints[1].translated(2 * q));
 
+      // stick last point to first
+      b1.controlPoints.back().setXY(b1.controlPoints[0]);
+
+      // second curve is not empty
       if (b2.getPoints())
       {
-        b2.controlPoints.at(1).setXY(b1.controlPoints.at(1).translated(0.2 * q));
-        b2.controlPoints.front().setXY(b1.controlPoints.front());
-        b2.controlPoints.at(4).setXY(b1.controlPoints.at(4).translated(0.8 * q));
-        b2.controlPoints.back().setXY(b1.controlPoints.front());
+        // stick first point to first curve's first point
+        b2.controlPoints[0].setXY(b1.controlPoints[0]);
+
+        // translate first curve's second point w/ vector & multiply with
+        // 1 - first curve's degree / second curve's degree (1 - 4/5 = 0.2)
+        b2.controlPoints[1].setXY(b1.controlPoints[1].translated(0.2 * q));
+
+        // translate first curve's second point w/ vector & multiply with
+        // first curve's degree / second curve's degree (4/5 = 0.8)
+        b2.controlPoints[4].setXY(b1.controlPoints[4].translated(0.8 * q));
+
+        // stick last point to first curve's first point
+        b2.controlPoints.back().setXY(b1.controlPoints[0]);
       }
     }
 
     if (b2.clicked)
+      // handle clicked point on second curve
       b2.handleClick(xMouse, HEIGHT - yMouse, clicked);
 
     glutPostRedisplay();
   }
 
+  // handle slider
   if (slider.isDragging())
   {
     slider.setHandlePos(xMouse);
