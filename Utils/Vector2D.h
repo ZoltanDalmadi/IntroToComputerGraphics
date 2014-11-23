@@ -1,6 +1,5 @@
 #pragma once
 #include <cmath>
-//#include "Line.h"
 #include "Point2D.h"
 #include "Color.h"
 
@@ -18,7 +17,14 @@ public:
   GLfloat lineWidth = 2.0;
   Color color = BLACK;
 
-  inline Vector2D(T x, T y) : xp(x), yp(y) {}
+  inline Vector2D(T x, T y) : xp(x), yp(y)
+  {
+  }
+
+  inline Vector2D(const Point2D<T>& a, const Point2D<T>& b)
+    : xp(b.x() - a.x()), yp(b.y() - a.y())
+  {
+  }
 
   virtual ~Vector2D() {}
 
