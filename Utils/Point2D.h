@@ -4,6 +4,7 @@
 #include <cmath>
 #include "Color.h"
 #include "Matrix.h"
+#include "Vector2D.h"
 
 namespace Utils
 {
@@ -273,6 +274,17 @@ public:
     T oldY = yp;
     xp = m(0, 0) * oldX + m(0, 1) * oldY + m(0, 2);
     yp = m(1, 0) * oldX + m(1, 1) * oldY + m(1, 2);
+  }
+
+  inline void translate(const Vector2D<T>& v)
+  {
+    xp += v.x();
+    yp += v.y();
+  }
+
+  inline Point2D<T> translated(const Vector2D<T>& v) const
+  {
+    return Point2D<T>(xp + v.x(), yp + v.y());
   }
 
 }; // end class Point2D
