@@ -58,6 +58,13 @@ public:
 
   inline void addPoint(const Point2D<T>& p)
   {
+    this->controlPoints.push_back(p);
+    this->controlPoints.back().color = pointColor;
+    this->points++;
+  }
+
+  inline void movePoint(const Point2D<T>& p)
+  {
     this->controlPoints.emplace_back(p);
     this->controlPoints.back().color = pointColor;
     this->points++;
@@ -263,7 +270,7 @@ public:
       if (colorIterator == colorCycle.end())
         colorIterator = colorCycle.begin();
 
-      colorIterator->setGLColor(); 
+      colorIterator->setGLColor();
 
       glBegin(GL_LINE_STRIP);
 
@@ -289,6 +296,7 @@ public:
 
       colorIterator++;
     }
+
     this->curveColor.setGLColor();
     glBegin(GL_POINTS);
     glVertex2<T>(temp[0]);
