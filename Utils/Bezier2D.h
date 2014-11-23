@@ -185,6 +185,26 @@ public:
     glEnd();
   }
 
+  void drawUntilParam(double param) const
+  {
+    if (!this->points)
+      return;
+
+    glLineWidth(lineWidth);
+    this->curveColor.setGLColor();
+
+    glBegin(GL_LINE_STRIP);
+
+    for (double t = 0.0f; t <= param; t += 0.01)
+    {
+      glVertex2<T>(calcPointOnCurve(t));
+    }
+
+    glVertex2<T>(calcPointOnCurve(param));
+
+    glEnd();
+  }
+
   void drawPoints() const
   {
     if (!this->points)
