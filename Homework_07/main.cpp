@@ -202,7 +202,7 @@ void processMouse(GLint button, GLint action, GLint xMouse, GLint yMouse)
           b2.addPoint(b1.controlPoints[0]);
           b2.controlPoints.back().disabled = true;
 
-          // calculate vector between fist curve's first and second point
+          // calculate vector between first curve's first and second point
           Vector2D q(b1.controlPoints[0], b1.controlPoints[1]);
 
           // translate first curve's first point w/ vector & multiply with
@@ -283,7 +283,7 @@ void processMouseActiveMotion(GLint xMouse, GLint yMouse)
         // 1 - first curve's degree / second curve's degree (1 - 4/5 = 0.2)
         b2.controlPoints[1].setXY(b1.controlPoints[1].translated(0.2 * q));
 
-        // translate first curve's second point w/ vector & multiply with
+        // translate first curve's penultimate point w/ vector & multiply with
         // first curve's degree / second curve's degree (4/5 = 0.8)
         b2.controlPoints[4].setXY(b1.controlPoints[4].translated(0.8 * q));
 
