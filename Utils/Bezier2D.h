@@ -9,6 +9,9 @@
 namespace Utils
 {
 
+// ----------------------------------------------------------------------------
+// Calculate binomial coefficient [recursive]
+// ----------------------------------------------------------------------------
 size_t binomialCoeff(size_t n, size_t k)
 {
   if (k == 0 || k == n)
@@ -17,11 +20,17 @@ size_t binomialCoeff(size_t n, size_t k)
   return binomialCoeff(n - 1, k - 1) + binomialCoeff(n - 1, k);
 }
 
+// ----------------------------------------------------------------------------
+// Returns value of the Bernstein polynomial.
+// ----------------------------------------------------------------------------
 double bernsteinPolynomial(size_t n, size_t i, double t)
 {
   return binomialCoeff(n, i) * std::pow(t, i) * std::pow(1 - t, n - i);
 }
 
+// ----------------------------------------------------------------------------
+// 2D Bezier curve class template
+// ----------------------------------------------------------------------------
 template <typename T>
 class Bezier2D
 {
@@ -29,8 +38,8 @@ protected:
   size_t points = 0;
 
 public:
-  std::vector <Point2D<T>> controlPoints;
-  std::vector <Color> colorCycle;
+  std::vector<Point2D<T>> controlPoints;
+  std::vector<Color> colorCycle;
   GLfloat lineWidth = 2.0;
   GLfloat interpolationLinesWidth = 1.0;
   GLfloat pointSize = 8.0;
@@ -47,23 +56,24 @@ public:
   }
 
   virtual ~Bezier2D()
-  {}
+  {
+  }
 
-  inline void addPoint(T xp, T yp)
+  inline virtual void addPoint(T xp, T yp)
   {
     this->controlPoints.emplace_back(xp, yp);
     this->controlPoints.back().color = pointColor;
     this->points++;
   }
 
-  inline void addPoint(const Point2D<T>& p)
+  inline virtual void addPoint(const Point2D<T>& p)
   {
     this->controlPoints.push_back(p);
     this->controlPoints.back().color = pointColor;
     this->points++;
   }
 
-  inline void movePoint(const Point2D<T>& p)
+  inline virtual void movePoint(const Point2D<T>& p)
   {
     this->controlPoints.emplace_back(p);
     this->controlPoints.back().color = pointColor;
@@ -142,7 +152,7 @@ public:
 
     size_t n = this->points;
 
-    for (double t = 0.0f; t <= 1.0; t += 0.01)
+    for (double t = 0.0f; t < 1.0; t += 0.01)
     {
       double sumX = 0.0f;
       double sumY = 0.0f;
@@ -184,7 +194,7 @@ public:
 
     glBegin(GL_LINE_STRIP);
 
-    for (double t = 0.0f; t <= 1.0; t += 0.01)
+    for (double t = 0.0f; t < 1.0; t += 0.01)
     {
       glVertex2<T>(calcPointOnCurve(t));
     }
@@ -302,7 +312,6 @@ public:
     glVertex2<T>(temp[0]);
     glEnd();
   }
-
 
 }; // end class Bezier2D
 
