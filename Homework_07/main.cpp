@@ -1,4 +1,6 @@
 #include <GL/freeglut.h>
+#include <sstream>
+#include <string>
 #include "Polygon2D.h"
 #include "Line.h"
 #include "Bezier2D.h"
@@ -23,6 +25,10 @@ const GLfloat lineWidth = 2.0f;
 // Active points --------------------------------------------------------------
 Point2D *clicked = nullptr;
 
+// Info text ------------------------------------------------------------------
+std::string tText;
+std::stringstream ss;
+
 Bezier2D b1;
 
 Slider slider(100, 40, WIDTH - 100, 40);
@@ -45,9 +51,23 @@ void init()
   //b1.addPoint(800, 200);
 }
 
+void drawInfoText(GLint x, GLint y, const Utils::Color& color)
+{
+  ss << "t: " << static_cast<double>(slider.getValue()) / 100 << std::endl;
+  tText = ss.str();
+  ss.str("");
+
+  color.setGLColor();
+  glRasterPos2i(x, y);
+  glutBitmapString(GLUT_BITMAP_HELVETICA_18, (unsigned char *)tText.c_str());
+}
+
 void display()
 {
   glClear(GL_COLOR_BUFFER_BIT);
+
+  drawInfoText(10, HEIGHT - 24, Utils::BLACK);
+
   b1.drawControlPolygon();
   b1.draw();
   //b1.drawBernstein();
