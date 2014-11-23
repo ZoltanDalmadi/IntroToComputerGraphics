@@ -105,12 +105,9 @@ void processMouse(GLint button, GLint action, GLint xMouse, GLint yMouse)
         b1.addPoint(b1.controlPoints.front().x(),
                     b1.controlPoints.front().y());
         b1.controlPoints.back().disabled = true;
-
       }
 
       clicked = b1.checkClick(xMouse, HEIGHT - yMouse, 12);
-      //if (!clicked)
-
     }
   }
 
@@ -121,6 +118,7 @@ void processMouse(GLint button, GLint action, GLint xMouse, GLint yMouse)
 
     if (clicked)
     {
+      clicked->clicked = false;
       clicked = nullptr;
 
       if (b1.clicked)
@@ -136,7 +134,17 @@ void processMouseActiveMotion(GLint xMouse, GLint yMouse)
   if (clicked)
   {
     if (b1.clicked)
+    {
       b1.handleClick(xMouse, HEIGHT - yMouse, clicked);
+
+      auto dx = b1.controlPoints.front().x() - b1.controlPoints.at(1).x();
+      auto dy = b1.controlPoints.front().y() - b1.controlPoints.at(1).y();
+
+      b1.controlPoints.at(3).setX(b1.controlPoints.at(1).x() + 2*dx);
+      b1.controlPoints.at(3).setY(b1.controlPoints.at(1).y() + 2*dy);
+
+      b1.controlPoints.back().setXY(b1.controlPoints.front());
+    }
   }
 
   if(slider.isDragging())
