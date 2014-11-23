@@ -52,12 +52,14 @@ public:
   inline void addPoint(T xp, T yp)
   {
     this->controlPoints.emplace_back(xp, yp);
+    this->controlPoints.back().color = pointColor;
     this->points++;
   }
 
   inline void addPoint(const Point2D<T>& p)
   {
     this->controlPoints.emplace_back(p);
+    this->controlPoints.back().color = pointColor;
     this->points++;
   }
 
@@ -211,12 +213,12 @@ public:
       return;
 
     glPointSize(pointSize);
-    this->pointColor.setGLColor();
 
     glBegin(GL_POINTS);
 
     for (const auto& point : this->controlPoints)
     {
+      point.color.setGLColor();
       glVertex2<T>(point);
     }
 
