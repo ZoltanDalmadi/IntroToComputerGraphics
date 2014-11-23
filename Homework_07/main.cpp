@@ -69,9 +69,9 @@ void display()
   drawInfoText(10, HEIGHT - 24, Utils::BLACK);
 
   b1.drawControlPolygon();
-  b1.draw();
-  //b1.drawBernstein();
-  b1.drawInterPolations(static_cast<double>(slider.getValue()) / 100.0f);
+  b1.drawBernstein();
+  //b1.draw();
+  //b1.drawInterPolations(static_cast<double>(slider.getValue()) / 100.0f);
   b1.drawPoints();
 
   slider.draw();
@@ -86,10 +86,31 @@ void processMouse(GLint button, GLint action, GLint xMouse, GLint yMouse)
     slider.checkClick(xMouse, HEIGHT - yMouse, 12);
     if (!slider.isDragging())
     {
-      clicked = b1.checkClick(xMouse, HEIGHT - yMouse, 12);
-      //if (b1.getPoints() < 3)
-      if (!clicked)
+      if (b1.getPoints() < 2)
+      {
         b1.addPoint(xMouse, HEIGHT - yMouse);
+      }
+      else if (b1.getPoints() < 5)
+      {
+        b1.addPoint(xMouse, HEIGHT - yMouse);
+
+        auto dx = b1.controlPoints.front().x() - b1.controlPoints.at(1).x();
+        auto dy = b1.controlPoints.front().y() - b1.controlPoints.at(1).y();
+
+        b1.addPoint(b1.controlPoints.front().x() + dx,
+                    b1.controlPoints.front().y() + dy);
+        b1.controlPoints.back().color = Utils::VERY_LIGHT_GRAY;
+        b1.controlPoints.back().disabled = true;
+
+        b1.addPoint(b1.controlPoints.front().x(),
+                    b1.controlPoints.front().y());
+        b1.controlPoints.back().disabled = true;
+
+      }
+
+      clicked = b1.checkClick(xMouse, HEIGHT - yMouse, 12);
+      //if (!clicked)
+
     }
   }
 
