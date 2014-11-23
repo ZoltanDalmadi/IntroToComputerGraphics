@@ -13,6 +13,11 @@ namespace Utils
 
 const GLdouble PI = 3.14159265358979323846;
 
+double degToRad(double deg)
+{
+  return deg * (Utils::PI / 180);
+}
+
 template <typename T>
 class Ellipse
 {
