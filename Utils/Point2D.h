@@ -27,6 +27,7 @@ public:
   Color color = BLACK;
   GLfloat size = 10.0;
   bool clicked = false;
+  bool disabled = false;
 
   /// Initialize point at (0, 0) (origin). (glut: bottom-left corner)
   Point2D() : xp(0), yp(0) {}
@@ -235,6 +236,9 @@ public:
 
   inline Point2D<T>* checkClick(const Point2D<T>& mousePos, int sens)
   {
+    if (this->disabled)
+      return nullptr;
+
     Point2D<T> *point = nullptr;
     int s = sens * sens;
 
@@ -248,6 +252,9 @@ public:
 
   inline Point2D<T>* checkClick(GLint xMouse, GLint yMouse, int sens)
   {
+    if (this->disabled)
+      return nullptr;
+
     Point2D<T> mousePos(static_cast<T>(xMouse),
                         static_cast<T>(yMouse));
     return this->checkClick(mousePos, sens);
