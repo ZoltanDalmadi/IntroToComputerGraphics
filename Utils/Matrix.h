@@ -47,7 +47,7 @@ public:
   {
   }
 
-  const T& operator()(size_t row, size_t column) const
+  inline const T& operator()(size_t row, size_t column) const
   {
     if (row >= 0 && row < this->rows && column >= 0 && column < this->cols)
       return data[column][row];
@@ -55,7 +55,7 @@ public:
       return data[0][0];
   }
 
-  T& operator()(size_t row, size_t column)
+  inline T& operator()(size_t row, size_t column)
   {
     if (row >= 0 && row < this->rows && column >= 0 && column < this->cols)
       return data[column][row];
