@@ -1,11 +1,12 @@
 #pragma once
-#include <cmath>
+#include "functions.h"
 #include "Point2D.h"
 #include "Color.h"
 
 namespace Utils
 {
 template <typename T> class Point2D;
+template <typename T> void glVertex2(const Point2D<T>& p);
 
 template <typename T>
 class Vector2D
