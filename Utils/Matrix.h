@@ -330,6 +330,7 @@ public:
   Scale2D(double lambda1, double lambda2)
     : Matrix<T>(3, 3), Xfactor(lambda1), Yfactor(lambda2)
   {
+    this->data[2][2] = 1.0f;
     updateTransform();
   }
 
