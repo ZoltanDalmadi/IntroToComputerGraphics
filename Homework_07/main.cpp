@@ -250,6 +250,8 @@ void processMouse(GLint button, GLint action, GLint xMouse, GLint yMouse)
         b1.release();
     }
   }
+
+  glutPostRedisplay();
 }
 
 // ----------------------------------------------------------------------------
