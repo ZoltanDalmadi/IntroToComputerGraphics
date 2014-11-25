@@ -234,7 +234,7 @@ public:
     return e * e / (DY * DY + DX * DX);
   }
 
-  inline Point2D<T>* checkClick(const Point2D<T>& mousePos, int sens)
+  inline Point2D<T> *checkClick(const Point2D<T>& mousePos, int sens)
   {
     if (this->disabled)
       return nullptr;
@@ -247,10 +247,11 @@ public:
       this->clicked = true;
       point = this;
     }
+
     return point;
   }
 
-  inline Point2D<T>* checkClick(GLint xMouse, GLint yMouse, int sens)
+  inline Point2D<T> *checkClick(GLint xMouse, GLint yMouse, int sens)
   {
     if (this->disabled)
       return nullptr;
