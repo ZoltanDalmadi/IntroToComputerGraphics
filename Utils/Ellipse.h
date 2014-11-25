@@ -81,7 +81,7 @@ public:
   /// Sets center point.
   inline void setCentre(const Point2D<T>& P)
   {
-    centre = P;
+    this->setCentre(P.x(), P.y());
   }
 
   /// Sets center point. (overload)
@@ -89,6 +89,7 @@ public:
   {
     centre.setX(x);
     centre.setY(y);
+    recalcPoints();
   }
 
   /// Returns X radius.
@@ -145,8 +146,10 @@ public:
   /// Translate Ellipse with a given Vector2D.
   inline void translate(const Vector2D<T>& vector)
   {
-    centre.changeX(vector.x());
-    centre.changeY(vector.y());
+    centre.translate(vector);
+
+    for (auto& point : this->pointsContainer)
+      point.translate(vector);
   }
 
   /// Increase Ellipse's points with postfix increment operator.
@@ -269,8 +272,8 @@ public:
     {
       for (size_t j = i + 1; j < points; j++)
       {
-        glVertex2<T>(centre + pointsContainer[i]);
-        glVertex2<T>(centre + pointsContainer[j]);
+        glVertex2<T>(pointsContainer[i]);
+        glVertex2<T>(pointsContainer[j]);
       }
     }
 
