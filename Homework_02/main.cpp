@@ -340,8 +340,8 @@ void display()
 
   ball1.translate(vec1);
   ball2.translate(vec2);
-  ball1Outer.setCentre(*c1);
-  ball2Outer.setCentre(*c2);
+  ball1Outer.translate(vec1);
+  ball2Outer.translate(vec2);
 
   detectLineCollision();
   detectWallCollision();
