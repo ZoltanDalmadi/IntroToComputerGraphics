@@ -305,6 +305,71 @@ public:
 }; // end class Translate2D
 
 template <typename T>
+class Translate3D : public Matrix<T>
+{
+protected:
+  T deltaX;
+  T deltaY;
+  T deltaZ;
+
+  void updateTransform()
+  {
+    this->data[2][0] = deltaX;
+    this->data[2][1] = deltaY;
+    this->data[3][2] = deltaZ;
+  }
+
+public:
+  Translate3D(T delta1, T delta2, T delta3)
+    : Matrix<T>(4, 4), deltaX(delta1), deltaY(delta2), deltaZ(delta3)
+  {
+    this->data[0][0] = 1.0f;
+    this->data[1][1] = 1.0f;
+    this->data[2][2] = 1.0f;
+    this->data[3][3] = 1.0f;
+    updateTransform();
+  }
+
+  virtual ~Translate3D()
+  {
+  }
+
+  inline void setDeltaX(double delta)
+  {
+    this->deltaX = delta;
+    updateTransform();
+  }
+
+  inline void setDeltaY(double delta)
+  {
+    this->deltaY = delta;
+    updateTransform();
+  }
+
+  inline void setDeltaZ(double delta)
+  {
+    this->deltaZ = delta;
+    updateTransform();
+  }
+
+  inline T getDeltaX() const
+  {
+    return deltaX;
+  }
+
+  inline T getDeltaY() const
+  {
+    return deltaY;
+  }
+
+  inline T getDeltaZ() const
+  {
+    return deltaY;
+  }
+
+}; // end class Translate3D
+
+template <typename T>
 class Scale2D : public Matrix<T>
 {
 protected:
@@ -370,6 +435,85 @@ public:
 }; // end class Scale2D
 
 template <typename T>
+class Scale3D : public Matrix<T>
+{
+protected:
+  double Xfactor;
+  double Yfactor;
+  double Zfactor;
+
+  void updateTransform()
+  {
+    this->data[0][0] = Xfactor;
+    this->data[1][1] = Yfactor;
+    this->data[2][2] = Zfactor;
+  }
+
+public:
+  /// Uniform scale
+  Scale3D(double lambda)
+    : Matrix<T>(4, 4), Xfactor(lambda), Yfactor(lambda), Zfactor(lambda)
+  {
+    this->data[3][3] = 1.0f;
+    updateTransform();
+  }
+
+  /// Non-Uniform scale
+  Scale3D(double lambda1, double lambda2, double lambda3)
+    : Matrix<T>(4, 4), Xfactor(lambda1), Yfactor(lambda2), Zfactor(lambda3)
+  {
+    this->data[3][3] = 1.0f;
+    updateTransform();
+  }
+
+  virtual ~Scale3D()
+  {
+  }
+
+  inline void setXFactor(double lambda)
+  {
+    this->Xfactor = lambda;
+    updateTransform();
+  }
+
+  inline void setYFactor(double lambda)
+  {
+    this->Yfactor = lambda;
+    updateTransform();
+  }
+
+  inline void setZFactor(double lambda)
+  {
+    this->Zfactor = lambda;
+    updateTransform();
+  }
+
+  inline void setFactor(double lambda)
+  {
+    this->Xfactor = lambda;
+    this->Yfactor = lambda;
+    this->Zfactor = lambda;
+    updateTransform();
+  }
+
+  inline double getXFactor() const
+  {
+    return Xfactor;
+  }
+
+  inline double getYFactor() const
+  {
+    return Yfactor;
+  }
+
+  inline double getZFactor() const
+  {
+    return Zfactor;
+  }
+
+}; // end class Scale3D
+
+template <typename T>
 class Rotate2D : public Matrix<T>
 {
 protected:
@@ -406,5 +550,115 @@ public:
   }
 
 }; // end class Rotate2D
+
+template <typename T>
+class Rotate3D : public Matrix<T>
+{
+protected:
+  double angle;
+
+  virtual void updateTransform()
+  {
+  }
+
+public:
+  Rotate3D(double alpha) : Matrix<T>(4, 4), angle(alpha)
+  {
+  }
+
+  virtual ~Rotate3D()
+  {
+  }
+
+  inline void setAngle(double alpha)
+  {
+    this->angle = alpha;
+    updateTransform();
+  }
+
+  inline double getAngle() const
+  {
+    return angle;
+  }
+
+}; // end class Rotate3D
+
+template <typename T>
+class Rotate3DX : public Rotate3D<T>
+{
+protected:
+  virtual void updateTransform()
+  {
+    this->data[1][1] = cos(angle);
+    this->data[2][1] = -sin(angle);
+    this->data[1][2] = sin(angle);
+    this->data[2][2] = cos(angle);
+  }
+
+public:
+  Rotate3DX(double alpha) : Rotate3D<T>(alpha)
+  {
+    this->data[0][0] = 1.0f;
+    this->data[3][3] = 1.0f;
+    updateTransform();
+  }
+
+  virtual ~Rotate3DX()
+  {
+  }
+
+}; // end class Rotate3DX
+
+template <typename T>
+class Rotate3DY : public Rotate3D<T>
+{
+protected:
+  void updateTransform()
+  {
+    this->data[0][0] = cos(angle);
+    this->data[2][0] = sin(angle);
+    this->data[0][2] = -sin(angle);
+    this->data[2][2] = cos(angle);
+  }
+
+public:
+  Rotate3DY(double alpha) : Rotate3D<T>(alpha)
+  {
+    this->data[1][1] = 1.0f;
+    this->data[3][3] = 1.0f;
+    updateTransform();
+  }
+
+  virtual ~Rotate3DY()
+  {
+  }
+
+}; // end class Rotate3DY
+
+template <typename T>
+class Rotate3DZ : public Rotate3D<T>
+{
+protected:
+  void updateTransform()
+  {
+    this->data[0][0] = cos(angle);
+    this->data[1][0] = -sin(angle);
+    this->data[0][1] = sin(angle);
+    this->data[1][1] = cos(angle);
+  }
+
+public:
+  Rotate3DZ(double alpha) : Rotate3D<T>(alpha)
+  {
+    this->data[2][2] = 1.0f;
+    this->data[3][3] = 1.0f;
+    updateTransform();
+  }
+
+  virtual ~Rotate3DZ()
+  {
+  }
+
+}; // end class Rotate3DZ
 
 } // end namespace Utils
