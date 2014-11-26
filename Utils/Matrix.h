@@ -661,4 +661,60 @@ public:
 
 }; // end class Rotate3DZ
 
+template <typename T>
+class PerpendicularProjection : public Matrix<T>
+{
+public:
+  PerpendicularProjection()
+    : Matrix<T>(4, 4)
+  {
+    this->data[0][0] = 1.0f;
+    this->data[1][1] = 1.0f;
+    this->data[3][3] = 1.0f;
+  }
+
+  virtual ~PerpendicularProjection()
+  {
+  }
+
+}; // end class PerpendicularProjection
+
+template <typename T>
+class CentralProjection : public Matrix<T>
+{
+protected:
+  double zDepth;
+
+  void updateTransform()
+  {
+    this->data[2][3] = -1 / this->zDepth;
+  }
+
+public:
+  CentralProjection(double z)
+    : Matrix<T>(4, 4), zDepth(z)
+  {
+    this->data[0][0] = 1.0f;
+    this->data[1][1] = 1.0f;
+    this->data[3][3] = 1.0f;
+    updateTransform();
+  }
+
+  virtual ~CentralProjection()
+  {
+  }
+
+  inline void setZDepth(double z)
+  {
+    this->zDepth = z;
+    updateTransform();
+  }
+
+  inline double getZDepth() const
+  {
+    return this->zDepth;
+  }
+
+}; // end class CentralProjection
+
 } // end namespace Utils
