@@ -3,6 +3,7 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
+#include "Rectangle.h"
 
 namespace Utils
 {
@@ -573,7 +574,7 @@ public:
   inline void setAngle(double alpha)
   {
     this->angle = alpha;
-    updateTransform();
+    this->updateTransform();
   }
 
   inline double getAngle() const
@@ -600,7 +601,7 @@ public:
   {
     this->data[0][0] = 1.0f;
     this->data[3][3] = 1.0f;
-    updateTransform();
+    this->updateTransform();
   }
 
   virtual ~Rotate3DX()
@@ -626,7 +627,7 @@ public:
   {
     this->data[1][1] = 1.0f;
     this->data[3][3] = 1.0f;
-    updateTransform();
+    this->updateTransform();
   }
 
   virtual ~Rotate3DY()
@@ -652,7 +653,7 @@ public:
   {
     this->data[2][2] = 1.0f;
     this->data[3][3] = 1.0f;
-    updateTransform();
+    this->updateTransform();
   }
 
   virtual ~Rotate3DZ()
@@ -683,38 +684,102 @@ template <typename T>
 class CentralProjection : public Matrix<T>
 {
 protected:
-  double zDepth;
+  T distanceToOrigin;
 
   void updateTransform()
   {
-    this->data[2][3] = -1 / this->zDepth;
+    this->data[2][3] = -1.0f / this->distanceToOrigin;
   }
 
 public:
   CentralProjection(double z)
-    : Matrix<T>(4, 4), zDepth(z)
+    : Matrix<T>(4, 4), distanceToOrigin(z)
   {
     this->data[0][0] = 1.0f;
     this->data[1][1] = 1.0f;
     this->data[3][3] = 1.0f;
-    updateTransform();
+    this->updateTransform();
   }
 
   virtual ~CentralProjection()
   {
   }
 
-  inline void setZDepth(double z)
+  inline void setDistanceToOrigin(double z)
   {
     this->zDepth = z;
-    updateTransform();
+    this->updateTransform();
   }
 
-  inline double getZDepth() const
+  inline double getDistanceToOrigin() const
   {
     return this->zDepth;
   }
 
 }; // end class CentralProjection
+
+template <typename T> class Rectangle;
+
+template <typename T>
+class WindowToViewport : public Matrix<T>
+{
+protected:
+  Rectangle<T> window;
+  Rectangle<T> viewport;
+
+  void updateTransform()
+  {
+    data[0][0] = viewport.width() / window.width();
+    data[1][1] = viewport.height() / window.height();
+    data[3][0] = viewport.left() - window.left() * data[0][0];
+    data[3][1] = viewport.bottom() - window.bottom() * data[1][1];
+  }
+
+public:
+  WindowToViewport(const Rectangle<T>& window, const Rectangle<T>& viewport)
+    : Matrix<T>(4, 4), window(window), viewport(viewport)
+  {
+    this->data[2][2] = 1.0f;
+    this->data[3][3] = 1.0f;
+    this->updateTransform();
+  }
+
+  WindowToViewport(T wblx, T wbly, T wtrx, T wtry,
+                   T vblx, T vbly, T vtrx, T vtry)
+    : Matrix<T>(4, 4), window(wblx, wbly, wtrx, wtry),
+      viewport(vblx, vbly, vtrx, vtry)
+  {
+    this->data[2][2] = 1.0f;
+    this->data[3][3] = 1.0f;
+    this->updateTransform();
+  }
+
+  virtual ~WindowToViewport()
+  {
+  }
+
+  inline void setWindow(const Rectangle<T>& rect)
+  {
+    this->window = std::move(rect);
+    this->updateTransform();
+  }
+
+  inline void setViewport(const Rectangle<T>& rect)
+  {
+    this->viewport = std::move(rect);
+    this->updateTransform();
+  }
+
+  inline Rectangle<T> getWindow() const
+  {
+    return this->window;
+  }
+
+  inline Rectangle<T> getViewport() const
+  {
+    return this->viewport;
+  }
+
+}; // end class WindowToViewport
 
 } // end namespace Utils
