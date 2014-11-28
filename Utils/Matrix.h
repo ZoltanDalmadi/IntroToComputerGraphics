@@ -707,13 +707,13 @@ public:
 
   inline void setDistanceToOrigin(double z)
   {
-    this->zDepth = z;
+    this->distanceToOrigin = z;
     this->updateTransform();
   }
 
   inline double getDistanceToOrigin() const
   {
-    return this->zDepth;
+    return this->distanceToOrigin;
   }
 
 }; // end class CentralProjection
