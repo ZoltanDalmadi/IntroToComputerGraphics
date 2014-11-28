@@ -590,10 +590,10 @@ class Rotate3DX : public Rotate3D<T>
 protected:
   virtual void updateTransform()
   {
-    this->data[1][1] = cos(angle);
-    this->data[2][1] = -sin(angle);
-    this->data[1][2] = sin(angle);
-    this->data[2][2] = cos(angle);
+    this->data[1][1] = cos(this->angle);
+    this->data[2][1] = -sin(this->angle);
+    this->data[1][2] = sin(this->angle);
+    this->data[2][2] = cos(this->angle);
   }
 
 public:
@@ -616,10 +616,10 @@ class Rotate3DY : public Rotate3D<T>
 protected:
   void updateTransform()
   {
-    this->data[0][0] = cos(angle);
-    this->data[2][0] = sin(angle);
-    this->data[0][2] = -sin(angle);
-    this->data[2][2] = cos(angle);
+    this->data[0][0] = cos(this->angle);
+    this->data[2][0] = sin(this->angle);
+    this->data[0][2] = -sin(this->angle);
+    this->data[2][2] = cos(this->angle);
   }
 
 public:
@@ -642,10 +642,10 @@ class Rotate3DZ : public Rotate3D<T>
 protected:
   void updateTransform()
   {
-    this->data[0][0] = cos(angle);
-    this->data[1][0] = -sin(angle);
-    this->data[0][1] = sin(angle);
-    this->data[1][1] = cos(angle);
+    this->data[0][0] = cos(this->angle);
+    this->data[1][0] = -sin(this->angle);
+    this->data[0][1] = sin(this->angle);
+    this->data[1][1] = cos(this->angle);
   }
 
 public:
@@ -729,10 +729,10 @@ protected:
 
   void updateTransform()
   {
-    data[0][0] = viewport.width() / window.width();
-    data[1][1] = viewport.height() / window.height();
-    data[3][0] = viewport.left() - window.left() * data[0][0];
-    data[3][1] = viewport.bottom() - window.bottom() * data[1][1];
+    this->data[0][0] = viewport.width() / window.width();
+    this->data[1][1] = viewport.height() / window.height();
+    this->data[3][0] = viewport.left() - window.left() * this->data[0][0];
+    this->data[3][1] = viewport.bottom() - window.bottom() * this->data[1][1];
   }
 
 public:
