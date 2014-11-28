@@ -11,6 +11,7 @@ namespace Utils
 
 // Forward declare
 template <typename T> class Point2D;
+template <typename T> class Matrix;
 template <typename T> class Line;
 template <typename T> void glVertex2(const Point2D<T>& p);
 template <typename T> void glVertex2(T x, T y);
