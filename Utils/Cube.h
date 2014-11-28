@@ -15,8 +15,8 @@ class Cube
 public:
   std::vector<Point3DH<T>> pointsContainer;
   std::vector<std::vector<Point3DH<T>*>> faces;
-  GLfloat lineWidth = 1.0;
-  GLfloat pointSize = 6.0;
+  GLfloat lineWidth = 2.0;
+  GLfloat pointSize = 8.0;
   Color pointColor = RED;
   Color color = BLACK;
 
@@ -79,9 +79,23 @@ public:
       glBegin(GL_LINE_STRIP);
 
       for (const auto& point : face)
-      {
         glVertex2<T>(point->transformed(proj).normalized2D());
-      }
+
+      glEnd();
+    }
+  }
+
+  void drawPoints(const Matrix<T>& proj) const
+  {
+    this->pointColor.setGLColor();
+    glPointSize(this->pointSize);
+
+    for (const auto& face : this->faces)
+    {
+      glBegin(GL_POINTS);
+
+      for (const auto& point : face)
+        glVertex2<T>(point->transformed(proj).normalized2D());
 
       glEnd();
     }
