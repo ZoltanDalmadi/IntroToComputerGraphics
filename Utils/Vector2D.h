@@ -22,6 +22,10 @@ public:
   {
   }
 
+  inline Vector2D(T x1, T y1, T x2, T y2) : xp(x2 - x1), yp(y2 - y1)
+  {
+  }
+
   inline Vector2D(const Point2D<T>& a, const Point2D<T>& b)
     : xp(b.x() - a.x()), yp(b.y() - a.y())
   {
