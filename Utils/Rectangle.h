@@ -49,17 +49,17 @@ public:
 
   inline T width() const
   {
-    return this->pointsContainer[3].x() - this->pointsContainer[1].x();
+    return this->pointsContainer[0].x() - this->pointsContainer[2].x();
   }
 
   inline T height() const
   {
-    return this->pointsContainer[3].y() - this->pointsContainer[1].y();
+    return this->pointsContainer[0].y() - this->pointsContainer[2].y();
   }
 
   inline T left() const
   {
-    return this->pointsContainer[1].x();
+    return this->pointsContainer[2].x();
   }
 
   inline T right() const
@@ -77,7 +77,7 @@ public:
     return this->pointsContainer[3].y();
   }
 
-  void draw()
+  void draw() const
   {
     this->color.setGLColor();
 
@@ -92,7 +92,7 @@ public:
     glEnd();
   }
 
-  void drawPoints()
+  void drawPoints() const
   {
     this->pointColor.setGLColor();
     glPointSize(this->pointSize);
