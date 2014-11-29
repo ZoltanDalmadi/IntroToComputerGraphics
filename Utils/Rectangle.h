@@ -8,6 +8,9 @@
 namespace Utils
 {
 
+template <typename T> class Point2D;
+template <typename T> void glVertex2(const Point2D<T>& p);
+
 template <typename T>
 class Rectangle
 {
