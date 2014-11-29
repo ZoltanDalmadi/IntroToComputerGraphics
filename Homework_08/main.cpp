@@ -10,8 +10,8 @@
 // ----------------------------------------------------------------------------
 typedef Utils::Rectangle<GLdouble> Rect;
 typedef Utils::Cube<GLdouble> Cube;
-typedef Utils::PerpendicularProjection<GLdouble> PP;
-typedef Utils::CentralProjection<GLdouble> CP;
+typedef Utils::PerpendicularProjection<GLdouble> PerpendicularProjection;
+typedef Utils::CentralProjection<GLdouble> CentralProjection;
 typedef Utils::WindowToViewport<GLdouble> WTV;
 typedef Utils::Rotate3DX<GLdouble> Rotate3DX;
 typedef Utils::Rotate3DY<GLdouble> Rotate3DY;
@@ -39,32 +39,45 @@ const GLfloat lineWidth = 2.0f;
 const int gridSize = 40;
 
 // ----------------------------------------------------------------------------
+// Window and viewports
+// ----------------------------------------------------------------------------
+Rect window(-1, -1, 1, 1);
+Rect viewport1(0, 40, 0 + 640, 40 + 640);
+Rect viewport2(640, 40, 640 + 640, 40 + 640);
+
+// ----------------------------------------------------------------------------
+// Matrices
+// ----------------------------------------------------------------------------
+PerpendicularProjection pp;
+CentralProjection cp(2.0f);
+WTV wtv1(window, viewport1);
+WTV wtv2(window, viewport2);
+Rotate3DX rx(0);
+Rotate3DY ry(0);
+
+// ----------------------------------------------------------------------------
 // Info text
 // ----------------------------------------------------------------------------
 std::string tText;
 std::stringstream ss;
 
-
-Rect window(-1, -1, 1, 1);
-Rect viewport1(0, 40, 0 + 640, 40 + 640);
-Rect viewport2(640, 40, 640 + 640, 40 + 640);
+// ----------------------------------------------------------------------------
+// The cube
+// ----------------------------------------------------------------------------
 Cube cube;
 
-PP pp;
-CP cp(2.0f);
-WTV wtv1(window, viewport1);
-WTV wtv2(window, viewport2);
-Rotate3DX rx(Utils::degToRad(0));
-Rotate3DY ry(Utils::degToRad(0));
-
+// ----------------------------------------------------------------------------
+// Miscellaneous variables
+// ----------------------------------------------------------------------------
 bool drag = false;
-
 double lastRotX = 0.0f;
 double lastRotY = 0.0f;
-
 GLint clickedX;
 GLint clickedY;
 
+// ----------------------------------------------------------------------------
+// Init function
+// ----------------------------------------------------------------------------
 void init()
 {
   bgColor.setGLClearColor();
@@ -77,7 +90,7 @@ void init()
 }
 
 // ----------------------------------------------------------------------------
-// Info test function. Shows current value of t
+// Info test function. Shows current value of s
 // ----------------------------------------------------------------------------
 void drawInfoText(GLint x, GLint y, const Utils::Color& color)
 {
@@ -91,7 +104,7 @@ void drawInfoText(GLint x, GLint y, const Utils::Color& color)
 }
 
 // ----------------------------------------------------------------------------
-// Draw grid to background
+// Draw grid floor
 // ----------------------------------------------------------------------------
 void drawGrid(double start, double end, double gap, GLfloat lineWidth,
               const Utils::Color& color, const Utils::Matrix<GLdouble>& mat)
@@ -104,8 +117,6 @@ void drawGrid(double start, double end, double gap, GLfloat lineWidth,
 
   for (double i = start; i <= end; i += gap)
   {
-    //glVertex2i(i, 0);
-    //glVertex2i(i, height);
     Utils::Point3DH<GLdouble> asd1(i, -0.5, end);
     Utils::glVertex2<GLdouble>(asd1.transformed(mat).normalized2D());
     Utils::Point3DH<GLdouble> asd2(i, -0.5, start);
@@ -114,8 +125,6 @@ void drawGrid(double start, double end, double gap, GLfloat lineWidth,
 
   for (double i = start; i <= end; i += gap)
   {
-    //glVertex2i(0, i);
-    //glVertex2i(width, i);
     Utils::Point3DH<GLdouble> asd1(start, -0.5, i);
     Utils::glVertex2<GLdouble>(asd1.transformed(mat).normalized2D());
     Utils::Point3DH<GLdouble> asd2(end, -0.5, i);
@@ -140,30 +149,17 @@ void display()
   auto m1 = projTrans1 * rxry;
   auto m2 = projTrans2 * rxry;
 
-  // draw grid to into background
+  // draw grid floor
   drawGrid(-0.7, 0.7, 0.1, lineWidth, Utils::VERY_LIGHT_GRAY, m1);
   drawGrid(-0.7, 0.7, 0.1, lineWidth, Utils::VERY_LIGHT_GRAY, m2);
 
   // draw info text
   drawInfoText(WIDTH - 60, HEIGHT - 30, Utils::BLACK);
 
-  //Utils::Point3DH<GLdouble> p1(0, 0, 2);
-  //Utils::Point3DH<GLdouble> p2(0, 0, -2);
-
-  //glBegin(GL_LINES);
-  //Utils::glVertex2<GLdouble>(p1.transformed(m1).normalized2D());
-  //Utils::glVertex2<GLdouble>(p2.transformed(m1).normalized2D());
-  //glEnd();
-
-  //glBegin(GL_LINES);
-  //Utils::glVertex2<GLdouble>(p1.transformed(m2).normalized2D());
-  //Utils::glVertex2<GLdouble>(p2.transformed(m2).normalized2D());
-  //glEnd();
-
   // draw cube(s)
-  cube.draw(m1);
+  cube.drawEdges(m1);
   cube.drawPoints(m1);
-  cube.draw(m2);
+  cube.drawEdges(m2);
   cube.drawPoints(m2);
 
   glutSwapBuffers();
@@ -177,6 +173,8 @@ void processMouse(GLint button, GLint action, GLint xMouse, GLint yMouse)
   if (button == GLUT_LEFT_BUTTON && action == GLUT_DOWN)
   {
     drag = true;
+
+    // cache clicked point position
     clickedX = xMouse;
     clickedY = HEIGHT - yMouse;
   }
@@ -184,6 +182,8 @@ void processMouse(GLint button, GLint action, GLint xMouse, GLint yMouse)
   if (button == GLUT_LEFT_BUTTON && action == GLUT_UP)
   {
     drag = false;
+
+    // cache current rotation values
     lastRotX = rx.getAngle();
     lastRotY = ry.getAngle();
   }
@@ -196,14 +196,20 @@ void processMouseActiveMotion(GLint xMouse, GLint yMouse)
 {
   if (drag)
   {
-    Utils::Vector2D<GLdouble> v(clickedX, clickedY, xMouse, HEIGHT - yMouse);
-    rx.setAngle(lastRotX + Utils::degToRad(-v.y()) * 0.25);
+    // calculate vector between clicked and dragged point
+    Utils::Vector2D<GLint> v(clickedX, clickedY, xMouse, HEIGHT - yMouse);
+
+    // set rotation values
+    rx.setAngle(lastRotX - Utils::degToRad(v.y()) * 0.25);
     ry.setAngle(lastRotY + Utils::degToRad(v.x()) * 0.25);
   }
 
   glutPostRedisplay();
 }
 
+// ----------------------------------------------------------------------------
+// Mouse wheel handler
+// ----------------------------------------------------------------------------
 void wheelFunc(int wheel, int direction, int x, int y)
 {
   auto value = cp.getDistanceToOrigin();
@@ -211,6 +217,9 @@ void wheelFunc(int wheel, int direction, int x, int y)
   glutPostRedisplay();
 }
 
+// ----------------------------------------------------------------------------
+// Main function
+// ----------------------------------------------------------------------------
 int main(int argc, char **argv)
 {
   glutInit(&argc, argv);
