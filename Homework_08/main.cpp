@@ -74,6 +74,8 @@ double lastRotX = 0.0f;
 double lastRotY = 0.0f;
 GLint clickedX;
 GLint clickedY;
+GLint draggedX;
+GLint draggedY;
 
 // ----------------------------------------------------------------------------
 // Init function
@@ -162,6 +164,14 @@ void display()
   cube.drawEdges(m2);
   cube.drawPoints(m2);
 
+  if (drag)
+  {
+    glBegin(GL_LINES);
+    glVertex2i(clickedX, clickedY);
+    glVertex2i(draggedX, draggedY);
+    glEnd();
+  }
+
   glutSwapBuffers();
 }
 
@@ -186,6 +196,8 @@ void processMouse(GLint button, GLint action, GLint xMouse, GLint yMouse)
     // cache current rotation values
     lastRotX = rx.getAngle();
     lastRotY = ry.getAngle();
+
+    glutPostRedisplay();
   }
 }
 
@@ -202,6 +214,8 @@ void processMouseActiveMotion(GLint xMouse, GLint yMouse)
     // set rotation values
     rx.setAngle(lastRotX - Utils::degToRad(v.y()) * 0.25);
     ry.setAngle(lastRotY + Utils::degToRad(v.x()) * 0.25);
+    draggedX = clickedX + v.x();
+    draggedY = clickedY + v.y();
   }
 
   glutPostRedisplay();
