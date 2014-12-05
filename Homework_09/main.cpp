@@ -146,7 +146,7 @@ void display()
 
   drawInfoText(10, HEIGHT - 24, Utils::BLACK);
 
-  drawGrid(-20, 20, 1.0, 1.0, Utils::VERY_LIGHT_GRAY, T);
+  drawGrid(xMin - 2, xMax + 2, 1.0, 1.0, Utils::VERY_LIGHT_GRAY, T);
 
   for (double x = xMin; x < xMax; x += step)
   {
