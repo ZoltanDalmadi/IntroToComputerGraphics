@@ -26,7 +26,7 @@ const GLsizei HEIGHT = 720;
 // ----------------------------------------------------------------------------
 const Utils::Color bgColor(Utils::WHITE);
 const Utils::Color graphColor(Utils::ORANGE);
-const Utils::Color graphGridColor(Utils::MEDIUM_GRAY);
+const Utils::Color graphGridColor(Utils::BLACK);
 
 // ----------------------------------------------------------------------------
 // Refresh rate
@@ -119,17 +119,17 @@ void drawGrid(double start, double end, double gap, GLfloat lineWidth,
 
   for (double i = start; i <= end; i += gap)
   {
-    Utils::Point3DH<GLdouble> asd1(i, -0.5, end);
+    Utils::Point3DH<GLdouble> asd1(i, end, -2);
     Utils::glVertex2<GLdouble>(asd1.transformed(mat).normalized2D());
-    Utils::Point3DH<GLdouble> asd2(i, -0.5, start);
+    Utils::Point3DH<GLdouble> asd2(i, start, -2);
     Utils::glVertex2<GLdouble>(asd2.transformed(mat).normalized2D());
   }
 
   for (double i = start; i <= end; i += gap)
   {
-    Utils::Point3DH<GLdouble> asd1(start, -0.5, i);
+    Utils::Point3DH<GLdouble> asd1(start, i, -2);
     Utils::glVertex2<GLdouble>(asd1.transformed(mat).normalized2D());
-    Utils::Point3DH<GLdouble> asd2(end, -0.5, i);
+    Utils::Point3DH<GLdouble> asd2(end, i, -2);
     Utils::glVertex2<GLdouble>(asd2.transformed(mat).normalized2D());
   }
 
@@ -146,6 +146,8 @@ void display()
 
   drawInfoText(10, HEIGHT - 24, Utils::BLACK);
 
+  drawGrid(-20, 20, 1.0, 1.0, Utils::VERY_LIGHT_GRAY, T);
+
   for (double x = xMin; x < xMax; x += step)
   {
     for (double y = yMin; y < yMax; y += step)
@@ -154,7 +156,10 @@ void display()
       auto f2 = f(x + step, y, p).transformed(T).normalized2D();
       auto f3 = f(x + step, y + step, p).transformed(T).normalized2D();
       auto f4 = f(x, y + step, p).transformed(T).normalized2D();
-      graphColor.setGLColor();
+      //graphColor.setGLColor();
+      glColor3f(static_cast<GLfloat>((std::abs(x) + 20) / 40),
+                static_cast<GLfloat>((std::abs(y) + 20) / 40), 0.4f);
+
       glBegin(GL_POLYGON);
       Utils::glVertex2<GLdouble>(f1);
       Utils::glVertex2<GLdouble>(f2);
@@ -169,7 +174,6 @@ void display()
       Utils::glVertex2<GLdouble>(f3);
       Utils::glVertex2<GLdouble>(f4);
       glEnd();
-
     }
   }
 
