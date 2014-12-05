@@ -614,7 +614,7 @@ template <typename T>
 class Rotate3DY : public Rotate3D<T>
 {
 protected:
-  void updateTransform()
+  virtual void updateTransform()
   {
     this->data[0][0] = cos(this->angle);
     this->data[2][0] = sin(this->angle);
@@ -640,7 +640,7 @@ template <typename T>
 class Rotate3DZ : public Rotate3D<T>
 {
 protected:
-  void updateTransform()
+  virtual void updateTransform()
   {
     this->data[0][0] = cos(this->angle);
     this->data[1][0] = -sin(this->angle);
@@ -717,6 +717,57 @@ public:
   }
 
 }; // end class CentralProjection
+
+template <typename T>
+class CavalierProjection : public Matrix<T>
+{
+protected:
+  T alpha;
+  T q;
+
+  void updateTransform()
+  {
+    this->data[0][0] = q * cos(alpha);
+    this->data[0][1] = q * sin(alpha);
+  }
+
+public:
+  CavalierProjection(T alpha, T q = 0.5f)
+    : Matrix<T>(4, 4), alpha(alpha), q(q)
+  {
+    this->data[1][0] = 1.0f;
+    this->data[2][1] = 1.0f;
+    this->data[3][3] = 1.0f;
+    this->updateTransform();
+  }
+
+  virtual ~CavalierProjection()
+  {
+  }
+
+  inline void setAlpha(T alpha)
+  {
+    this->alpha = alpha;
+    this->updateTransform();
+  }
+
+  inline double getAlpha() const
+  {
+    return this->alpha;
+  }
+
+  inline void setQ(T q)
+  {
+    this->q = q;
+    this->updateTransform();
+  }
+
+  inline double getQ() const
+  {
+    return this->q;
+  }
+
+}; // end class CavalierProjection
 
 template <typename T> class Rectangle;
 
