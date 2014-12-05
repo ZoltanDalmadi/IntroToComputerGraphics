@@ -2,13 +2,18 @@
 #include <sstream>
 #include <string>
 #include "Rectangle.h"
+#include "Matrix.h"
+#include "Point2D.h"
 #include "Point3D.h"
 
 // ----------------------------------------------------------------------------
 // Typedefs
 // ----------------------------------------------------------------------------
 typedef Utils::Rectangle<GLdouble> Rect;
+typedef Utils::CavalierProjection<GLdouble> CvP;
 typedef Utils::WindowToViewport<GLdouble> WTV;
+typedef Utils::Point2D<GLdouble> Point2D;
+typedef Utils::Point3DH<GLdouble> Point3DH;
 
 // ----------------------------------------------------------------------------
 // Window size
@@ -20,6 +25,8 @@ const GLsizei HEIGHT = 720;
 // Colors
 // ----------------------------------------------------------------------------
 const Utils::Color bgColor(Utils::WHITE);
+const Utils::Color graphColor(Utils::ORANGE);
+const Utils::Color graphGridColor(Utils::MEDIUM_GRAY);
 
 // ----------------------------------------------------------------------------
 // Refresh rate
@@ -33,15 +40,26 @@ const GLfloat lineWidth = 2.0f;
 const int gridSize = 40;
 
 // ----------------------------------------------------------------------------
+// Miscellaneous variables
+// ----------------------------------------------------------------------------
+double step = 0.6f;
+double p = 0.0f;
+double xMin = -20.0f;
+double xMax = 20.0f;
+double yMin = -20.0f;
+double yMax = 20.0f;
+
+// ----------------------------------------------------------------------------
 // Window and viewport
 // ----------------------------------------------------------------------------
-Rect window(-1, -1, 1, 1);
-Rect viewport(0, 40, 0 + 640, 40 + 640);
+Rect window(xMin, yMin, xMax, yMax);
+Rect viewport(280, 0, 280 + HEIGHT, HEIGHT);
 
 // ----------------------------------------------------------------------------
 // Matrices
 // ----------------------------------------------------------------------------
 WTV wtv1(window, viewport);
+CvP cvp(Utils::degToRad(235));
 
 // ----------------------------------------------------------------------------
 // Info text
@@ -50,10 +68,12 @@ std::string tText;
 std::stringstream ss;
 
 // ----------------------------------------------------------------------------
-// Miscellaneous variables
+// Math function to plot
 // ----------------------------------------------------------------------------
-double p = 0.0;
-
+Point3DH f(double x, double y)
+{
+  return Point3DH(x, y, std::sin(std::sqrt(x * x + y * y)));
+}
 
 // ----------------------------------------------------------------------------
 // Init function
@@ -121,6 +141,31 @@ void drawGrid(double start, double end, double gap, GLfloat lineWidth,
 void display()
 {
   glClear(GL_COLOR_BUFFER_BIT);
+
+  //viewport.draw();
+  auto T = wtv1 * cvp;
+
+  for (double x = xMin; x < xMax; x += step)
+  {
+    for (double y = yMin; y < yMax; y += step)
+    {
+      graphColor.setGLColor();
+      glBegin(GL_POLYGON);
+      Utils::glVertex2<GLdouble>(f(x, y).transformed(T).normalized2D());
+      Utils::glVertex2<GLdouble>(f(x + step, y).transformed(T).normalized2D());
+      Utils::glVertex2<GLdouble>(f(x + step, y + step).transformed(T).normalized2D());
+      Utils::glVertex2<GLdouble>(f(x, y + step).transformed(T).normalized2D());
+      glEnd();
+
+      graphGridColor.setGLColor();
+      glBegin(GL_LINE_LOOP);
+      Utils::glVertex2<GLdouble>(f(x, y).transformed(T).normalized2D());
+      Utils::glVertex2<GLdouble>(f(x + step, y).transformed(T).normalized2D());
+      Utils::glVertex2<GLdouble>(f(x + step, y + step).transformed(T).normalized2D());
+      Utils::glVertex2<GLdouble>(f(x, y + step).transformed(T).normalized2D());
+      glEnd();
+    }
+  }
 
   glutSwapBuffers();
 }
