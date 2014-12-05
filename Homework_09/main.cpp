@@ -42,12 +42,13 @@ const int gridSize = 40;
 // ----------------------------------------------------------------------------
 // Miscellaneous variables
 // ----------------------------------------------------------------------------
-double step = 0.6f;
+double step = 0.5f;
 double p = 0.0f;
 double xMin = -20.0f;
 double xMax = 20.0f;
 double yMin = -20.0f;
 double yMax = 20.0f;
+double projAngle = 235.0;
 
 // ----------------------------------------------------------------------------
 // Window and viewport
@@ -59,7 +60,8 @@ Rect viewport(280, 0, 280 + HEIGHT, HEIGHT);
 // Matrices
 // ----------------------------------------------------------------------------
 WTV wtv1(window, viewport);
-CvP cvp(Utils::degToRad(235));
+CvP cvp(Utils::degToRad(projAngle));
+auto T = wtv1 * cvp;
 
 // ----------------------------------------------------------------------------
 // Info text
@@ -70,9 +72,9 @@ std::stringstream ss;
 // ----------------------------------------------------------------------------
 // Math function to plot
 // ----------------------------------------------------------------------------
-Point3DH f(double x, double y)
+Point3DH f(double x, double y, double p)
 {
-  return Point3DH(x, y, std::sin(std::sqrt(x * x + y * y)));
+  return Point3DH(x, y, std::sin(std::sqrt(x * x + y * y) + p));
 }
 
 // ----------------------------------------------------------------------------
@@ -90,11 +92,11 @@ void init()
 }
 
 // ----------------------------------------------------------------------------
-// Info test function. Shows current value of p
+// Info test function. Shows current value of projection angle
 // ----------------------------------------------------------------------------
 void drawInfoText(GLint x, GLint y, const Utils::Color& color)
 {
-  ss << "p: " << p << std::endl;
+  ss << "Projection angle: " << projAngle << " degrees" << std::endl;
   tText = ss.str();
   ss.str("");
 
@@ -142,32 +144,66 @@ void display()
 {
   glClear(GL_COLOR_BUFFER_BIT);
 
-  //viewport.draw();
-  auto T = wtv1 * cvp;
+  drawInfoText(10, HEIGHT - 24, Utils::BLACK);
 
   for (double x = xMin; x < xMax; x += step)
   {
     for (double y = yMin; y < yMax; y += step)
     {
+      auto f1 = f(x, y, p).transformed(T).normalized2D();
+      auto f2 = f(x + step, y, p).transformed(T).normalized2D();
+      auto f3 = f(x + step, y + step, p).transformed(T).normalized2D();
+      auto f4 = f(x, y + step, p).transformed(T).normalized2D();
       graphColor.setGLColor();
       glBegin(GL_POLYGON);
-      Utils::glVertex2<GLdouble>(f(x, y).transformed(T).normalized2D());
-      Utils::glVertex2<GLdouble>(f(x + step, y).transformed(T).normalized2D());
-      Utils::glVertex2<GLdouble>(f(x + step, y + step).transformed(T).normalized2D());
-      Utils::glVertex2<GLdouble>(f(x, y + step).transformed(T).normalized2D());
+      Utils::glVertex2<GLdouble>(f1);
+      Utils::glVertex2<GLdouble>(f2);
+      Utils::glVertex2<GLdouble>(f3);
+      Utils::glVertex2<GLdouble>(f4);
       glEnd();
 
       graphGridColor.setGLColor();
       glBegin(GL_LINE_LOOP);
-      Utils::glVertex2<GLdouble>(f(x, y).transformed(T).normalized2D());
-      Utils::glVertex2<GLdouble>(f(x + step, y).transformed(T).normalized2D());
-      Utils::glVertex2<GLdouble>(f(x + step, y + step).transformed(T).normalized2D());
-      Utils::glVertex2<GLdouble>(f(x, y + step).transformed(T).normalized2D());
+      Utils::glVertex2<GLdouble>(f1);
+      Utils::glVertex2<GLdouble>(f2);
+      Utils::glVertex2<GLdouble>(f3);
+      Utils::glVertex2<GLdouble>(f4);
       glEnd();
+
     }
   }
 
   glutSwapBuffers();
+}
+
+void keyPressed(int key, int x, int y)
+{
+  if (key == GLUT_KEY_UP)
+  {
+    if (projAngle < 360)
+    {
+      projAngle++;
+      cvp.setAlpha(Utils::degToRad(projAngle));
+      T = wtv1 * cvp;
+    }
+  }
+
+  if (key == GLUT_KEY_DOWN)
+  {
+    if (projAngle > 180)
+    {
+      projAngle--;
+      cvp.setAlpha(Utils::degToRad(projAngle));
+      T = wtv1 * cvp;
+    }
+  }
+}
+
+void appUpdate(int n)
+{
+  p -= 0.1;
+  glutPostRedisplay();
+  glutTimerFunc(refreshRate, appUpdate, 0);
 }
 
 // ----------------------------------------------------------------------------
@@ -182,6 +218,8 @@ int main(int argc, char **argv)
 
   init();
   glutDisplayFunc(display);
+  glutSpecialFunc(keyPressed);
+  glutTimerFunc(refreshRate, appUpdate, 0);
   glutMainLoop();
   return 0;
 }
