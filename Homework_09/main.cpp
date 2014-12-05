@@ -42,13 +42,15 @@ const int gridSize = 40;
 // ----------------------------------------------------------------------------
 // Miscellaneous variables
 // ----------------------------------------------------------------------------
-double step = 0.5f;
 double p = 0.0f;
-double xMin = -20.0f;
-double xMax = 20.0f;
-double yMin = -20.0f;
-double yMax = 20.0f;
 double projAngle = 235.0;
+const double step = 0.5f;
+const double xMin = -20.0f;
+const double xMax = 20.0f;
+const double yMin = -20.0f;
+const double yMax = 20.0f;
+const size_t points =
+  static_cast<size_t>((std::abs(xMin) + std::abs(xMax)) / step);
 
 // ----------------------------------------------------------------------------
 // Window and viewport
@@ -77,6 +79,8 @@ Point3DH f(double x, double y, double p)
   return Point3DH(x, y, std::sin(std::sqrt(x * x + y * y) + p));
 }
 
+std::vector<std::vector<Point2D>> graph;
+
 // ----------------------------------------------------------------------------
 // Init function
 // ----------------------------------------------------------------------------
@@ -89,6 +93,24 @@ void init()
   glEnable(GL_POINT_SMOOTH);
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+  size_t i = 0;
+
+  graph.resize(80);
+
+  for (double x = xMin; x < xMax; x += step)
+  {
+    for (double y = yMin; y < yMax; y += step)
+    {
+      graph[i].emplace_back(f(x, y, p).transformed(T).normalized2D());
+    }
+
+    graph[i].shrink_to_fit();
+    i++;
+  }
+
+  graph.shrink_to_fit();
+
 }
 
 // ----------------------------------------------------------------------------
@@ -148,34 +170,54 @@ void display()
 
   drawGrid(xMin - 2, xMax + 2, 1.0, 1.0, Utils::VERY_LIGHT_GRAY, T);
 
-  for (double x = xMin; x < xMax; x += step)
+  for (size_t row = 0; row < points - 1; row++)
   {
-    for (double y = yMin; y < yMax; y += step)
+    for (size_t col = 0; col < points - 1; col++)
     {
-      auto f1 = f(x, y, p).transformed(T).normalized2D();
-      auto f2 = f(x + step, y, p).transformed(T).normalized2D();
-      auto f3 = f(x + step, y + step, p).transformed(T).normalized2D();
-      auto f4 = f(x, y + step, p).transformed(T).normalized2D();
+      // draw polygons
+      auto Xval = static_cast<GLfloat>(xMin + row * (xMax - xMin)) / points;
+      auto Yval = static_cast<GLfloat>(yMin + col * (yMax - yMin)) / points;
+
+      glColor3f(Xval * 0.02, Yval * 0.02, 0.9f);
       //graphColor.setGLColor();
-      glColor3f(static_cast<GLfloat>((std::abs(x) + 20) / 40),
-                static_cast<GLfloat>((std::abs(y) + 20) / 40), 0.4f);
 
       glBegin(GL_POLYGON);
-      Utils::glVertex2<GLdouble>(f1);
-      Utils::glVertex2<GLdouble>(f2);
-      Utils::glVertex2<GLdouble>(f3);
-      Utils::glVertex2<GLdouble>(f4);
-      glEnd();
-
-      graphGridColor.setGLColor();
-      glBegin(GL_LINE_LOOP);
-      Utils::glVertex2<GLdouble>(f1);
-      Utils::glVertex2<GLdouble>(f2);
-      Utils::glVertex2<GLdouble>(f3);
-      Utils::glVertex2<GLdouble>(f4);
+      glVertex2d(graph[row][col].x(), graph[row][col].y());
+      glVertex2d(graph[row][col + 1].x(), graph[row][col + 1].y());
+      glVertex2d(graph[row + 1][col + 1].x(), graph[row + 1][col + 1].y());
+      glVertex2d(graph[row + 1][col].x(), graph[row + 1][col].y());
       glEnd();
     }
+
+    // draw horizontal lines
+    graphGridColor.setGLColor();
+
+    glBegin(GL_LINE_STRIP);
+
+    for (size_t col = 0; col < points; col++)
+      glVertex2d(graph[row][col].x(), graph[row][col].y());
+
+    glEnd();
+
+    // draw vertical lines
+    glBegin(GL_LINES);
+
+    for (size_t col = 0; col < points; col++)
+    {
+      glVertex2d(graph[row][col].x(), graph[row][col].y());
+      glVertex2d(graph[row + 1][col].x(), graph[row + 1][col].y());
+    }
+
+    glEnd();
   }
+
+  // draw last horizontal line
+  glBegin(GL_LINE_STRIP);
+
+  for (size_t col = 0; col < points; col++)
+    glVertex2d(graph.back()[col].x(), graph.back()[col].y());
+
+  glEnd();
 
   glutSwapBuffers();
 }
@@ -206,6 +248,23 @@ void keyPressed(int key, int x, int y)
 void appUpdate(int n)
 {
   p -= 0.1;
+
+  size_t i = 0;
+  size_t j;
+
+  for (double x = xMin; x < xMax; x += step)
+  {
+    j = 0;
+
+    for (double y = yMin; y < yMax; y += step)
+    {
+      graph[i][j] = f(x, y, p).transformed(T).normalized2D();
+      j++;
+    }
+
+    i++;
+  }
+
   glutPostRedisplay();
   glutTimerFunc(refreshRate, appUpdate, 0);
 }
