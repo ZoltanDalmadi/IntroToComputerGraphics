@@ -49,8 +49,8 @@ const double xMin = -20.0f;
 const double xMax = 20.0f;
 const double yMin = -20.0f;
 const double yMax = 20.0f;
-const size_t points =
-  static_cast<size_t>((std::abs(xMin) + std::abs(xMax)) / step);
+const size_t points = static_cast<size_t>((abs(xMin) + abs(xMax)) / step);
+Point2D **graph;
 
 // ----------------------------------------------------------------------------
 // Window and viewport
@@ -72,19 +72,20 @@ std::string tText;
 std::stringstream ss;
 
 // ----------------------------------------------------------------------------
+// FPS counter variables
+// ----------------------------------------------------------------------------
+size_t frameCount = 0;
+size_t previousTime = 0;
+size_t currentTime = 0;
+float fps = 0;
+
+// ----------------------------------------------------------------------------
 // Math function to plot
 // ----------------------------------------------------------------------------
 Point3DH f(double x, double y, double p)
 {
   return Point3DH(x, y, std::sin(std::sqrt(x * x + y * y) + p));
 }
-
-Point2D **graph;
-
-size_t frameCount = 0;
-size_t previousTime = 0;
-size_t currentTime = 0;
-float fps = 0;
 
 // ----------------------------------------------------------------------------
 // Init function
@@ -99,6 +100,7 @@ void init()
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+  // Allocate memory for graph points
   size_t i = 0;
   size_t j = 0;
 
@@ -120,7 +122,7 @@ void init()
 }
 
 // ----------------------------------------------------------------------------
-// Info test function. Shows current value of projection angle
+// Info text function. Shows current value of projection angle and FPS
 // ----------------------------------------------------------------------------
 void drawInfoText(GLint x, GLint y, const Utils::Color& color)
 {
@@ -187,7 +189,6 @@ void display()
 
       glColor3f(static_cast<GLfloat>(Xval * 0.02),
                 static_cast<GLfloat>(Yval * 0.02), 0.9f);
-      //graphColor.setGLColor();
 
       glBegin(GL_POLYGON);
       glVertex2d(graph[row][col].x(), graph[row][col].y());
@@ -224,9 +225,6 @@ void display()
 
   for (size_t col = 0; col < points; col++)
     glVertex2d(graph[79][col].x(), graph[79][col].y());
-
-  //glVertex2d(graph.back()[col].x(), graph.back()[col].y());
-
 
   glEnd();
 
