@@ -52,8 +52,6 @@ const double yMax = 20.0f;
 const size_t points =
   static_cast<size_t>((std::abs(xMin) + std::abs(xMax)) / step);
 
-
-
 // ----------------------------------------------------------------------------
 // Window and viewport
 // ----------------------------------------------------------------------------
@@ -306,9 +304,7 @@ void appUpdate()
 void cleanup()
 {
   for (size_t i = 0; i < points; i++)
-  {
     delete[] graph[i];
-  }
 
   delete[] graph;
 }
