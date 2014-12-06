@@ -52,6 +52,8 @@ const double yMax = 20.0f;
 const size_t points =
   static_cast<size_t>((std::abs(xMin) + std::abs(xMax)) / step);
 
+
+
 // ----------------------------------------------------------------------------
 // Window and viewport
 // ----------------------------------------------------------------------------
@@ -79,7 +81,12 @@ Point3DH f(double x, double y, double p)
   return Point3DH(x, y, std::sin(std::sqrt(x * x + y * y) + p));
 }
 
-std::vector<std::vector<Point2D>> graph;
+Point2D **graph;
+
+size_t frameCount = 0;
+size_t previousTime = 0;
+size_t currentTime = 0;
+float fps = 0;
 
 // ----------------------------------------------------------------------------
 // Init function
@@ -95,22 +102,23 @@ void init()
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   size_t i = 0;
+  size_t j = 0;
 
-  graph.resize(80);
+  graph = new Point2D*[points];
 
   for (double x = xMin; x < xMax; x += step)
   {
+    graph[i] = new Point2D[points];
+    j = 0;
+
     for (double y = yMin; y < yMax; y += step)
     {
-      graph[i].emplace_back(f(x, y, p).transformed(T).normalized2D());
+      graph[i][j] = f(x, y, p).transformed(T).normalized2D();
+      j++;
     }
 
-    graph[i].shrink_to_fit();
     i++;
   }
-
-  graph.shrink_to_fit();
-
 }
 
 // ----------------------------------------------------------------------------
@@ -119,6 +127,7 @@ void init()
 void drawInfoText(GLint x, GLint y, const Utils::Color& color)
 {
   ss << "Projection angle: " << projAngle << " degrees" << std::endl;
+  ss << "FPS: " << fps << std::endl;
   tText = ss.str();
   ss.str("");
 
@@ -178,7 +187,8 @@ void display()
       auto Xval = static_cast<GLfloat>(xMin + row * (xMax - xMin)) / points;
       auto Yval = static_cast<GLfloat>(yMin + col * (yMax - yMin)) / points;
 
-      glColor3f(Xval * 0.02, Yval * 0.02, 0.9f);
+      glColor3f(static_cast<GLfloat>(Xval * 0.02),
+                static_cast<GLfloat>(Yval * 0.02), 0.9f);
       //graphColor.setGLColor();
 
       glBegin(GL_POLYGON);
@@ -215,7 +225,10 @@ void display()
   glBegin(GL_LINE_STRIP);
 
   for (size_t col = 0; col < points; col++)
-    glVertex2d(graph.back()[col].x(), graph.back()[col].y());
+    glVertex2d(graph[79][col].x(), graph[79][col].y());
+
+  //glVertex2d(graph.back()[col].x(), graph.back()[col].y());
+
 
   glEnd();
 
@@ -245,7 +258,7 @@ void keyPressed(int key, int x, int y)
   }
 }
 
-void appUpdate(int n)
+void appUpdate()
 {
   p -= 0.1;
 
@@ -265,8 +278,39 @@ void appUpdate(int n)
     i++;
   }
 
+  //  Increase frame count
+  frameCount++;
+
+  //  Get the number of milliseconds since glutInit called
+  //  (or first call to glutGet(GLUT ELAPSED TIME)).
+  currentTime = glutGet(GLUT_ELAPSED_TIME);
+
+  //  Calculate time passed
+  int timeInterval = currentTime - previousTime;
+
+  if (timeInterval > 1000)
+  {
+    //  calculate the number of frames per second
+    fps = frameCount / (timeInterval / 1000.0f);
+
+    //  Set time
+    previousTime = currentTime;
+
+    //  Reset frame count
+    frameCount = 0;
+  }
+
   glutPostRedisplay();
-  glutTimerFunc(refreshRate, appUpdate, 0);
+}
+
+void cleanup()
+{
+  for (size_t i = 0; i < points; i++)
+  {
+    delete[] graph[i];
+  }
+
+  delete[] graph;
 }
 
 // ----------------------------------------------------------------------------
@@ -282,7 +326,8 @@ int main(int argc, char **argv)
   init();
   glutDisplayFunc(display);
   glutSpecialFunc(keyPressed);
-  glutTimerFunc(refreshRate, appUpdate, 0);
+  glutIdleFunc(appUpdate);
+  glutCloseFunc(cleanup);
   glutMainLoop();
   return 0;
 }
