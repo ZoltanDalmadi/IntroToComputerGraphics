@@ -258,6 +258,9 @@ void appUpdate()
 {
   p -= 0.1;
 
+  if (p < (-2 * Utils::PI))
+    p = 0.0;
+
   size_t i = 0;
   size_t j;
 
