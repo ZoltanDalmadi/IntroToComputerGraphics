@@ -49,7 +49,8 @@ const double xMin = -20.0f;
 const double xMax = 20.0f;
 const double yMin = -20.0f;
 const double yMax = 20.0f;
-const size_t points = static_cast<size_t>((abs(xMin) + abs(xMax)) / step);
+const size_t points = static_cast<size_t>(
+                        std::round((abs(xMin) + abs(xMax)) / step));
 Point2D **graph;
 
 // ----------------------------------------------------------------------------
@@ -177,7 +178,7 @@ void display()
 
   drawInfoText(10, HEIGHT - 24, Utils::BLACK);
 
-  drawGrid(xMin - 2, xMax + 2, 1.0, 1.0, Utils::VERY_LIGHT_GRAY, T);
+  drawGrid(xMin - 2, xMax + 2, 1.0, 1.0, Utils::MEDIUM_GRAY, T);
 
   for (size_t row = 0; row < points - 1; row++)
   {
