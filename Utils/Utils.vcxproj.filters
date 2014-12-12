@@ -56,5 +56,8 @@
     <ClInclude Include="Point3D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Vector3D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
