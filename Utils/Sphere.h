@@ -12,6 +12,7 @@ class Sphere
 {
 private:
   typedef Point3DH<T> point_t;
+  typedef Point2D<T> point2D_t;
   typedef Vector3D<T> vector3D_t;
 
   struct Face
@@ -31,6 +32,8 @@ private:
   T radius;
   void recalcPoints()
   {
+    auto segment2 = segments * 2;
+
     // empty container
     this->points.clear();
 
@@ -58,7 +61,7 @@ private:
       }
 
       // reduce memory usage
-      points.back().shrink_to_fit();
+      //points.back().shrink_to_fit();
     }
 
     // add bottom Z point
@@ -66,7 +69,24 @@ private:
     points.back().emplace_back(center.x(), center.y(), -radius);
 
     // assign faces -----------------------------------------------------------
+    this->faces.clear();
+    point_t& topPoint = points.front().back();
+    point_t& bottomPoint = points.back().back();
+
     // add top triangles
+    for (size_t i = 0; i < segment2; ++i)
+    {
+      Face face;
+      face.vertices.emplace_back(&topPoint);
+      face.vertices.emplace_back(&points[1][i]);
+
+      if (i < segment2 - 1)
+        face.vertices.emplace_back(&points[1][i + 1]);
+      else
+        face.vertices.emplace_back(&points[1][0]);
+
+      faces.emplace_back(face);
+    }
 
     // assign edges -----------------------------------------------------------
     // calculate normals
@@ -74,6 +94,7 @@ private:
 
 public:
   std::vector<std::vector<point_t>> points;
+  std::vector<std::vector<point2D_t>> transformedPoints;
   std::vector<Face> faces;
   std::vector<Edge> edges;
   GLfloat lineWidth = 2.0;
@@ -125,6 +146,23 @@ public:
     this->recalcPoints();
   }
 
+  void transformPoints(const Matrix<T>& m)
+  {
+    this->transformedPoints.clear();
+
+    for (const auto& row : this->points)
+    {
+      this->transformedPoints.emplace_back();
+
+      for (const auto& point : row)
+      {
+        this->transformedPoints.back().emplace_back(
+          point.transformed(m).normalized2D()
+        );
+      }
+    }
+  }
+
   void drawPoints(const Matrix<T>& proj) const
   {
     this->pointColor.setGLColor();
@@ -139,10 +177,25 @@ public:
     glEnd();
   }
 
-  void drawEdges(const Matrix<T>& proj) const
+  void drawFaces(const Matrix<T>& proj) const
+  {
+    this->color.setGLColor();
+
+    glBegin(GL_LINE_STRIP);
+
+    for (const auto& face : this->faces)
+      for (const auto& vertex : face.vertices)
+        glVertex2<T>(vertex->transformed(proj).normalized2D());
+
+    glEnd();
+  }
+
+  void drawEdges(const Matrix<T>& proj)
   {
     this->edgeColor.setGLColor();
     glLineWidth(this->lineWidth);
+
+    this->transformPoints(proj);
 
     // horizontal lines
     for (size_t row = 1; row < segments; row++)
@@ -150,7 +203,7 @@ public:
       glBegin(GL_LINE_LOOP);
 
       for (size_t col = 0; col < segments * 2; col++)
-        glVertex2<T>(points[row][col].transformed(proj).normalized2D());
+        glVertex2<T>(transformedPoints[row][col]);
 
       glEnd();
     }
@@ -159,12 +212,12 @@ public:
     for (size_t col = 0; col < segments * 2; col++)
     {
       glBegin(GL_LINE_STRIP);
-      glVertex2<T>(points.front().back().transformed(proj).normalized2D());
+      glVertex2<T>(transformedPoints.front().back());
 
       for (size_t row = 1; row < segments; row++)
-        glVertex2<T>(points[row][col].transformed(proj).normalized2D());
+        glVertex2<T>(transformedPoints[row][col]);
 
-      glVertex2<T>(points.back().back().transformed(proj).normalized2D());
+      glVertex2<T>(transformedPoints.back().back());
 
       glEnd();
     }
