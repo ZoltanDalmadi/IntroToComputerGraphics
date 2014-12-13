@@ -1,8 +1,6 @@
 #pragma once
 #include <vector>
 #include <array>
-#include <utility>
-#include <map>
 #include "Point3D.h"
 #include "Vector3D.h"
 
@@ -15,12 +13,18 @@ class Sphere
 private:
   typedef Point3DH<T> point_t;
   typedef Vector3D<T> vector3D_t;
-  typedef std::array<point_t *, 4> face_t;
-  typedef std::pair<point_t *, point_t *> edge_t;
-  typedef std::vector<std::vector<point_t>> points_t;
-  typedef std::vector<std::vector<face_t *>> faces_t;
-  typedef std::vector<std::vector<edge_t *>> edges_t;
-  typedef std::map<face_t *, vector3D_t> normals_t;
+
+  struct Face
+  {
+    std::vector<point_t *> vertices;
+    vector3D_t normal;
+    point_t centroid;
+  };
+
+  struct Edge
+  {
+    std::array<point_t *, 2> vertices;
+  };
 
   point_t center;
   size_t segments;
@@ -30,18 +34,22 @@ private:
     // empty container
     this->points.clear();
 
-    // calculate points
+    // calculate points -------------------------------------------------------
     double step = Utils::PI / segments;
 
+    // add top Z point
     points.emplace_back();
     points.back().emplace_back(center.x(), center.y(), radius);
 
+    // add points in a circular fashion
     for (double phi = step; phi < Utils::PI; phi += step)
     {
+      // start columns
       points.emplace_back();
 
       for (double theta = 0; theta < 2 * Utils::PI; theta += step)
       {
+        // fill rows
         points.back().emplace_back(
           center.x() + radius * std::cos(theta) * std::sin(phi),
           center.y() + radius * std::sin(theta) * std::sin(phi),
@@ -49,24 +57,24 @@ private:
         );
       }
 
+      // reduce memory usage
       points.back().shrink_to_fit();
     }
 
-    points.emplace_back();
+    // add bottom Z point
     points.back().emplace_back(center.x(), center.y(), -radius);
 
-    // assign faces
+    // assign faces -----------------------------------------------------------
+    // add top triangles
 
-    // assign edges
-
+    // assign edges -----------------------------------------------------------
     // calculate normals
   }
 
 public:
-  points_t points;
-  faces_t faces;
-  edges_t edges;
-  normals_t normals;
+  std::vector<std::vector<point_t>> points;
+  std::vector<Face> faces;
+  std::vector<Edge> edges;
   GLfloat lineWidth = 2.0;
   GLfloat pointSize = 8.0;
   Color pointColor = RED;
@@ -82,6 +90,11 @@ public:
 
   virtual ~Sphere()
   {}
+
+  inline size_t getSegments()
+  {
+    return this->segments;
+  }
 
   /// Increase Spheres's segments with postfix increment operator.
   inline void operator++(int)
