@@ -62,6 +62,7 @@ private:
     }
 
     // add bottom Z point
+    points.emplace_back();
     points.back().emplace_back(center.x(), center.y(), -radius);
 
     // assign faces -----------------------------------------------------------
