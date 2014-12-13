@@ -11,6 +11,10 @@ private:
   T xp, yp, zp;
 
 public:
+  inline Vector3D() : xp(0), yp(0), zp(0)
+  {
+  }
+
   inline Vector3D(T x, T y, T z) : xp(x), yp(y), zp(z)
   {
   }
