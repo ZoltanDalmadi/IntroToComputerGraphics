@@ -1,4 +1,6 @@
 #include <GL/freeglut.h>
+#include <sstream>
+#include <string>
 #include "Rectangle.h"
 #include "Matrix.h"
 #include "Point3D.h"
@@ -65,6 +67,12 @@ WTV wtv(window, viewport);
 Rotate3DX rx(0);
 Rotate3DY ry(0);
 
+// ----------------------------------------------------------------------------
+// Info text
+// ----------------------------------------------------------------------------
+std::string tText;
+std::stringstream ss;
+
 Sphere sphere;
 
 // ----------------------------------------------------------------------------
@@ -83,11 +91,28 @@ void init()
 }
 
 // ----------------------------------------------------------------------------
+// Info text function. Shows current value of projection angle and FPS
+// ----------------------------------------------------------------------------
+void drawInfoText(GLint x, GLint y, const Utils::Color& color)
+{
+  ss << "Projection distance: " << cp.getDistanceToOrigin() << std::endl;
+  ss << "Segments: " << sphere.getSegments() << std::endl;
+  tText = ss.str();
+  ss.str("");
+
+  color.setGLColor();
+  glRasterPos2i(x, y);
+  glutBitmapString(GLUT_BITMAP_HELVETICA_18, (unsigned char *)tText.c_str());
+}
+
+// ----------------------------------------------------------------------------
 // Main display function
 // ----------------------------------------------------------------------------
 void display()
 {
   glClear(GL_COLOR_BUFFER_BIT);
+
+  drawInfoText(10, HEIGHT - 24, Utils::BLACK);
 
   auto projTrans = wtv * cp;
   auto rxry = rx * ry;
