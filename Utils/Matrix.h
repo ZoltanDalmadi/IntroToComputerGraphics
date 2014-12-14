@@ -96,7 +96,7 @@ public:
     }
   }
 
-  Matrix<T>& operator*=(T factor) const
+  Matrix<T>& operator*=(T factor)
   {
     for (size_t row = 0; row < this->rows; ++row)
       for (size_t col = 0; col < this->cols; ++col)
