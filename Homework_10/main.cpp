@@ -33,8 +33,8 @@ double lastLightX = 0.0f;
 double lastLightY = 0.0f;
 GLint clickedX;
 GLint clickedY;
-GLint clickedLightX;
-GLint clickedLightY;
+GLint lightX;
+GLint lightY;
 
 // ----------------------------------------------------------------------------
 // Window and viewport
@@ -184,8 +184,8 @@ void processMouse(GLint button, GLint action, GLint xMouse, GLint yMouse)
     lightDrag = true;
 
     // cache clicked point position
-    clickedLightX = xMouse;
-    clickedLightY = HEIGHT - yMouse;
+    lightX = xMouse;
+    lightY = HEIGHT - yMouse;
   }
 
   if (button == GLUT_RIGHT_BUTTON && action == GLUT_UP)
@@ -218,7 +218,7 @@ void processMouseActiveMotion(GLint xMouse, GLint yMouse)
 
   if (lightDrag)
   {
-    Utils::Vector2D<GLint> v(clickedLightX, clickedLightY, xMouse, HEIGHT - yMouse);
+    Utils::Vector2D<GLint> v(lightX, lightY, xMouse, HEIGHT - yMouse);
     lightSource.setX(lastLightX + v.x() * 0.25);
     lightSource.setY(lastLightY + v.y() * 0.25);
   }
