@@ -32,23 +32,6 @@ private:
   size_t segments;
   T radius;
 
-  void transformPoints(const Matrix<T>& m)
-  {
-    this->transformedPoints.clear();
-
-    for (const auto& row : this->points)
-    {
-      this->transformedPoints.emplace_back();
-
-      for (const auto& point : row)
-      {
-        this->transformedPoints.back().emplace_back(
-          point.transformed(m).normalized()
-        );
-      }
-    }
-  }
-
   void recalcPoints()
   {
     auto segment2 = segments * 2;
@@ -85,6 +68,18 @@ private:
     points.back().emplace_back(center.x(), center.y(), -radius);
 
     // assign faces -----------------------------------------------------------
+    //Matrix<T> m(4, 4);
+    //m.setToIdentity();
+    //transformedPoints.clear();
+    //transformedPoints.resize(points.size());
+
+    //for (size_t i = 0; i < transformedPoints.size(); ++i)
+    //{
+    //  transformedPoints[i].resize(points[i].size());
+    //}
+
+    //transformPoints(m);
+
     this->faces.clear();
     point_t& topPoint = points.front().back();
     point_t& bottomPoint = points.back().back();
@@ -229,8 +224,8 @@ public:
   GLfloat lineWidth = 2.0;
   GLfloat pointSize = 8.0;
   Color pointColor = RED;
-  Color edgeColor = BLACK;
-  Color color = ORANGE;
+  Color edgeColor = LIGHT_GRAY;
+  Color color = YELLOW;
 
   // unit radius sphere at origin
   Sphere(size_t segments = 8)
@@ -275,6 +270,13 @@ public:
     this->recalcPoints();
   }
 
+  void transformPoints(const Matrix<T>& m)
+  {
+    for (size_t i = 0; i < points.size(); ++i)
+      for (size_t j = 0, j < points[i].size(); ++j)
+        transformedPoints[i][j] = points[i][j].transformed(m);
+  }
+
   void drawPoints(const Matrix<T>& proj) const
   {
     this->pointColor.setGLColor();
@@ -289,51 +291,94 @@ public:
     glEnd();
   }
 
-  void drawFaces(const Matrix<T>& proj, const point_t& projCenter)
+  void drawFaces(const Matrix<T>& proj, const Matrix<T>& rot,
+                 const point_t& projCenter, const point_t& lightSource)
   {
-    //this->transformPoints(proj);
+    //this->transformPoints(rot);
+
+    std::vector<Face> facesToDraw;
 
     for (auto& face : this->faces)
     {
-      //face.normal.transform(proj);
-      //vector3D_t u(face.vertices[0]->transformed(proj),
-      //             face.vertices[1]->transformed(proj));
-      //vector3D_t v(face.vertices[0]->transformed(proj),
-      //             face.vertices[2]->transformed(proj));
-      //face.normal = vector3D_t::crossProduct(u, v);
-      //face.normal.normalize();
+      auto normal = face.normal.transformed(rot);
+      auto centroid = face.centroid.transformed(rot);
+
+      //vector3D_t u(face.vertices[0]->transformed(rot),
+      //             face.vertices[1]->transformed(rot));
+
+      //vector3D_t v(face.vertices[0]->transformed(rot),
+      //             face.vertices[2]->transformed(rot));
+
+      //vector3D_t u(*face.vertices[0], *face.vertices[1]);
+
+      //vector3D_t v(*face.vertices[0], *face.vertices[2]);
+
+      //auto normal = vector3D_t::crossProduct(u, v);
+      //normal.normalize();
 
       // backface culling
-      //vector3D_t s(face.vertices[0]->transformed(proj), projCenter);
-      //s.normalize();
+      vector3D_t s(centroid, projCenter);
+      s.normalize();
 
-      //if (vector3D_t::dotProduct(s, face.normal) <= 0)
-      //  continue;
+      if (vector3D_t::dotProduct(s, normal) > 0)
+        facesToDraw.push_back(face);
+    }
 
-      //point_t endpoint(
-      //  face.centroid.x() + face.normal.x() * 0.25,
-      //  face.centroid.y() + face.normal.y() * 0.25,
-      //  face.centroid.z() + face.normal.z() * 0.25
-      //);
+    std::sort(facesToDraw.begin(), facesToDraw.end(),
+              [&rot](const Face & a, const Face & b)
+    {
+      return a.centroid.transformed(rot).z() < b.centroid.transformed(rot).z();
+    });
 
-      //this->edgeColor.setGLColor();
+    for (auto& face : facesToDraw)
+    {
+      auto normal = face.normal.transformed(rot);
+      auto centroid = face.centroid.transformed(rot);
+      vector3D_t f(centroid, lightSource);
+      f.normalize();
 
-      //glBegin(GL_LINES);
-      //glVertex2<T>(face.centroid.transformed(proj).normalized2D());
-      //glVertex2<T>(endpoint.transformed(proj).normalized2D());
-      //glEnd();
+      auto dp = static_cast<GLfloat>((vector3D_t::dotProduct(f, normal) + 1) / 2);
+
+      auto Tm = proj * rot;
+
+      glColor3f(dp, dp, dp);
 
       glBegin(GL_POLYGON);
 
       for (const auto& vertex : face.vertices)
-        glVertex2<T>(vertex->transformed(proj).normalized2D());
+        glVertex2<T>(vertex->transformed(Tm).normalized2D());
 
       glEnd();
 
-      //glBegin(GL_LINE_STRIP);
+      point_t endpoint(
+        centroid.x() + normal.x() * 0.25,
+        centroid.y() + normal.y() * 0.25,
+        centroid.z() + normal.z() * 0.25
+      );
+
+      pointColor.setGLColor();
+      glBegin(GL_LINES);
+      glVertex2<T>(centroid.transformed(proj).normalized2D());
+      glVertex2<T>(endpoint.transformed(proj).normalized2D());
+      glEnd();
+
+      //glColor3f(static_cast<GLfloat>(dp * 0.5),
+      //          static_cast<GLfloat>(dp * 0.5),
+      //          static_cast<GLfloat>(dp * 0.5));
+
+      //glBegin(GL_LINE_LOOP);
 
       //for (const auto& vertex : face.vertices)
-      //  glVertex2<T>(vertex->transformed(proj).normalized2D());
+      //  glVertex2<T>(vertex->transformed(Tm).normalized2D());
+
+      //glEnd();
+
+      //glPointSize(this->pointSize);
+      //this->pointColor.setGLColor();
+      //glBegin(GL_POINTS);
+
+      //for (const auto& vertex : face.vertices)
+      //  glVertex2<T>(vertex->transformed(Tm).normalized2D());
 
       //glEnd();
     }
