@@ -244,7 +244,7 @@ public:
     zp = m(2, 0) * oldX + m(2, 1) * oldY + m(2, 2) * oldZ;
   }
 
-  inline Vector3D<T> transformed(const Matrix<T>& m)
+  inline Vector3D<T> transformed(const Matrix<T>& m) const
   {
     T oldX = xp;
     T oldY = yp;
