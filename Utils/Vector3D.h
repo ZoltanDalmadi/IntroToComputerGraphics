@@ -29,6 +29,11 @@ public:
   {
   }
 
+  inline Vector3D(const Point3DH<T>& a, const Point3DH<T>& b)
+    : xp(b.x() - a.x()), yp(b.y() - a.y()), zp(b.z() - a.z())
+  {
+  }
+
   virtual ~Vector3D()
   {}
 
