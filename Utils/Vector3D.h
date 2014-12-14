@@ -244,6 +244,19 @@ public:
     zp = m(2, 0) * oldX + m(2, 1) * oldY + m(2, 2) * oldZ;
   }
 
+  inline Vector3D<T> transformed(const Matrix<T>& m)
+  {
+    T oldX = xp;
+    T oldY = yp;
+    T oldZ = zp;
+    return Vector3D<T>(
+             m(0, 0) * oldX + m(0, 1) * oldY + m(0, 2) * oldZ,
+             m(1, 0) * oldX + m(1, 1) * oldY + m(1, 2) * oldZ,
+             m(2, 0) * oldX + m(2, 1) * oldY + m(2, 2) * oldZ
+           );
+  }
+
+
 }; // end class Vector3D
 
 } // end namespace Utils
