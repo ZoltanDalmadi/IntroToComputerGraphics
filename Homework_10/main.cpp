@@ -10,19 +10,6 @@
 #include "Button.h"
 
 // ----------------------------------------------------------------------------
-// Typedefs
-// ----------------------------------------------------------------------------
-typedef Utils::Rectangle<GLdouble> Rect;
-typedef Utils::CentralProjection<GLdouble> CentralProjection;
-typedef Utils::WindowToViewport<GLdouble> WTV;
-typedef Utils::Rotate3DX<GLdouble> Rotate3DX;
-typedef Utils::Rotate3DY<GLdouble> Rotate3DY;
-typedef Utils::Point2D<GLdouble> Point2D;
-typedef Utils::Point3D<GLdouble> Point3D;
-typedef Utils::Point3DH<GLdouble> Point3DH;
-typedef Utils::Sphere<GLdouble> Sphere;
-
-// ----------------------------------------------------------------------------
 // Window size
 // ----------------------------------------------------------------------------
 const GLsizei WIDTH = 1280;
@@ -32,48 +19,40 @@ const GLsizei HEIGHT = 720;
 // Colors
 // ----------------------------------------------------------------------------
 const Utils::Color bgColor(Utils::WHITE);
-const Utils::Color graphColor(Utils::ORANGE);
-const Utils::Color graphGridColor(Utils::BLACK);
-
-// ----------------------------------------------------------------------------
-// Refresh rate
-// ----------------------------------------------------------------------------
-const size_t refreshRate = 10;
-
-// ----------------------------------------------------------------------------
-// Sizes
-// ----------------------------------------------------------------------------
-const GLfloat lineWidth = 2.0f;
+const Utils::Color normalColor(Utils::DARK_MAGENTA);
+const Utils::Color pointColor(Utils::DARK_RED);
 
 // ----------------------------------------------------------------------------
 // Miscellaneous variables
 // ----------------------------------------------------------------------------
 bool drag = false;
-bool drag2 = false;
+bool lightDrag = false;
 double lastRotX = 0.0f;
 double lastRotY = 0.0f;
 double lastLightX = 0.0f;
 double lastLightY = 0.0f;
 GLint clickedX;
 GLint clickedY;
-GLint clicked2X;
-GLint clicked2Y;
+GLint clickedLightX;
+GLint clickedLightY;
 
 // ----------------------------------------------------------------------------
 // Window and viewport
 // ----------------------------------------------------------------------------
-Rect window(-1.5, -1.5, 1.5, 1.5);
-Rect viewport(280, 0, 280 + HEIGHT, HEIGHT);
+Utils::Rectangle<GLdouble> window(-1.5, -1.5, 1.5, 1.5);
+Utils::Rectangle<GLdouble> viewport(280, 0, 280 + HEIGHT, HEIGHT);
 
 // ----------------------------------------------------------------------------
 // Matrices
 // ----------------------------------------------------------------------------
-CentralProjection cp(8.0f);
-WTV wtv(window, viewport);
-Rotate3DX rx(0);
-Rotate3DY ry(0);
-Point3DH centerofProjection(0, 0, 8.0f, 1);
-Point3DH lightSource(2, 2, 8, 1);
+Utils::CentralProjection<GLdouble> cp(8.0f);
+Utils::WindowToViewport<GLdouble> wtv(window, viewport);
+auto projTrans = wtv * cp;
+Utils::Rotate3DX<GLdouble> rx(0);
+Utils::Rotate3DY<GLdouble> ry(0);
+auto rxry = rx * ry;
+Utils::Point3DH<GLdouble> centerofProjection(0, 0, 8.0f, 1);
+Utils::Point3DH<GLdouble> lightSource(2, 2, 8, 1);
 
 // ----------------------------------------------------------------------------
 // Info text
@@ -81,11 +60,17 @@ Point3DH lightSource(2, 2, 8, 1);
 std::string tText;
 std::stringstream ss;
 
-Sphere sphere;
-
+// ----------------------------------------------------------------------------
+// Buttons
+// ----------------------------------------------------------------------------
 Utils::Button edgesButton("Toggle edges", 16, 16, 138, 32);
 Utils::Button normalsButton("Toggle normals", 16, 64, 148, 32);
 Utils::Button pointsButton("Toggle points", 16, 112, 140, 32);
+
+// ----------------------------------------------------------------------------
+// The sphere
+// ----------------------------------------------------------------------------
+Utils::Sphere<GLdouble> sphere;
 
 // ----------------------------------------------------------------------------
 // Init function
@@ -100,10 +85,12 @@ void init()
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   sphere.pointSize = 6.0f;
+  sphere.normalColor = normalColor;
+  sphere.pointColor = pointColor;
 }
 
 // ----------------------------------------------------------------------------
-// Info text function. Shows current value of projection angle and FPS
+// Shows current value of projection distance and number of segments
 // ----------------------------------------------------------------------------
 void drawInfoText(GLint x, GLint y, const Utils::Color& color)
 {
@@ -126,12 +113,7 @@ void display()
 
   drawInfoText(10, HEIGHT - 24, Utils::BLACK);
 
-  auto projTrans = wtv * cp;
-  auto rxry = rx * ry;
-
   sphere.drawFaces(projTrans, rxry, centerofProjection, lightSource);
-  //sphere.drawEdges(T);
-  //sphere.drawPoints(T);
 
   edgesButton.draw();
   normalsButton.draw();
@@ -156,21 +138,23 @@ void processMouse(GLint button, GLint action, GLint xMouse, GLint yMouse)
     if (edgesButton.hover(xMouse, HEIGHT - yMouse))
     {
       edgesButton.setColor(Utils::RED);
-      sphere.drawEdges == true ? sphere.drawEdges = false : sphere.drawEdges = true;
+      sphere.drawEdges == true ?
+      sphere.drawEdges = false : sphere.drawEdges = true;
     }
 
     if (normalsButton.hover(xMouse, HEIGHT - yMouse))
     {
       normalsButton.setColor(Utils::RED);
-      sphere.drawNormals == true ? sphere.drawNormals = false : sphere.drawNormals = true;
+      sphere.drawNormals == true ?
+      sphere.drawNormals = false : sphere.drawNormals = true;
     }
 
     if (pointsButton.hover(xMouse, HEIGHT - yMouse))
     {
       pointsButton.setColor(Utils::RED);
-      sphere.drawPoints == true ? sphere.drawPoints = false : sphere.drawPoints = true;
+      sphere.drawPoints == true ?
+      sphere.drawPoints = false : sphere.drawPoints = true;
     }
-
 
     glutPostRedisplay();
   }
@@ -197,16 +181,16 @@ void processMouse(GLint button, GLint action, GLint xMouse, GLint yMouse)
 
   if (button == GLUT_RIGHT_BUTTON && action == GLUT_DOWN)
   {
-    drag2 = true;
+    lightDrag = true;
 
     // cache clicked point position
-    clicked2X = xMouse;
-    clicked2Y = HEIGHT - yMouse;
+    clickedLightX = xMouse;
+    clickedLightY = HEIGHT - yMouse;
   }
 
   if (button == GLUT_RIGHT_BUTTON && action == GLUT_UP)
   {
-    drag2 = false;
+    lightDrag = false;
 
     // cache current rotation values
     lastLightX = lightSource.x();
@@ -229,11 +213,12 @@ void processMouseActiveMotion(GLint xMouse, GLint yMouse)
     // set rotation values
     rx.setAngle(lastRotX - Utils::degToRad(v.y()) * 0.25);
     ry.setAngle(lastRotY + Utils::degToRad(v.x()) * 0.25);
+    rxry = rx * ry;
   }
 
-  if (drag2)
+  if (lightDrag)
   {
-    Utils::Vector2D<GLint> v(clicked2X, clicked2Y, xMouse, HEIGHT - yMouse);
+    Utils::Vector2D<GLint> v(clickedLightX, clickedLightY, xMouse, HEIGHT - yMouse);
     lightSource.setX(lastLightX + v.x() * 0.25);
     lightSource.setY(lastLightY + v.y() * 0.25);
   }
@@ -261,9 +246,9 @@ void keyPressed(int key, int x, int y)
 }
 
 // ----------------------------------------------------------------------------
-// Mouse wheel handler
+// Segmentation control
 // ----------------------------------------------------------------------------
-void keyPressed(unsigned char key, int x, int y)
+void segmentationControl(unsigned char key, int x, int y)
 {
   if (key == 'w')
     sphere++;
@@ -288,7 +273,7 @@ int main(int argc, char **argv)
   glutMouseFunc(processMouse);
   glutMotionFunc(processMouseActiveMotion);
   glutSpecialFunc(keyPressed);
-  glutKeyboardFunc(keyPressed);
+  glutKeyboardFunc(segmentationControl);
   glutMainLoop();
   return 0;
 }
