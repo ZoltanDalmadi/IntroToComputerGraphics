@@ -122,6 +122,12 @@ public:
     return *this;
   }
 
+  /// Convert to 2D coordinates.
+  inline Point2D<T> normalized() const
+  {
+    return Point2D<T>(xp / zp, yp / zp);
+  }
+
 }; // end class Point3D
 
 template <typename T>
@@ -160,6 +166,30 @@ public:
   inline T w() const
   {
     return wp;
+  }
+
+  /// Sets X coordinate.
+  inline void setX(T x)
+  {
+    this->xp = x;
+  }
+
+  /// Sets Y coordinate.
+  inline void setY(T y)
+  {
+    this->yp = y;
+  }
+
+  /// Sets Z coordinate.
+  inline void setZ(T z)
+  {
+    this->zp = z;
+  }
+
+  /// Sets W coordinate.
+  inline void setW(T w)
+  {
+    this->wp = w;
   }
 
   /// Convert to normal coordinates.
