@@ -27,6 +27,32 @@ private:
   size_t segments;
   T radius;
 
+  void prepareFace(Face& face)
+  {
+    // calculate normal
+    vector3D_t u(*face.vertices[0], *face.vertices[1]);
+    vector3D_t v(*face.vertices[0], *face.vertices[2]);
+    face.normal = vector3D_t::crossProduct(u, v);
+    face.normal.normalize();
+
+    // calculate centroid
+    T x = 0, y = 0, z = 0;
+    auto numOfVertices = face.vertices.size();
+
+    for (const auto& vertex : face.vertices)
+    {
+      x += vertex->x();
+      y += vertex->y();
+      z += vertex->z();
+    }
+
+    x /= numOfVertices;
+    y /= numOfVertices;
+    z /= numOfVertices;
+
+    face.centroid = std::move(point_t(x, y, z, 1));
+  }
+
   void recalcPoints()
   {
     auto segment2 = segments * 2;
@@ -80,28 +106,7 @@ private:
       else
         face.vertices.emplace_back(&points[1][0]);
 
-      // calculate normal
-      vector3D_t u(*face.vertices[0], *face.vertices[1]);
-      vector3D_t v(*face.vertices[0], *face.vertices[2]);
-      face.normal = vector3D_t::crossProduct(u, v);
-      face.normal.normalize();
-
-      // calculate centroid
-      T x = 0, y = 0, z = 0;
-      auto numOfVertices = face.vertices.size();
-
-      for (const auto& vertex : face.vertices)
-      {
-        x += vertex->x();
-        y += vertex->y();
-        z += vertex->z();
-      }
-
-      x /= numOfVertices;
-      y /= numOfVertices;
-      z /= numOfVertices;
-
-      face.centroid = std::move(point_t(x, y, z, 1));
+      prepareFace(face);
 
       // insert face into face container
       faces.emplace_back(face);
@@ -128,28 +133,7 @@ private:
           face.vertices.emplace_back(&points[i - 1][0]);
         }
 
-        // calculate normal
-        vector3D_t u(*face.vertices[0], *face.vertices[1]);
-        vector3D_t v(*face.vertices[0], *face.vertices[2]);
-        face.normal = vector3D_t::crossProduct(u, v);
-        face.normal.normalize();
-
-        // calculate centroid
-        T x = 0, y = 0, z = 0;
-        auto numOfVertices = face.vertices.size();
-
-        for (const auto& vertex : face.vertices)
-        {
-          x += vertex->x();
-          y += vertex->y();
-          z += vertex->z();
-        }
-
-        x /= numOfVertices;
-        y /= numOfVertices;
-        z /= numOfVertices;
-
-        face.centroid = std::move(point_t(x, y, z, 1));
+        prepareFace(face);
 
         // insert face into face container
         faces.emplace_back(face);
@@ -169,28 +153,7 @@ private:
       else
         face.vertices.emplace_back(&points[segments - 1][0]);
 
-      // calculate normal
-      vector3D_t u(*face.vertices[0], *face.vertices[1]);
-      vector3D_t v(*face.vertices[0], *face.vertices[2]);
-      face.normal = vector3D_t::crossProduct(u, v);
-      face.normal.normalize();
-
-      // calculate centroid
-      T x = 0, y = 0, z = 0;
-      auto numOfVertices = face.vertices.size();
-
-      for (const auto& vertex : face.vertices)
-      {
-        x += vertex->x();
-        y += vertex->y();
-        z += vertex->z();
-      }
-
-      x /= numOfVertices;
-      y /= numOfVertices;
-      z /= numOfVertices;
-
-      face.centroid = std::move(point_t(x, y, z, 1));
+      prepareFace(face);
 
       // insert face into face container
       faces.emplace_back(face);
@@ -204,12 +167,16 @@ public:
   std::vector<Face> faces;
   GLfloat lineWidth = 2.0;
   GLfloat pointSize = 8.0;
-  Color pointColor = RED;
+  Color pointColor = DARK_RED;
   Color edgeColor = LIGHT_GRAY;
+  Color normalColor = DARK_YELLOW;
   Color color = YELLOW;
+  bool drawEdges = false;
+  bool drawNormals = false;
+  bool drawPoints = false;
 
   // unit radius sphere at origin
-  Sphere(size_t segments = 8)
+  Sphere(size_t segments = 16)
     : center(0, 0, 0), segments(segments), radius(1.0f)
   {
     this->recalcPoints();
@@ -251,32 +218,9 @@ public:
     this->recalcPoints();
   }
 
-  void transformPoints(const Matrix<T>& m)
-  {
-    for (size_t i = 0; i < points.size(); ++i)
-      for (size_t j = 0, j < points[i].size(); ++j)
-        transformedPoints[i][j] = points[i][j].transformed(m);
-  }
-
-  void drawPoints(const Matrix<T>& proj) const
-  {
-    this->pointColor.setGLColor();
-    glPointSize(this->pointSize);
-
-    glBegin(GL_POINTS);
-
-    for (const auto& line : this->points)
-      for (const auto& point : line)
-        glVertex2<T>(point.transformed(proj).normalized2D());
-
-    glEnd();
-  }
-
   void drawFaces(const Matrix<T>& proj, const Matrix<T>& rot,
                  const point_t& projCenter, const point_t& lightSource)
   {
-    //this->transformPoints(rot);
-
     std::vector<Face *> facesToDraw;
 
     for (auto& face : this->faces)
@@ -284,25 +228,12 @@ public:
       auto normal = face.normal.transformed(rot);
       auto centroid = face.centroid.transformed(rot);
 
-      //vector3D_t u(face.vertices[0]->transformed(rot),
-      //             face.vertices[1]->transformed(rot));
-
-      //vector3D_t v(face.vertices[0]->transformed(rot),
-      //             face.vertices[2]->transformed(rot));
-
-      //vector3D_t u(*face.vertices[0], *face.vertices[1]);
-
-      //vector3D_t v(*face.vertices[0], *face.vertices[2]);
-
-      //auto normal = vector3D_t::crossProduct(u, v);
-      //normal.normalize();
-
       // backface culling
       vector3D_t s(centroid, projCenter);
       s.normalize();
 
+      // add to visible faces
       if (vector3D_t::dotProduct(s, normal) > 0)
-        // add to visible faces
         facesToDraw.emplace_back(&face);
     }
 
@@ -329,81 +260,62 @@ public:
 
       auto Tm = proj * rot;
 
+      std::vector<point2D_t> transformedPoints;
+
+      for (const auto& vertex : face->vertices)
+        transformedPoints.emplace_back(vertex->transformed(Tm).normalized2D());
+
       glColor3f(dp, dp, dp);
 
       glBegin(GL_POLYGON);
 
-      for (const auto& vertex : face->vertices)
-        glVertex2<T>(vertex->transformed(Tm).normalized2D());
+      for (const auto& vertex : transformedPoints)
+        glVertex2<T>(vertex);
 
       glEnd();
 
-      //point_t endpoint(
-      //  centroid.x() + normal.x() * 0.1,
-      //  centroid.y() + normal.y() * 0.1,
-      //  centroid.z() + normal.z() * 0.1
-      //);
+      if (drawEdges)
+      {
+        glColor3f(static_cast<GLfloat>(dp * 0.5),
+                  static_cast<GLfloat>(dp * 0.5),
+                  static_cast<GLfloat>(dp * 0.5));
 
-      //pointColor.setGLColor();
-      //glBegin(GL_LINES);
-      //glVertex2<T>(centroid.transformed(proj).normalized2D());
-      //glVertex2<T>(endpoint.transformed(proj).normalized2D());
-      //glEnd();
+        glBegin(GL_LINE_LOOP);
 
-      //glColor3f(static_cast<GLfloat>(dp * 0.5),
-      //          static_cast<GLfloat>(dp * 0.5),
-      //          static_cast<GLfloat>(dp * 0.5));
+        for (const auto& vertex : transformedPoints)
+          glVertex2<T>(vertex);
 
-      //glBegin(GL_LINE_LOOP);
+        glEnd();
+      }
 
-      //for (const auto& vertex : face.vertices)
-      //  glVertex2<T>(vertex->transformed(Tm).normalized2D());
+      if (drawNormals)
+      {
+        point_t endpoint(
+          centroid.x() + normal.x() * 0.1,
+          centroid.y() + normal.y() * 0.1,
+          centroid.z() + normal.z() * 0.1
+        );
 
-      //glEnd();
+        this->normalColor.setGLColor();
+        glBegin(GL_LINES);
+        glVertex2<T>(centroid.transformed(proj).normalized2D());
+        glVertex2<T>(endpoint.transformed(proj).normalized2D());
+        glEnd();
+      }
 
-      //glPointSize(this->pointSize);
-      //this->pointColor.setGLColor();
-      //glBegin(GL_POINTS);
+      if (drawPoints)
+      {
+        glPointSize(this->pointSize);
+        this->pointColor.setGLColor();
+        glBegin(GL_POINTS);
 
-      //for (const auto& vertex : face.vertices)
-      //  glVertex2<T>(vertex->transformed(Tm).normalized2D());
+        for (const auto& vertex : transformedPoints)
+          glVertex2<T>(vertex);
 
-      //glEnd();
+        glEnd();
+      }
     }
 
-  }
-
-  void drawEdges(const Matrix<T>& proj)
-  {
-    this->edgeColor.setGLColor();
-    glLineWidth(this->lineWidth);
-
-    this->transformPoints(proj);
-
-    // horizontal lines
-    for (size_t row = 1; row < segments; row++)
-    {
-      glBegin(GL_LINE_LOOP);
-
-      for (size_t col = 0; col < segments * 2; col++)
-        glVertex2<T>(transformedPoints[row][col]);
-
-      glEnd();
-    }
-
-    // vertical lines
-    for (size_t col = 0; col < segments * 2; col++)
-    {
-      glBegin(GL_LINE_STRIP);
-      glVertex2<T>(transformedPoints.front().back());
-
-      for (size_t row = 1; row < segments; row++)
-        glVertex2<T>(transformedPoints[row][col]);
-
-      glVertex2<T>(transformedPoints.back().back());
-
-      glEnd();
-    }
   }
 
 }; // end class Sphere
