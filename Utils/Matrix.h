@@ -78,7 +78,7 @@ public:
     }
   }
 
-  void print(std::ostream& os)
+  void print(std::ostream& os) const
   {
     for (size_t row = 0; row < this->rows; ++row)
     {
@@ -96,7 +96,7 @@ public:
     }
   }
 
-  Matrix<T>& operator*=(T factor)
+  Matrix<T>& operator*=(T factor) const
   {
     for (size_t row = 0; row < this->rows; ++row)
       for (size_t col = 0; col < this->cols; ++col)
@@ -105,7 +105,7 @@ public:
     return *this;
   }
 
-  Matrix<T> operator*(const Matrix<T>& rhs)
+  Matrix<T> operator*(const Matrix<T>& rhs) const
   {
     Matrix<T> result(this->rows, rhs.cols);
 
