@@ -7,6 +7,7 @@
 #include "Color.h"
 #include "Vector2D.h"
 #include "Sphere.h"
+#include "Button.h"
 
 // ----------------------------------------------------------------------------
 // Typedefs
@@ -82,6 +83,10 @@ std::stringstream ss;
 
 Sphere sphere;
 
+Utils::Button edgesButton("Toggle edges", 16, 16, 138, 32);
+Utils::Button normalsButton("Toggle normals", 16, 64, 148, 32);
+Utils::Button pointsButton("Toggle points", 16, 112, 140, 32);
+
 // ----------------------------------------------------------------------------
 // Init function
 // ----------------------------------------------------------------------------
@@ -128,6 +133,10 @@ void display()
   //sphere.drawEdges(T);
   //sphere.drawPoints(T);
 
+  edgesButton.draw();
+  normalsButton.draw();
+  pointsButton.draw();
+
   glutSwapBuffers();
 }
 
@@ -143,6 +152,27 @@ void processMouse(GLint button, GLint action, GLint xMouse, GLint yMouse)
     // cache clicked point position
     clickedX = xMouse;
     clickedY = HEIGHT - yMouse;
+
+    if (edgesButton.hover(xMouse, HEIGHT - yMouse))
+    {
+      edgesButton.setColor(Utils::RED);
+      sphere.drawEdges == true ? sphere.drawEdges = false : sphere.drawEdges = true;
+    }
+
+    if (normalsButton.hover(xMouse, HEIGHT - yMouse))
+    {
+      normalsButton.setColor(Utils::RED);
+      sphere.drawNormals == true ? sphere.drawNormals = false : sphere.drawNormals = true;
+    }
+
+    if (pointsButton.hover(xMouse, HEIGHT - yMouse))
+    {
+      pointsButton.setColor(Utils::RED);
+      sphere.drawPoints == true ? sphere.drawPoints = false : sphere.drawPoints = true;
+    }
+
+
+    glutPostRedisplay();
   }
 
   if (button == GLUT_LEFT_BUTTON && action == GLUT_UP)
@@ -152,6 +182,15 @@ void processMouse(GLint button, GLint action, GLint xMouse, GLint yMouse)
     // cache current rotation values
     lastRotX = rx.getAngle();
     lastRotY = ry.getAngle();
+
+    if (edgesButton.hover(xMouse, HEIGHT - yMouse))
+      edgesButton.setColor(Utils::BLACK);
+
+    if (normalsButton.hover(xMouse, HEIGHT - yMouse))
+      normalsButton.setColor(Utils::BLACK);
+
+    if (pointsButton.hover(xMouse, HEIGHT - yMouse))
+      pointsButton.setColor(Utils::BLACK);
 
     glutPostRedisplay();
   }
@@ -224,11 +263,11 @@ void keyPressed(int key, int x, int y)
 // ----------------------------------------------------------------------------
 // Mouse wheel handler
 // ----------------------------------------------------------------------------
-void wheelFunc(int wheel, int direction, int x, int y)
+void keyPressed(unsigned char key, int x, int y)
 {
-  if (direction > 0)
+  if (key == 'w')
     sphere++;
-  else if (sphere.getSegments() > 2)
+  else if (key == 's' && sphere.getSegments() > 2)
     sphere--;
 
   glutPostRedisplay();
@@ -249,7 +288,7 @@ int main(int argc, char **argv)
   glutMouseFunc(processMouse);
   glutMotionFunc(processMouseActiveMotion);
   glutSpecialFunc(keyPressed);
-  glutMouseWheelFunc(wheelFunc);
+  glutKeyboardFunc(keyPressed);
   glutMainLoop();
   return 0;
 }
