@@ -16,7 +16,7 @@ class Rectangle
 {
 public:
   std::vector <Point2D<T>> pointsContainer;
-  GLfloat lineWidth = 1.0;
+  GLfloat lineWidth = 2.0;
   GLfloat pointSize = 6.0;
   Color pointColor = RED;
   Color color = BLACK;
@@ -80,14 +80,24 @@ public:
     return this->pointsContainer[3].y();
   }
 
+  inline bool isInside(const T& x, const T& y) const
+  {
+    return x > left() && x < right() && y > bottom() && y < top();
+  }
+
   void draw() const
   {
     this->color.setGLColor();
 
     if (filled)
+    {
       glBegin(GL_POLYGON);
+    }
     else
+    {
+      glLineWidth(this->lineWidth);
       glBegin(GL_LINE_LOOP);
+    }
 
     for (const auto& point : this->pointsContainer)
       glVertex2<T>(point);
