@@ -63,6 +63,7 @@ Rect viewport(280, 0, 280 + HEIGHT, HEIGHT);
 // Matrices
 // ----------------------------------------------------------------------------
 CentralProjection cp(8.0f);
+Point3DH centerofProjection(0, 0, 8.0f, 1);
 WTV wtv(window, viewport);
 Rotate3DX rx(0);
 Rotate3DY ry(0);
@@ -118,7 +119,8 @@ void display()
   auto rxry = rx * ry;
   auto T = projTrans * rxry;
 
-  sphere.drawEdges(T);
+  sphere.drawFaces(T, centerofProjection);
+  //sphere.drawEdges(T);
   //sphere.drawPoints(T);
 
   glutSwapBuffers();
@@ -174,12 +176,14 @@ void keyPressed(int key, int x, int y)
   {
     auto old = cp.getDistanceToOrigin();
     cp.setDistanceToOrigin(old - 0.1f);
+    centerofProjection.setZ(old - 0.1f);
   }
 
   if (key == GLUT_KEY_DOWN)
   {
     auto old = cp.getDistanceToOrigin();
     cp.setDistanceToOrigin(old + 0.1f);
+    centerofProjection.setZ(old + 0.1f);
   }
 
   glutPostRedisplay();
@@ -190,7 +194,11 @@ void keyPressed(int key, int x, int y)
 // ----------------------------------------------------------------------------
 void wheelFunc(int wheel, int direction, int x, int y)
 {
-  direction > 0 ? sphere++ : sphere--;
+  if (direction > 0)
+    sphere++;
+  else if (sphere.getSegments() > 2)
+    sphere--;
+
   glutPostRedisplay();
 }
 
