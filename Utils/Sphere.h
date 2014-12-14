@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include <array>
+#include <algorithm>
 #include "Point3D.h"
 #include "Vector3D.h"
 
@@ -21,11 +21,6 @@ private:
     std::vector<point_t *> vertices;
     vector3D_t normal;
     point_t centroid;
-  };
-
-  struct Edge
-  {
-    std::array<point_t *, 2> vertices;
   };
 
   point_t center;
@@ -68,18 +63,6 @@ private:
     points.back().emplace_back(center.x(), center.y(), -radius);
 
     // assign faces -----------------------------------------------------------
-    //Matrix<T> m(4, 4);
-    //m.setToIdentity();
-    //transformedPoints.clear();
-    //transformedPoints.resize(points.size());
-
-    //for (size_t i = 0; i < transformedPoints.size(); ++i)
-    //{
-    //  transformedPoints[i].resize(points[i].size());
-    //}
-
-    //transformPoints(m);
-
     this->faces.clear();
     point_t& topPoint = points.front().back();
     point_t& bottomPoint = points.back().back();
@@ -218,9 +201,7 @@ private:
 
 public:
   std::vector<std::vector<point_t>> points;
-  std::vector<std::vector<point3D_t>> transformedPoints;
   std::vector<Face> faces;
-  std::vector<Edge> edges;
   GLfloat lineWidth = 2.0;
   GLfloat pointSize = 8.0;
   Color pointColor = RED;
@@ -296,7 +277,7 @@ public:
   {
     //this->transformPoints(rot);
 
-    std::vector<Face> facesToDraw;
+    std::vector<Face *> facesToDraw;
 
     for (auto& face : this->faces)
     {
@@ -321,23 +302,30 @@ public:
       s.normalize();
 
       if (vector3D_t::dotProduct(s, normal) > 0)
-        facesToDraw.push_back(face);
+        // add to visible faces
+        facesToDraw.emplace_back(&face);
     }
 
+    // order visible faces by their centroid's Z coordinate
     std::sort(facesToDraw.begin(), facesToDraw.end(),
-              [&rot](const Face & a, const Face & b)
+              [&rot](const Face * a, const Face * b)
     {
-      return a.centroid.transformed(rot).z() < b.centroid.transformed(rot).z();
+      return a->centroid.transformed(rot).z() < b->centroid.transformed(rot).z();
     });
 
-    for (auto& face : facesToDraw)
+    // draw visible faces
+    for (const auto& face : facesToDraw)
     {
-      auto normal = face.normal.transformed(rot);
-      auto centroid = face.centroid.transformed(rot);
+      auto normal = face->normal.transformed(rot);
+      auto centroid = face->centroid.transformed(rot);
+
       vector3D_t f(centroid, lightSource);
       f.normalize();
 
-      auto dp = static_cast<GLfloat>((vector3D_t::dotProduct(f, normal) + 1) / 2);
+      auto dp =
+        static_cast<GLfloat>(
+          (vector3D_t::dotProduct(f, normal) + 1) / 2
+        );
 
       auto Tm = proj * rot;
 
@@ -345,22 +333,22 @@ public:
 
       glBegin(GL_POLYGON);
 
-      for (const auto& vertex : face.vertices)
+      for (const auto& vertex : face->vertices)
         glVertex2<T>(vertex->transformed(Tm).normalized2D());
 
       glEnd();
 
-      point_t endpoint(
-        centroid.x() + normal.x() * 0.25,
-        centroid.y() + normal.y() * 0.25,
-        centroid.z() + normal.z() * 0.25
-      );
+      //point_t endpoint(
+      //  centroid.x() + normal.x() * 0.1,
+      //  centroid.y() + normal.y() * 0.1,
+      //  centroid.z() + normal.z() * 0.1
+      //);
 
-      pointColor.setGLColor();
-      glBegin(GL_LINES);
-      glVertex2<T>(centroid.transformed(proj).normalized2D());
-      glVertex2<T>(endpoint.transformed(proj).normalized2D());
-      glEnd();
+      //pointColor.setGLColor();
+      //glBegin(GL_LINES);
+      //glVertex2<T>(centroid.transformed(proj).normalized2D());
+      //glVertex2<T>(endpoint.transformed(proj).normalized2D());
+      //glEnd();
 
       //glColor3f(static_cast<GLfloat>(dp * 0.5),
       //          static_cast<GLfloat>(dp * 0.5),
