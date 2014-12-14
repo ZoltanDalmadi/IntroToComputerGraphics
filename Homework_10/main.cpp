@@ -48,10 +48,15 @@ const GLfloat lineWidth = 2.0f;
 // Miscellaneous variables
 // ----------------------------------------------------------------------------
 bool drag = false;
+bool drag2 = false;
 double lastRotX = 0.0f;
 double lastRotY = 0.0f;
+double lastLightX = 0.0f;
+double lastLightY = 0.0f;
 GLint clickedX;
 GLint clickedY;
+GLint clicked2X;
+GLint clicked2Y;
 
 // ----------------------------------------------------------------------------
 // Window and viewport
@@ -63,10 +68,11 @@ Rect viewport(280, 0, 280 + HEIGHT, HEIGHT);
 // Matrices
 // ----------------------------------------------------------------------------
 CentralProjection cp(8.0f);
-Point3DH centerofProjection(0, 0, 8.0f, 1);
 WTV wtv(window, viewport);
 Rotate3DX rx(0);
 Rotate3DY ry(0);
+Point3DH centerofProjection(0, 0, 8.0f, 1);
+Point3DH lightSource(2, 2, 8, 1);
 
 // ----------------------------------------------------------------------------
 // Info text
@@ -117,9 +123,8 @@ void display()
 
   auto projTrans = wtv * cp;
   auto rxry = rx * ry;
-  auto T = projTrans * rxry;
 
-  sphere.drawFaces(T, centerofProjection);
+  sphere.drawFaces(projTrans, rxry, centerofProjection, lightSource);
   //sphere.drawEdges(T);
   //sphere.drawPoints(T);
 
@@ -150,6 +155,26 @@ void processMouse(GLint button, GLint action, GLint xMouse, GLint yMouse)
 
     glutPostRedisplay();
   }
+
+  if (button == GLUT_RIGHT_BUTTON && action == GLUT_DOWN)
+  {
+    drag2 = true;
+
+    // cache clicked point position
+    clicked2X = xMouse;
+    clicked2Y = HEIGHT - yMouse;
+  }
+
+  if (button == GLUT_RIGHT_BUTTON && action == GLUT_UP)
+  {
+    drag2 = false;
+
+    // cache current rotation values
+    lastLightX = lightSource.x();
+    lastLightY = lightSource.y();
+
+    glutPostRedisplay();
+  }
 }
 
 // ----------------------------------------------------------------------------
@@ -165,6 +190,13 @@ void processMouseActiveMotion(GLint xMouse, GLint yMouse)
     // set rotation values
     rx.setAngle(lastRotX - Utils::degToRad(v.y()) * 0.25);
     ry.setAngle(lastRotY + Utils::degToRad(v.x()) * 0.25);
+  }
+
+  if (drag2)
+  {
+    Utils::Vector2D<GLint> v(clicked2X, clicked2Y, xMouse, HEIGHT - yMouse);
+    lightSource.setX(lastLightX + v.x() * 0.25);
+    lightSource.setY(lastLightY + v.y() * 0.25);
   }
 
   glutPostRedisplay();
