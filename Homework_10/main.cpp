@@ -19,8 +19,9 @@ const GLsizei HEIGHT = 720;
 // Colors
 // ----------------------------------------------------------------------------
 const Utils::Color bgColor(Utils::WHITE);
-const Utils::Color normalColor(Utils::DARK_MAGENTA);
+const Utils::Color normalColor(Utils::MAGENTA);
 const Utils::Color pointColor(Utils::DARK_RED);
+const Utils::Color edgeColor(Utils::BLACK);
 
 // ----------------------------------------------------------------------------
 // Miscellaneous variables
@@ -90,6 +91,7 @@ void init()
   sphere.pointSize = 6.0f;
   sphere.normalColor = normalColor;
   sphere.pointColor = pointColor;
+  sphere.edgeColor = edgeColor;
 
   normalsButton.setPaddingX(46);
   pointsButton.setPaddingX(52);
@@ -263,6 +265,7 @@ void keyPressed(int key, int x, int y)
     auto old = cp.getDistanceToOrigin();
     cp.setDistanceToOrigin(old - 0.1f);
     centerofProjection.setZ(old - 0.1f);
+    projTrans = wtv * cp;
   }
 
   if (key == GLUT_KEY_DOWN)
@@ -270,6 +273,7 @@ void keyPressed(int key, int x, int y)
     auto old = cp.getDistanceToOrigin();
     cp.setDistanceToOrigin(old + 0.1f);
     centerofProjection.setZ(old + 0.1f);
+    projTrans = wtv * cp;
   }
 
   glutPostRedisplay();
