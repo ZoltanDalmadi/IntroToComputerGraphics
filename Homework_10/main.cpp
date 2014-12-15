@@ -106,6 +106,12 @@ void drawInfoText(GLint x, GLint y, const Utils::Color& color)
 {
   ss << "Projection distance: " << cp.getDistanceToOrigin() << std::endl;
   ss << "Segments: " << sphere.getSegments() << std::endl;
+
+  if (sphere.backfaceCull)
+    ss << "Backface culling: " << "on" << std::endl;
+  else
+    ss << "Backface culling: " << "off" << std::endl;
+
   tText = ss.str();
   ss.str("");
 
