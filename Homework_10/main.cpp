@@ -63,9 +63,11 @@ std::stringstream ss;
 // ----------------------------------------------------------------------------
 // Buttons
 // ----------------------------------------------------------------------------
-Utils::Button edgesButton("Toggle edges", 16, 16, 138, 32);
-Utils::Button normalsButton("Toggle normals", 16, 64, 148, 32);
-Utils::Button pointsButton("Toggle points", 16, 112, 140, 32);
+Utils::Button normalsButton("Normals", 16, 208, 156, 32);
+Utils::Button pointsButton("Points", 16, 160, 156, 32);
+Utils::Button shadingButton("Shading", 16, 112, 156, 32);
+Utils::Button edgesButton("Wireframe", 16, 64, 156, 32);
+Utils::Button cullButton("Backface culling", 16, 16, 156, 32);
 
 // ----------------------------------------------------------------------------
 // The sphere
@@ -84,9 +86,15 @@ void init()
   glEnable(GL_POINT_SMOOTH);
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
   sphere.pointSize = 6.0f;
   sphere.normalColor = normalColor;
   sphere.pointColor = pointColor;
+
+  normalsButton.setPaddingX(46);
+  pointsButton.setPaddingX(52);
+  shadingButton.setPaddingX(48);
+  edgesButton.setPaddingX(36);
 }
 
 // ----------------------------------------------------------------------------
@@ -118,6 +126,8 @@ void display()
   edgesButton.draw();
   normalsButton.draw();
   pointsButton.draw();
+  cullButton.draw();
+  shadingButton.draw();
 
   glutSwapBuffers();
 }
@@ -156,6 +166,20 @@ void processMouse(GLint button, GLint action, GLint xMouse, GLint yMouse)
       sphere.drawPoints = false : sphere.drawPoints = true;
     }
 
+    if (cullButton.hover(xMouse, HEIGHT - yMouse))
+    {
+      cullButton.setColor(Utils::RED);
+      sphere.backfaceCull == true ?
+      sphere.backfaceCull = false : sphere.backfaceCull = true;
+    }
+
+    if (shadingButton.hover(xMouse, HEIGHT - yMouse))
+    {
+      shadingButton.setColor(Utils::RED);
+      sphere.filled == true ?
+      sphere.filled = false : sphere.filled = true;
+    }
+
     glutPostRedisplay();
   }
 
@@ -175,6 +199,12 @@ void processMouse(GLint button, GLint action, GLint xMouse, GLint yMouse)
 
     if (pointsButton.hover(xMouse, HEIGHT - yMouse))
       pointsButton.setColor(Utils::BLACK);
+
+    if (cullButton.hover(xMouse, HEIGHT - yMouse))
+      cullButton.setColor(Utils::BLACK);
+
+    if (shadingButton.hover(xMouse, HEIGHT - yMouse))
+      shadingButton.setColor(Utils::BLACK);
 
     glutPostRedisplay();
   }
