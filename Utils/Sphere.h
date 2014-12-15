@@ -171,9 +171,11 @@ public:
   Color edgeColor = LIGHT_GRAY;
   Color normalColor = DARK_YELLOW;
   Color color = YELLOW;
+  bool filled = true;
   bool drawEdges = false;
   bool drawNormals = false;
   bool drawPoints = false;
+  bool backfaceCull = true;
 
   // unit radius sphere at origin
   Sphere(size_t segments = 16)
@@ -223,17 +225,25 @@ public:
   {
     std::vector<Face *> facesToDraw;
 
-    for (auto& face : this->faces)
+    if (backfaceCull)
     {
-      auto normal = face.normal.transformed(rot);
-      auto centroid = face.centroid.transformed(rot);
+      for (auto& face : this->faces)
+      {
+        auto normal = face.normal.transformed(rot);
+        auto centroid = face.centroid.transformed(rot);
 
-      // backface culling
-      vector3D_t s(centroid, projCenter);
-      s.normalize();
+        // backface culling
+        vector3D_t s(centroid, projCenter);
+        s.normalize();
 
-      // add to visible faces
-      if (vector3D_t::dotProduct(s, normal) > 0)
+        // add to visible faces
+        if (vector3D_t::dotProduct(s, normal) > 0)
+          facesToDraw.emplace_back(&face);
+      }
+    }
+    else
+    {
+      for (auto& face : this->faces)
         facesToDraw.emplace_back(&face);
     }
 
@@ -247,17 +257,6 @@ public:
     // draw visible faces
     for (const auto& face : facesToDraw)
     {
-      auto normal = face->normal.transformed(rot);
-      auto centroid = face->centroid.transformed(rot);
-
-      vector3D_t f(centroid, lightSource);
-      f.normalize();
-
-      auto dp =
-        static_cast<GLfloat>(
-          (vector3D_t::dotProduct(f, normal) + 1) / 2
-        );
-
       auto Tm = proj * rot;
 
       std::vector<point2D_t> transformedPoints;
@@ -265,26 +264,46 @@ public:
       for (const auto& vertex : face->vertices)
         transformedPoints.emplace_back(vertex->transformed(Tm).normalized2D());
 
-      glColor3f(dp, dp, dp);
+      auto normal = face->normal.transformed(rot);
+      auto centroid = face->centroid.transformed(rot);
 
-      glBegin(GL_POLYGON);
-
-      for (const auto& vertex : transformedPoints)
-        glVertex2<T>(vertex);
-
-      glEnd();
-
-      if (drawEdges)
+      if (filled)
       {
-        glColor3f(static_cast<GLfloat>(dp * 0.5),
-                  static_cast<GLfloat>(dp * 0.5),
-                  static_cast<GLfloat>(dp * 0.5));
+        vector3D_t f(centroid, lightSource);
+        f.normalize();
 
-        glBegin(GL_LINE_LOOP);
+        auto dp =
+          static_cast<GLfloat>(
+            (vector3D_t::dotProduct(f, normal) + 1) / 2
+          );
+
+
+        glColor3f(dp, dp, dp);
+
+        glBegin(GL_POLYGON);
 
         for (const auto& vertex : transformedPoints)
           glVertex2<T>(vertex);
 
+        glEnd();
+      }
+
+      if (drawEdges)
+      {
+        edgeColor.setGLColor();
+        glLineWidth(lineWidth);
+
+        glBegin(GL_LINE_STRIP);
+
+        for (const auto& vertex : transformedPoints)
+          glVertex2<T>(vertex);
+
+        glEnd();
+
+        // GL_LINE_LOOP is broken on linux, so we draw last line manually
+        glBegin(GL_LINE_STRIP);
+        glVertex2<T>(transformedPoints.back());
+        glVertex2<T>(transformedPoints.front());
         glEnd();
       }
 
@@ -315,7 +334,6 @@ public:
         glEnd();
       }
     }
-
   }
 
 }; // end class Sphere
