@@ -131,8 +131,8 @@ private:
 public:
 
   // unit radius sphere at origin
-  Sphere(size_t segments = 16)
-    : Mesh<T>(segments), radius(1.0f)
+  Sphere(size_t segments = 16, std::string label = "Sphere")
+    : Mesh<T>(segments, label), radius(1.0f)
   {
     this->recalcPoints();
   }
