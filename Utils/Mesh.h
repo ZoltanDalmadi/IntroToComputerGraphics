@@ -77,29 +77,15 @@ public:
     return this->segments;
   }
 
-  /// Increase segments with postfix increment operator.
-  inline void operator++(int)
+  /// Increase segments.
+  inline void increaseSegments()
   {
     this->segments++;
     this->recalcPoints();
   }
 
-  /// Decrease segments with postfix decrement operator.
-  inline void operator--(int)
-  {
-    this->segments--;
-    this->recalcPoints();
-  }
-
-  /// Increase segments with prefix increment operator.
-  inline void operator++()
-  {
-    this->segments++;
-    this->recalcPoints();
-  }
-
-  /// Decrease segments with prefix decrement operator.
-  inline void operator--()
+  /// Decrease segments.
+  inline void decreaseSegments()
   {
     this->segments--;
     this->recalcPoints();
