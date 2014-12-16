@@ -1,6 +1,7 @@
 #include <GL/freeglut.h>
 #include <sstream>
 #include <string>
+#include <memory>
 #include "Rectangle.h"
 #include "Matrix.h"
 #include "Point3D.h"
@@ -71,12 +72,14 @@ Utils::Button shadingButton("Shading", 16, 112, 156, 32);
 Utils::Button edgesButton("Wireframe", 16, 64, 156, 32);
 Utils::Button cullButton("Backface culling", 16, 16, 156, 32);
 
+Utils::Button objectsButton("Object", 1100, 668, 160, 32);
+
 // ----------------------------------------------------------------------------
 // The sphere
 // ----------------------------------------------------------------------------
-Utils::Sphere<GLdouble> sphere;
-Utils::Torus<GLdouble> torus;
-Utils::Mesh<GLdouble> *activeObject;
+std::shared_ptr<Utils::Mesh<GLdouble>> activeObject;
+std::vector<std::shared_ptr<Utils::Mesh<GLdouble>>> objects;
+auto objIterator = objects.begin();
 
 // ----------------------------------------------------------------------------
 // Init function
@@ -91,21 +94,27 @@ void init()
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-  sphere.pointSize = 6.0f;
-  sphere.normalColor = normalColor;
-  sphere.pointColor = pointColor;
-  sphere.edgeColor = edgeColor;
+  objects.emplace_back(new Utils::Sphere<GLdouble>());
+  objects.back()->pointSize = 6.0f;
+  objects.back()->normalColor = normalColor;
+  objects.back()->pointColor = pointColor;
+  objects.back()->edgeColor = edgeColor;
 
-  torus.pointSize = 6.0f;
-  torus.normalColor = normalColor;
-  torus.pointColor = pointColor;
-  torus.edgeColor = edgeColor;
+  objects.emplace_back(new Utils::Torus<GLdouble>());
+  objects.back()->pointSize = 6.0f;
+  objects.back()->normalColor = normalColor;
+  objects.back()->pointColor = pointColor;
+  objects.back()->edgeColor = edgeColor;
 
   normalsButton.setPaddingX(46);
   pointsButton.setPaddingX(52);
   shadingButton.setPaddingX(48);
   edgesButton.setPaddingX(36);
-  activeObject = &torus;
+
+  activeObject = objects.front();
+  objIterator = std::next(objects.begin());
+
+  objectsButton.setLabel(activeObject->label);
 }
 
 // ----------------------------------------------------------------------------
@@ -138,18 +147,15 @@ void display()
 
   drawInfoText(10, HEIGHT - 24, Utils::BLACK);
 
-//  sphere.drawFaces(projTrans, rxry, centerofProjection, lightSource);
-
-//  auto T = projTrans * rxry;
-
-//  torus.drawVertices(T);
-  torus.drawFaces(projTrans, rxry, centerofProjection, lightSource);
+  activeObject->drawFaces(projTrans, rxry, centerofProjection, lightSource);
 
   edgesButton.draw();
   normalsButton.draw();
   pointsButton.draw();
   cullButton.draw();
   shadingButton.draw();
+
+  objectsButton.draw();
 
   glutSwapBuffers();
 }
@@ -202,6 +208,19 @@ void processMouse(GLint button, GLint action, GLint xMouse, GLint yMouse)
       activeObject->filled = false : activeObject->filled = true;
     }
 
+    if (objectsButton.hover(xMouse, HEIGHT - yMouse))
+    {
+      objectsButton.setColor(Utils::RED);
+
+      activeObject = *objIterator++;
+
+      if (objIterator == objects.end())
+        objIterator = objects.begin();
+
+      objectsButton.setLabel(activeObject->label);
+
+    }
+
     glutPostRedisplay();
   }
 
@@ -227,6 +246,9 @@ void processMouse(GLint button, GLint action, GLint xMouse, GLint yMouse)
 
     if (shadingButton.hover(xMouse, HEIGHT - yMouse))
       shadingButton.setColor(Utils::BLACK);
+
+    if (objectsButton.hover(xMouse, HEIGHT - yMouse))
+      objectsButton.setColor(Utils::BLACK);
 
     glutPostRedisplay();
   }
