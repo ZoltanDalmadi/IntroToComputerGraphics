@@ -23,6 +23,16 @@ public:
     body.color = this->color;
   }
 
+  inline std::string getLabel() const
+  {
+    return label;
+  }
+
+  inline void setLabel(const std::string& value)
+  {
+    label = value;
+  }
+
   inline void setColor(Color color)
   {
     this->color = color;
@@ -34,7 +44,7 @@ public:
     return paddingY;
   }
 
-  inline void setPaddingY(const size_t &value)
+  inline void setPaddingY(const size_t& value)
   {
     paddingY = value;
   }
@@ -44,7 +54,7 @@ public:
     return paddingX;
   }
 
-  inline void setPaddingX(const size_t &value)
+  inline void setPaddingX(const size_t& value)
   {
     paddingX = value;
   }
