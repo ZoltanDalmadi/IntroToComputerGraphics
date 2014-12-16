@@ -126,8 +126,6 @@ private:
       // insert face into face container
       this->faces.emplace_back(face);
     }
-
-    // assign edges -----------------------------------------------------------
   }
 
 public:
