@@ -7,6 +7,7 @@
 #include "Color.h"
 #include "Vector2D.h"
 #include "Sphere.h"
+#include "Torus.h"
 #include "Button.h"
 
 // ----------------------------------------------------------------------------
@@ -74,6 +75,8 @@ Utils::Button cullButton("Backface culling", 16, 16, 156, 32);
 // The sphere
 // ----------------------------------------------------------------------------
 Utils::Sphere<GLdouble> sphere;
+Utils::Torus<GLdouble> torus;
+Utils::Mesh<GLdouble> *activeObject;
 
 // ----------------------------------------------------------------------------
 // Init function
@@ -93,10 +96,16 @@ void init()
   sphere.pointColor = pointColor;
   sphere.edgeColor = edgeColor;
 
+  torus.pointSize = 6.0f;
+  torus.normalColor = normalColor;
+  torus.pointColor = pointColor;
+  torus.edgeColor = edgeColor;
+
   normalsButton.setPaddingX(46);
   pointsButton.setPaddingX(52);
   shadingButton.setPaddingX(48);
   edgesButton.setPaddingX(36);
+  activeObject = &torus;
 }
 
 // ----------------------------------------------------------------------------
@@ -105,9 +114,9 @@ void init()
 void drawInfoText(GLint x, GLint y, const Utils::Color& color)
 {
   ss << "Projection distance: " << cp.getDistanceToOrigin() << std::endl;
-  ss << "Segments: " << sphere.getSegments() << std::endl;
+  ss << "Segments: " << activeObject->getSegments() << std::endl;
 
-  if (sphere.backfaceCull)
+  if (activeObject->backfaceCull)
     ss << "Backface culling: " << "on" << std::endl;
   else
     ss << "Backface culling: " << "off" << std::endl;
@@ -129,7 +138,12 @@ void display()
 
   drawInfoText(10, HEIGHT - 24, Utils::BLACK);
 
-  sphere.drawFaces(projTrans, rxry, centerofProjection, lightSource);
+//  sphere.drawFaces(projTrans, rxry, centerofProjection, lightSource);
+
+//  auto T = projTrans * rxry;
+
+//  torus.drawVertices(T);
+  torus.drawFaces(projTrans, rxry, centerofProjection, lightSource);
 
   edgesButton.draw();
   normalsButton.draw();
@@ -156,36 +170,36 @@ void processMouse(GLint button, GLint action, GLint xMouse, GLint yMouse)
     if (edgesButton.hover(xMouse, HEIGHT - yMouse))
     {
       edgesButton.setColor(Utils::RED);
-      sphere.drawEdges == true ?
-      sphere.drawEdges = false : sphere.drawEdges = true;
+      activeObject->drawEdges == true ?
+      activeObject->drawEdges = false : activeObject->drawEdges = true;
     }
 
     if (normalsButton.hover(xMouse, HEIGHT - yMouse))
     {
       normalsButton.setColor(Utils::RED);
-      sphere.drawNormals == true ?
-      sphere.drawNormals = false : sphere.drawNormals = true;
+      activeObject->drawNormals == true ?
+      activeObject->drawNormals = false : activeObject->drawNormals = true;
     }
 
     if (pointsButton.hover(xMouse, HEIGHT - yMouse))
     {
       pointsButton.setColor(Utils::RED);
-      sphere.drawPoints == true ?
-      sphere.drawPoints = false : sphere.drawPoints = true;
+      activeObject->drawPoints == true ?
+      activeObject->drawPoints = false : activeObject->drawPoints = true;
     }
 
     if (cullButton.hover(xMouse, HEIGHT - yMouse))
     {
       cullButton.setColor(Utils::RED);
-      sphere.backfaceCull == true ?
-      sphere.backfaceCull = false : sphere.backfaceCull = true;
+      activeObject->backfaceCull == true ?
+      activeObject->backfaceCull = false : activeObject->backfaceCull = true;
     }
 
     if (shadingButton.hover(xMouse, HEIGHT - yMouse))
     {
       shadingButton.setColor(Utils::RED);
-      sphere.filled == true ?
-      sphere.filled = false : sphere.filled = true;
+      activeObject->filled == true ?
+      activeObject->filled = false : activeObject->filled = true;
     }
 
     glutPostRedisplay();
@@ -291,9 +305,9 @@ void keyPressed(int key, int x, int y)
 void segmentationControl(unsigned char key, int x, int y)
 {
   if (key == 'w')
-    sphere++;
-  else if (key == 's' && sphere.getSegments() > 2)
-    sphere--;
+    activeObject->increaseSegments();
+  else if (key == 's' && activeObject->getSegments() > 2)
+    activeObject->decreaseSegments();
 
   glutPostRedisplay();
 }
