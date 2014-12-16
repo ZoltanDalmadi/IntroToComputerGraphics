@@ -88,8 +88,8 @@ private:
 public:
 
   // unit major radius torus at origin
-  Torus(size_t segments = 8)
-    : Mesh<T>(segments), R(1.0f), r(0.4f)
+  Torus(size_t segments = 16, std::string label = "Torus")
+    : Mesh<T>(segments, label), R(1.0f), r(0.4f)
   {
     this->recalcPoints();
   }
