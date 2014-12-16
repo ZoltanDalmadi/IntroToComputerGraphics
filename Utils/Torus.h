@@ -24,15 +24,15 @@ private:
     this->points.clear();
 
     // calculate points -------------------------------------------------------
-    double step = Utils::PI / this->segments;
+    double step = 2 * Utils::PI / this->segments;
 
     // add points in a circular fashion
-    for (double theta = 0.0f; theta < 2 * Utils::PI; theta += step)
+    for (double phi = 0.0f; phi < 2 * Utils::PI; phi += step)
     {
       // start columns
       this->points.emplace_back();
 
-      for (double phi = 0.0f; phi < 2 * Utils::PI; phi += step)
+      for (double theta = 0.0f; theta < 2 * Utils::PI; theta += step)
       {
         // fill rows
         this->points.back().emplace_back(
@@ -46,40 +46,42 @@ private:
     // assign faces -----------------------------------------------------------
     this->faces.clear();
 
-    // add middle quads
-//    auto segment2 = this->segments * 2;
-//    for (size_t i = 2; i < this->segments; ++i)
-//    {
-//      for (size_t j = 0; j < segment2; ++j)
-//      {
-//        // create face
-//        Face face;
-//        face.vertices.emplace_back(&this->points[i - 1][j]);
-//        face.vertices.emplace_back(&this->points[i][j]);
+    // add quads
+    for (size_t i = 0; i < this->segments - 1; ++i)
+    {
+      for (size_t j = 0; j < this->segments - 1; ++j)
+      {
+        // create face
+        Face face;
+        face.vertices.resize(4);
 
-//        if (j < segment2 - 1)
-//        {
-//          face.vertices.emplace_back(&this->points[i][j + 1]);
-//          face.vertices.emplace_back(&this->points[i - 1][j + 1]);
-//        }
-//        else
-//        {
-//          face.vertices.emplace_back(&this->points[i][0]);
-//          face.vertices.emplace_back(&this->points[i - 1][0]);
-//        }
+        face.vertices[0] = &this->points[i][j];
+        face.vertices[1] = &this->points[i + 1][j];
+        face.vertices[2] = &this->points[i + 1][j + 1];
+        face.vertices[3] = &this->points[i][j + 1];
 
-//        this->prepareFace(face);
+        if (j < this->segments - 1)
+        {
+//          face.vertices[1] = &this->points[i + 1][0];
+//          face.vertices[2] = &this->points[i + 1][j + 1];
+        }
 
-//        // insert face into face container
-//        this->faces.emplace_back(face);
-//      }
-//    }
+        if (i < this->segments - 1)
+        {
+        }
+
+        this->prepareFace(face);
+
+        // insert face into face container
+        this->faces.emplace_back(face);
+      }
+    }
   }
 
 public:
 
   // unit major radius torus at origin
-  Torus(size_t segments = 64)
+  Torus(size_t segments = 8)
     : Mesh<T>(segments), R(1.0f), r(0.4f)
   {
     this->recalcPoints();
