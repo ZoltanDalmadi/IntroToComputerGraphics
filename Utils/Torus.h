@@ -47,9 +47,9 @@ private:
     this->faces.clear();
 
     // add quads
-    for (size_t i = 0; i < this->segments - 1; ++i)
+    for (size_t i = 0; i < this->segments; ++i)
     {
-      for (size_t j = 0; j < this->segments - 1; ++j)
+      for (size_t j = 0; j < this->segments; ++j)
       {
         // create face
         Face face;
@@ -60,14 +60,21 @@ private:
         face.vertices[2] = &this->points[i + 1][j + 1];
         face.vertices[3] = &this->points[i][j + 1];
 
-        if (j < this->segments - 1)
+        if (j == this->segments - 1)
         {
-//          face.vertices[1] = &this->points[i + 1][0];
-//          face.vertices[2] = &this->points[i + 1][j + 1];
+          face.vertices[2] = &this->points[i + 1][0];
+          face.vertices[3] = &this->points[i][0];
         }
 
-        if (i < this->segments - 1)
+        if (i == this->segments - 1)
         {
+          face.vertices[1] = &this->points[0][j];
+          face.vertices[2] = &this->points[0][j+1];
+
+          if (j == this->segments - 1)
+          {
+            face.vertices[2] = &this->points[0][0];
+          }
         }
 
         this->prepareFace(face);
