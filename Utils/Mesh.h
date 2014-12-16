@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <string>
 #include <algorithm>
 #include "Point3D.h"
 #include "Vector3D.h"
@@ -57,6 +58,7 @@ protected:
 public:
   std::vector<std::vector<point_t>> points;
   std::vector<Face> faces;
+  std::string label;
   GLfloat lineWidth = 2.0;
   GLfloat pointSize = 8.0;
   Color pointColor = DARK_RED;
@@ -69,7 +71,8 @@ public:
   bool drawPoints = false;
   bool backfaceCull = true;
 
-  Mesh(size_t segments = 16) : center(0, 0, 0), segments(segments)
+  Mesh(size_t segments = 16, std::string label = "Mesh")
+    : center(0, 0, 0), segments(segments), label(label)
   {}
 
   inline size_t getSegments()
