@@ -53,7 +53,7 @@ Utils::WindowToViewport<GLdouble> wtv(window, viewport);
 auto projTrans = wtv * cp;
 Utils::Rotate3DX<GLdouble> rx(0);
 Utils::Rotate3DY<GLdouble> ry(0);
-auto rxry = rx * ry;
+auto ryrx = ry * rx;
 Utils::Point3DH<GLdouble> centerofProjection(0, 0, 8.0f, 1);
 Utils::Point3DH<GLdouble> lightSource(2, 2, 8, 1);
 
@@ -147,7 +147,7 @@ void display()
 
   drawInfoText(10, HEIGHT - 24, Utils::BLACK);
 
-  activeObject->drawFaces(projTrans, rxry, centerofProjection, lightSource);
+  activeObject->drawFaces(projTrans, ryrx, centerofProjection, lightSource);
 
   edgesButton.draw();
   normalsButton.draw();
@@ -287,7 +287,7 @@ void processMouseActiveMotion(GLint xMouse, GLint yMouse)
     // set rotation values
     rx.setAngle(lastRotX - Utils::degToRad(v.y()) * 0.25);
     ry.setAngle(lastRotY + Utils::degToRad(v.x()) * 0.25);
-    rxry = rx * ry;
+    ryrx = ry * rx;
   }
 
   if (lightDrag)
