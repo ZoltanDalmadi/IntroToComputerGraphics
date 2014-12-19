@@ -8,7 +8,6 @@
 namespace Utils
 {
 
-
 template <typename T>
 class Mesh
 {
@@ -160,11 +159,8 @@ public:
         vector3D_t f(centroid, lightSource);
         f.normalize();
 
-        auto dp =
-          static_cast<GLfloat>(
-            (vector3D_t::dotProduct(f, normal) + 1) / 2
-          );
-
+        auto dp = static_cast<GLfloat>(
+                    (vector3D_t::dotProduct(f, normal) + 1) / 2);
 
         glColor3f(dp, dp, dp);
 

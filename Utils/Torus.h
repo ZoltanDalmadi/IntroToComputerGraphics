@@ -69,7 +69,7 @@ private:
         if (i == this->segments - 1)
         {
           face.vertices[1] = &this->points[0][j];
-          face.vertices[2] = &this->points[0][j+1];
+          face.vertices[2] = &this->points[0][j + 1];
 
           if (j == this->segments - 1)
           {
